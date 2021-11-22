@@ -1,0 +1,4 @@
+PGHOST="0.0.0.0"
+PGDATABASE="CAI"
+PGUSER="postgres"
+PGPASSWORD="postgres"
