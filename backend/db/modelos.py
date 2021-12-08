@@ -17,7 +17,8 @@ class Curso(db.Model):
     resolucion_usach = db.Column(db.Text)
     estado = db.Column(db.Text)
     f_vigencia = db.Column(db.Date)
-    def init(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia):
+
+    def __init__(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia):
         self.sence = sence
         self.nombre=nombre
         self.modalidad=modalidad
@@ -71,7 +72,7 @@ class Empresa(db.Model):
     correo = db.Column(db.Text)
     fono = db.Column(db.Text)
 
-    def init(self,razon_social,giro,atencion,departamento,rut,direccion,comuna,correo,fono):
+    def __init__(self,razon_social,giro,atencion,departamento,rut,direccion,comuna,correo,fono):
         self.razon_social = razon_social
         self.giro=giro
         self.atencion=atencion
