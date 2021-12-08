@@ -14,14 +14,14 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - Sistema de Reclutas para Emergencias',
-    title: 'SRE',
+    titleTemplate: '%s - Plataforma capacitacion',
+    title: 'CAI',
     htmlAttrs: {
       lang: 'en'
     },
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1'},
       { hid: 'description', name: 'description', content: '' }
     ],
     link: [
@@ -35,6 +35,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    {src: '~plugins/axios.js', ssr: false}
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

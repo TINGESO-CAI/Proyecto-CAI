@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer
+    <v-navigation-drawer color="#436899"
       v-model="drawer"
       :mini-variant="miniVariant"
       :clipped="clipped"
@@ -24,7 +24,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar
+    <v-app-bar color="#EA7600"
       :clipped-left="clipped"
       fixed
       app
@@ -98,8 +98,28 @@ export default {
       items: [
         {
           icon: 'mdi-apps',
-          title: 'Welcome',
+          title: 'Principal',
           to: '/'
+        },
+        {
+          icon: 'mdi-plus',
+          title: 'Cursos',
+          to: '/cursos'
+        },
+        {
+          icon: 'mdi-account-multiple-plus',
+          title: 'Nuevo participante',
+          to: '/nuevo_participante'
+        },
+        {
+          icon: 'mdi-plus',
+          title: 'Finanzas',
+          to: '/finanzas'
+        },
+        {
+          icon: 'mdi-plus',
+          title: 'Administracion',
+          to: '/administracion'
         },
         {
           icon: 'mdi-chart-bubble',

@@ -3,12 +3,6 @@ import sys, os
 import numpy as np
 import pandas as pd
 import db.credenciales as creds
-import db.schemas.Participante as Participante
-import db.schemas.Relator as Relator
-import db.schemas.Orden as Orden
-import db.schemas.Factura as Factura
-import db.schemas.Empresa as Empresa
-import db.schemas.Curso as Curso
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
 
