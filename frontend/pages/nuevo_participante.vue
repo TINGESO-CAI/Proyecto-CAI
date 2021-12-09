@@ -228,9 +228,9 @@ export default {
         this.message = `${this.rut} fue creado con éxito con id: ${id}`;
         
         //limpiar
-        this.nombre = ' ';
-        this.rut = ' ';
-        this.correo = ' @ ';
+        this.nombre = '';
+        this.rut = '';
+        this.correo = '';
         this.successMessage();
       }
       catch (error) {
