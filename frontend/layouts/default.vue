@@ -135,7 +135,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js'
+      title: 'Sistema de gestión administrativa para la capacitación CAI'
     }
   }
 }
