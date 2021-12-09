@@ -112,6 +112,11 @@ export default {
           to: '/nuevo_participante'
         },
         {
+          icon: 'mdi-account-multiple-plus',
+          title: 'Nuevos participantes Excel',
+          to: '/nuevos_participantes'
+        },
+        {
           icon: 'mdi-plus',
           title: 'Finanzas',
           to: '/finanzas'
