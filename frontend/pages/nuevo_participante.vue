@@ -49,23 +49,27 @@
                 </v-col>
 
                 <v-col>
-                <v-text-field
+                <v-select
                     v-model="genero"
-                    :rules="generoRules"
-                    :counter="20"
+                    :items="generos"
+                    item-text="genero"
                     label="genero"
-                    required
-                ></v-text-field>
+                    persistent-hint
+                    return-object
+                    single-line   
+                ></v-select>
                 </v-col>
 
                 <v-col>
-                <v-text-field
-                    v-model="nivel_educacional"
-                    :rules="nivel_educacionalRules"
-                    :counter="20"
-                    label="nivel_educacional"
-                    required
-                ></v-text-field>
+                <v-select
+                  v-model="nivel_educacional"
+                  :items="nivelesEdu"
+                  item-text="nivel_educacional"
+                  label="nivel_educacional"
+                  persistent-hint
+                  return-object
+                  single-line   
+                ></v-select>
                 </v-col>
               </v-row>
               <v-row>
@@ -80,23 +84,27 @@
                 </v-col>
 
                 <v-col>
-                <v-text-field
-                    v-model="nacionalidad"
-                    :rules="nacionalidadRules"
-                    :counter="20"
-                    label="nacionalidad"
-                    required
-                ></v-text-field>
+                <v-select
+                  v-model="nacionalidad"
+                  :items="paises"
+                  item-text="nacionalidad"
+                  label="nacionalidad"
+                  persistent-hint
+                  return-object
+                  single-line   
+                ></v-select>
                 </v-col>
 
                 <v-col>
-                <v-text-field
-                    v-model="tipo_inscripcion"
-                    :rules="tipo_inscripcionRules"
-                    :counter="20"
-                    label="tipo_inscripcion"
-                    required
-                ></v-text-field>
+                <v-select
+                  v-model="tipo_inscripcion"
+                  :items="inscripciones"
+                  item-text="tipo_inscripcion"
+                  label="tipo_inscripcion"
+                  persistent-hint
+                  return-object
+                  single-line   
+                ></v-select>
                 </v-col>
               </v-row>
               <v-row>
@@ -124,7 +132,7 @@
                 <v-text-field
                     v-model="fono"
                     :rules="fonoRules"
-                    :counter="20"
+                    :counter="15"
                     label="fono"
                     required
                 ></v-text-field>
@@ -136,10 +144,8 @@
                     :rules="razon_socialRules"
                     :counter="20"
                     label="razon_social"
-                    required
                 ></v-text-field>
                 </v-col>
-                
             </v-row>
             </v-container>
         </v-form>
@@ -159,7 +165,10 @@ export default {
   name: 'Home',
   data:function(){
     return{
-
+      generos : ["masculino","femenino"],
+      nivelesEdu : ["enseñanza básica incompleta","enseñanza básica completa","enseñanza media incompleta","enseñanza media completa","técnico profesional","enseñanza superior completa","desconocido","otro"],
+      paises: [ "Chilena","Otra"],
+      inscripciones: [ "presencial","online"],
       //FORMULARIO
       valid: false,
       message:'',
@@ -177,23 +186,39 @@ export default {
       correo: '',
       fono: '',
       razon_social: '',
-      /*FALTAN REGLAS
-      nameRules: [
-        v => !!v || 'Nombre es requerido',
-        v => v.length <= 100 || 'Nombre debe contener menos de 100 caracteres',
-      ],
+      //reglas
       rutRules: [
         v => !!v || 'Rut es requerido',
         v => v.length <= 12 || 'Rut debe contener menos de 12 caracteres',
       ],
-      emailRules: [
-        v => !!v || 'E-mail es requerido',
-        v => /.+@.+/.test(v) || 'E-mail debe ser válido',
+      nombreRules: [
+        v => !!v || 'Nombre es requerido',
+        v => v.length <= 100 || 'Nombre debe contener menos de 100 caracteres',
       ],
-      telefonoRules: [
-        v => !!v || 'Teléfono es requerido',
-        v => v.length <= 12 || 'Teléfono debe contener menos de 12 caracteres',
-      ],*/
+      apellido_paternoRules: [
+        v => !!v || 'apellido_paterno es requerido',
+        v => v.length <= 100 || 'apellido_paterno debe contener menos de 100 caracteres',
+      ],
+      apellido_maternoRules: [
+        v => !!v || 'apellido_materno es requerido',
+        v => v.length <= 100 || 'apellido_materno debe contener menos de 100 caracteres',
+      ],
+      correoRules: [
+        v => !!v || 'Correo es requerido',
+        v => /.+@.+/.test(v) || 'Correo debe ser válido',
+      ],
+      fecha_nacimientoRules: [
+        v => !!v || 'fecha_nacimiento es requerido',
+        //v => /.+.+/.test(v) || 'fecha_nacimiento debe ser válido',
+      ],
+      fonoRules: [
+        v => !!v || 'fono es requerido',
+        v => v.length <= 12 || 'fono debe contener menos de 12 caracteres',
+      ],
+      razon_socialRules: [
+        v => !!v || 'razon_social es requerido',
+        v => v.length <= 50 || 'razon_social debe contener menos de 50 caracteres',
+      ],
     }
   },
   methods:{
@@ -222,7 +247,7 @@ export default {
       
       try {
         //se llama el servicio para crear un nuevo participante
-        let response = await axios.post('http://localhost:5000/crear_participante' ,newParticipante);
+        let response = await axios.post('http://localhost:5000/crear_participante',newParticipante);
         console.log('response', response.data);
         let id = response.data.id;
         this.message = `${this.rut} fue creado con éxito con id: ${id}`;
