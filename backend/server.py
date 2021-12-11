@@ -7,6 +7,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 import json
 
+from sqlalchemy.sql import text
+
 app= Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai"
@@ -38,10 +40,7 @@ def crear_participante():
 	ocupacion=request.json['ocupacion']
 	correo=request.json['correo']
 	fono=request.json['fono']
-	try:
-		razon_social=request.json['razon_social']
-	except:
-		razon_social=None
+	razon_social=request.json['razon_social']
 	
 	nuevo_participante=mo.Participante(rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,correo,fono,razon_social)
 	
@@ -55,33 +54,58 @@ def crear_participante():
 
 	return jsonify(resultado)
 
-@app.route("/participante/obtener/todos",methods=["GET"])
-def obtener_todos():
+
+@app.route("/participante",methods=["GET"])
+def filtro_participante():
 
 	participante_schema = mo.ParticipanteSchema(many=True)
 
-	todosParticipante = mo.Participante.query.all()
-	listaParticipante = participante_schema.dump(todosParticipante)
-
-	return jsonify(listaParticipante)
-
-@app.route("/participante/obtener/rut",methods=["GET"])
-def obtener_por_rut():
-
-	participante_schema = mo.ParticipanteSchema()
-
 	rut=request.json['rut']
-	rutParticipante = mo.Participante.query.get(rut)
+	nombre=request.json['nombre']
+	apellido_paterno=request.json['apellido_paterno']
+	apellido_materno=request.json['apellido_materno']
+	genero=request.json['genero']
+	nivel_educacional=request.json['nivel_educacional']
+	fecha_nacimiento=request.json['fecha_nacimiento']
+	nacionalidad=request.json['nacionalidad']
+	tipo_inscripcion=request.json['tipo_inscripcion']
+	ocupacion=request.json['ocupacion']
+	correo=request.json['correo']
+	fono=request.json['fono']
+	razon_social=request.json['razon_social']
 
-	participante = participante_schema.dump(rutParticipante)
+	participantes = mo.Participante.query.filter()
+
+	if rut != None:
+		participantes = participantes.filter(mo.Participante.rut==rut)
+	if nombre != None:
+		participantes = participantes.filter(mo.Participante.nombre==nombre)
+	if apellido_paterno!= None:
+		participantes = participantes.filter(mo.Participante.apellido_paterno==apellido_paterno)
+	if apellido_materno != None:
+		participantes = participantes.filter(mo.Participante.apellido_materno==apellido_materno)
+	if genero != None:
+		participantes = participantes.filter(mo.Participante.genero==genero)
+	if nivel_educacional != None:
+		participantes = participantes.filter(mo.Participante.nivel_educacional==nivel_educacional)
+	if fecha_nacimiento != None:
+		participantes = participantes.filter(mo.Participante.fecha_nacimiento==fecha_nacimiento)
+	if nacionalidad!= None:
+		participantes = participantes.filter(mo.Participante.nacionalidad==nacionalidad)
+	if tipo_inscripcion!= None:
+		participantes = participantes.filter(mo.Participante.tipo_inscripcion==tipo_inscripcion)
+	if ocupacion!= None:
+		participantes = participantes.filter(mo.Participante.ocupacion==ocupacion)
+	if correo!= None:
+		participantes = participantes.filter(mo.Participante.correo==correo)
+	if fono!= None:
+		participantes = participantes.filter(mo.Participante.fono==fono)
+	if razon_social!= None:
+		participantes = participantes.filter(mo.Participante.razon_social==razon_social)
+			
+	participantes_filtrado = participante_schema.dump(participantes)
 	
-	return jsonify(participante)
-
-@app.route("/participante/filtro",methods=["GET"])
-def filtro():
-
-	participante_schema = mo.ParticipanteSchema()
-
+	return jsonify(participantes_filtrado)
 
 
 # -----------------------------------------------------------------------------------------------------
@@ -119,6 +143,41 @@ def crear_curso():
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
 
+@app.route("/empresa",methods=["GET"])
+def filtro_empresas():
+	
+	empresa_schema = mo.EmpresaSchema(many=True)
+	razon_social = request.json['razon_social']
+	giro = request.json['giro']
+	atencion = request.json['atencion']
+	departamento = request.json['departamento']
+	rut = request.json['rut']
+	direccion = request.json['direccion']
+	comuna = request.json['comuna']
+	correo = request.json['correo']
+	fono = request.json['fono']	
+	empresas = mo.Empresa.query.filter()
+	if giro != None:
+		empresas = empresas.filter(mo.Empresa.razon_social==razon_social)
+	if atencion != None:
+		empresas = empresas.filter(mo.Empresa.atencion==atencion)
+	if departamento!= None:
+		empresas = empresas.filter(mo.Empresa.departamento==departamento)
+	if rut != None:
+		empresas = empresas.filter(mo.Empresa.rut==rut)
+	if direccion != None:
+		empresas = empresas.filter(mo.Empresa.direccion==direccion)
+	if comuna != None:
+		empresas = empresas.filter(mo.Empresa.comuna==comuna)
+	if correo != None:
+		empresas = empresas.filter(mo.Empresa.correo==correo)
+	if fono != None:
+		empresas = empresas.filter(mo.Empresa.fono==fono)
+
+	empresas_filtrados = empresa_schema.dump(empresas)
+	
+	return jsonify(empresas_filtrados)
+
 @app.route("/empresa/agregar",methods=["POST"])
 def crear_empresa():
 
@@ -151,19 +210,6 @@ def obtener_por_razon_social():
 	empresa = empresa_schema.dump(razon_Social_Empresa)
 	
 	return jsonify(empresa)
-
-# AUN NO SE TERMINA ***
-@app.route("/empresa/obtener/rut",methods=["GET"])
-def e_obtener_por_rut():
-
-	empresa_schema = mo.EmpresaSchema()
-
-	rut=request.json['rut']
-	print(rut)
-	rutEmpresa = db.session.query(mo.Empresa).filter(mo.Empresa.rut == rut)
-	empresa = empresa_schema.dump(rutEmpresa)
-	
-	return jsonify(rutEmpresa)
 
 if __name__ == '__main__':
 	app.run(debug=True)
