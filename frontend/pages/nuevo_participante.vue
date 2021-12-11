@@ -137,14 +137,16 @@
                     required
                 ></v-text-field>
                 </v-col>
-
                 <v-col>
-                <v-text-field
+                <v-select
                     v-model="razon_social"
-                    :rules="razon_socialRules"
-                    :counter="20"
+                    :items="razones"
+                    item-text="razon_social"
                     label="razon_social"
-                ></v-text-field>
+                    persistent-hint
+                    return-object
+                    single-line
+                ></v-select>
                 </v-col>
             </v-row>
             </v-container>
@@ -166,9 +168,10 @@ export default {
   data:function(){
     return{
       generos : ["masculino","femenino"],
-      nivelesEdu : ["enseñanza básica incompleta","enseñanza básica completa","enseñanza media incompleta","enseñanza media completa","técnico profesional","enseñanza superior completa","desconocido","otro"],
+      nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
       paises: [ "Chilena","Otra"],
       inscripciones: [ "presencial","online"],
+      razones: ["ninguna"],
       //FORMULARIO
       valid: false,
       message:'',
@@ -222,6 +225,17 @@ export default {
     }
   },
   methods:{
+    async getRazones(){
+      try {
+        //se llama el servicio para obtener las emergencias 
+        let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
+        this.razones = response.data;
+        console.log(response);
+      }
+      catch (error) {
+        console.log('error', error); 
+      }
+    },
     successMessage:function(){
       alert("El participante se creo exitosamente.")
     },
@@ -247,7 +261,7 @@ export default {
       
       try {
         //se llama el servicio para crear un nuevo participante
-        let response = await axios.post('http://localhost:5000/crear_participante',newParticipante);
+        let response = await axios.post('http://localhost:5000/participante/agregar',newParticipante);
         console.log('response', response.data);
         let id = response.data.id;
         this.message = `${this.rut} fue creado con éxito con id: ${id}`;

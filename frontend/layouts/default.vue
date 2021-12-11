@@ -102,19 +102,24 @@ export default {
           to: '/'
         },
         {
-          icon: 'mdi-plus',
-          title: 'Cursos',
-          to: '/cursos'
-        },
-        {
           icon: 'mdi-account-multiple-plus',
           title: 'Nuevo participante',
           to: '/nuevo_participante'
         },
         {
-          icon: 'mdi-account-multiple-plus',
-          title: 'Nuevos participantes Excel',
-          to: '/nuevos_participantes'
+          icon: 'mdi-account-multiple',
+          title: 'Ver participantes',
+          to: '/ver_participantes'
+        },
+        {
+          icon: 'mdi-file-plus',
+          title: 'Subir archivo',
+          to: '/subir_archivo'
+        },
+        {
+          icon: 'mdi-plus',
+          title: 'Cursos',
+          to: '/cursos'
         },
         {
           icon: 'mdi-plus',
@@ -125,11 +130,6 @@ export default {
           icon: 'mdi-plus',
           title: 'Administracion',
           to: '/administracion'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
         }
       ],
       miniVariant: false,
