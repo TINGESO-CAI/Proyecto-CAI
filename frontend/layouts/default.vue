@@ -23,6 +23,40 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+
+      <!--
+        Seccion de sub menu
+        -->
+
+      <v-list-group
+            router
+            exact
+            sub-group
+          >
+      <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>Participantes</v-list-item-title>
+          </v-list-item-content>
+        </template>
+
+        <v-list-item
+          v-for="([title, icon,to], i) in participantes"
+          :key="i"
+          :to="to"
+          link
+        >
+           <v-list-item-icon>
+            <v-icon v-text="icon"></v-icon>
+          </v-list-item-icon>
+          <v-list-item-title v-text="title"></v-list-item-title>
+
+         
+        </v-list-item>
+      </v-list-group>
+      <!--
+        Seccion de sub menu
+        -->
+          
     </v-navigation-drawer>
     <v-app-bar color="#EA7600"
       :clipped-left="clipped"
@@ -95,6 +129,12 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
+      //lista para submenu
+      participantes: [
+      ['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
+      ['Ver participantes','mdi-account-multiple','/ver_participantes'],
+      ['Subir archivo', 'mdi-file-plus','/subir_archivo']
+      ],
       items: [
         {
           icon: 'mdi-apps',
