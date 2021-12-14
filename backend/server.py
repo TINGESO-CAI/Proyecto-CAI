@@ -8,7 +8,7 @@ from flask_cors import CORS
 import json
 
 from sqlalchemy.sql import text
-
+import db.modelos as mo
 app= Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai"
@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-import db.modelos as mo
+
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -107,7 +107,14 @@ def filtro_participante():
 	
 	return jsonify(participantes_filtrado)
 
+@app.route("/participante/obtener/rut",methods=["GET"])
+def obtener_ruts():
 
+	participante_schema = mo.ParticipanteSchema(many=True)
+	rut_curso = db.session.query(mo.Participante.rut).all()
+	participantes = participante_schema.dump(rut_curso)
+	
+	return jsonify(participantes)
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------CURSO------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -137,8 +144,14 @@ def crear_curso():
 	except:
 		return jsonify({"respuesta":"El curso ya ha sido ingresado"})
 	return jsonify({"respuesta":"Curso ingresado correctamente!"})
+@app.route("/curso/obtener/sence",methods=["GET"])
+def obtener_sences():
 
-
+	curso_schema = mo.CursoSchema(many=True)
+	sence_curso = db.session.query(mo.Curso.rut).all()
+	cursos = curso_schema.dump(sence_curso)
+	
+	return jsonify(cursos)
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -203,10 +216,8 @@ def crear_empresa():
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
 
-	empresa_schema = mo.EmpresaSchema()
-
-	razon_social=request.json['razon_social']
-	razon_Social_Empresa = mo.Empresa.query.get(razon_social)
+	empresa_schema = mo.EmpresaSchema(many=True)
+	razon_Social_Empresa = db.session.query(mo.Empresa.razon_social).all()
 	empresa = empresa_schema.dump(razon_Social_Empresa)
 	
 	return jsonify(empresa)
