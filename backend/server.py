@@ -17,8 +17,23 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
+participante_schema = mo.ParticipanteSchema()
+participante_schemas = mo.ParticipanteSchema(many=True)
 
+curso_schema = mo.CursoSchema()
+curso_schemas = mo.CursoSchema(many=True)
 
+empresa_schema = mo.EmpresaSchema()
+empresa_schemas = mo.EmpresaSchema(many=True)
+
+relator_schema = mo.RelatorSchema()
+relator_schemas = mo.RelatorSchema(many=True)
+
+factura_schema= mo.BoletaSchema()
+factura_schemas= mo.BoletaSchema(many=True)
+
+orden_schema= mo.OrdenSchema()
+orden_schemas= mo.OrdenSchema(many=True)
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -26,7 +41,7 @@ ma = Marshmallow(app)
 @app.route("/participante/agregar",methods=["POST"])
 def crear_participante():
 
-	participante_schema = mo.ParticipanteSchema()
+	
 
 	rut=request.json['rut']
 	nombre=request.json['nombre']
@@ -55,24 +70,23 @@ def crear_participante():
 	return jsonify(resultado)
 
 
-@app.route("/participante",methods=["GET"])
+@app.route("/participante/obtener",methods=["GET"])
 def filtro_participante():
 
-	participante_schema = mo.ParticipanteSchema(many=True)
+	rut=request.args.get('rut')
+	nombre=request.args.get('nombre')
+	apellido_paterno=request.args.get('apellido_paterno')
+	apellido_materno=request.args.get('apellido_materno')
+	genero=request.args.get('genero')
+	nivel_educacional=request.args.get('nivel_educacional')
+	fecha_nacimiento=request.args.get('fecha_nacimiento')
+	nacionalidad=request.args.get('nacionalidad')
+	tipo_inscripcion=request.args.get('tipo_inscripcion')
+	ocupacion=request.args.get('ocupacion')
+	correo=request.args.get('correo')
+	fono=request.args.get('fono')
+	razon_social=request.args.get('razon_social')
 
-	rut=request.json['rut']
-	nombre=request.json['nombre']
-	apellido_paterno=request.json['apellido_paterno']
-	apellido_materno=request.json['apellido_materno']
-	genero=request.json['genero']
-	nivel_educacional=request.json['nivel_educacional']
-	fecha_nacimiento=request.json['fecha_nacimiento']
-	nacionalidad=request.json['nacionalidad']
-	tipo_inscripcion=request.json['tipo_inscripcion']
-	ocupacion=request.json['ocupacion']
-	correo=request.json['correo']
-	fono=request.json['fono']
-	razon_social=request.json['razon_social']
 
 	participantes = mo.Participante.query.filter()
 
@@ -103,16 +117,15 @@ def filtro_participante():
 	if razon_social!= None:
 		participantes = participantes.filter(mo.Participante.razon_social==razon_social)
 			
-	participantes_filtrado = participante_schema.dump(participantes)
+	participantes_filtrado = participante_schemas.dump(participantes)
 	
 	return jsonify(participantes_filtrado)
 
 @app.route("/participante/obtener/rut",methods=["GET"])
 def obtener_ruts():
 
-	participante_schema = mo.ParticipanteSchema(many=True)
 	rut_curso = db.session.query(mo.Participante.rut).all()
-	participantes = participante_schema.dump(rut_curso)
+	participantes = participante_schemas.dump(rut_curso)
 	
 	return jsonify(participantes)
 # -----------------------------------------------------------------------------------------------------
@@ -122,7 +135,6 @@ def obtener_ruts():
 @app.route("/curso/agregar",methods=["POST"])
 def crear_curso():
 
-	cuso_schema = mo.CursoSchema(many=True)
 
 	sence = request.json['sence']
 	nombre = request.json['nombre']
@@ -144,12 +156,54 @@ def crear_curso():
 	except:
 		return jsonify({"respuesta":"El curso ya ha sido ingresado"})
 	return jsonify({"respuesta":"Curso ingresado correctamente!"})
+
+	
+@app.route("/curso/obtener",methods=["GET"])
+def obtener_curso():
+	sence = request.args.get('sence')
+	nombre = request.args.get('nombre')
+	modalidad = request.args.get('modalidad')
+	categoria = request.args.get('categoria')
+	horas_curso = request.args.get('horas_curso')
+	valor_efectivo_participante = request.args.get('valor_efectivo_participante')
+	valor_imputable_participante = request.args.get('valor_imputable_participante')
+	resolucion_sence = request.args.get('resolucion_sence')
+	resolucion_usach = request.args.get('resolucion_usach')
+	estado = request.args.get('estado')
+	f_vigencia = request.args.get('f_vigencia')
+	cursos = mo.Curso.query.filter()
+	
+	if sence != None:
+		cursos = cursos.filter(mo.Curso.sence==sence)
+	if nombre != None:
+		cursos = cursos.filter(mo.Curso.nombre==nombre)
+	if modalidad!= None:
+		cursos = cursos.filter(mo.Curso.modalidad==modalidad)
+	if categoria != None:
+		cursos = cursos.filter(mo.Curso.categoria==categoria)
+	if horas_curso != None:
+		cursos = cursos.filter(mo.Curso.horas_curso==horas_curso)
+	if valor_efectivo_participante != None:
+		cursos = cursos.filter(mo.Curso.valor_efectivo_participante==valor_efectivo_participante)
+	if valor_imputable_participante != None:
+		cursos = cursos.filter(mo.Curso.valor_imputable_participante==valor_imputable_participante)
+	if resolucion_sence!= None:
+		cursos = cursos.filter(mo.Curso.resolucion_sence==resolucion_sence)
+	if resolucion_usach!= None:
+		cursos = cursos.filter(mo.Curso.resolucion_usach==resolucion_usach)
+	if estado!= None:
+		cursos = cursos.filter(mo.Curso.estado==estado)
+	if f_vigencia!= None:
+		cursos = cursos.filter(mo.Curso.f_vigencia==f_vigencia)
+	cursos_filtrado = participante_schemas.dump(cursos)
+	
+	return jsonify(cursos_filtrado)
+
 @app.route("/curso/obtener/sence",methods=["GET"])
 def obtener_sences():
 
-	curso_schema = mo.CursoSchema(many=True)
 	sence_curso = db.session.query(mo.Curso.rut).all()
-	cursos = curso_schema.dump(sence_curso)
+	cursos = curso_schemas.dump(sence_curso)
 	
 	return jsonify(cursos)
 # -----------------------------------------------------------------------------------------------------
@@ -159,16 +213,16 @@ def obtener_sences():
 @app.route("/empresa",methods=["GET"])
 def filtro_empresas():
 	
-	empresa_schema = mo.EmpresaSchema(many=True)
-	razon_social = request.json['razon_social']
-	giro = request.json['giro']
-	atencion = request.json['atencion']
-	departamento = request.json['departamento']
-	rut = request.json['rut']
-	direccion = request.json['direccion']
-	comuna = request.json['comuna']
-	correo = request.json['correo']
-	fono = request.json['fono']	
+
+	razon_social = request.args.get('razon_social')
+	giro = request.args.get('giro')
+	atencion = request.args.get('atencion')
+	departamento = request.args.get('departamento')
+	rut = request.args.get('rut')
+	direccion = request.args.get('direccion')
+	comuna = request.args.get('comuna')
+	correo = request.args.get('correo')
+	fono = request.args.get('fono')
 	empresas = mo.Empresa.query.filter()
 	if giro != None:
 		empresas = empresas.filter(mo.Empresa.razon_social==razon_social)
@@ -187,7 +241,7 @@ def filtro_empresas():
 	if fono != None:
 		empresas = empresas.filter(mo.Empresa.fono==fono)
 
-	empresas_filtrados = empresa_schema.dump(empresas)
+	empresas_filtrados = empresa_schemas.dump(empresas)
 	
 	return jsonify(empresas_filtrados)
 
@@ -216,11 +270,93 @@ def crear_empresa():
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
 
-	empresa_schema = mo.EmpresaSchema(many=True)
 	razon_Social_Empresa = db.session.query(mo.Empresa.razon_social).all()
-	empresa = empresa_schema.dump(razon_Social_Empresa)
+	empresa = empresa_schemas.dump(razon_Social_Empresa)
 	
 	return jsonify(empresa)
+
+# -----------------------------------------------------------------------------------------------------
+# --------------------------------------RELATOR--------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
+@app.route("/relator/obtener",methods=["GET"])
+def filtro_relator():
+	
+	rut= request.args.get('rut')
+	nombre = request.args.get('nombre')
+	apellido_paterno = request.args.get('apellido_paterno')
+	apellido_materno = request.args.get('apellido_materno')
+	titulo = request.args.get('titulo')
+	cv = request.args.get('cv')
+	fecha_nacimiento = request.args.get('fecha_nacimiento')
+	numero_cuenta = request.args.get('numero_cuenta')
+	banco = request.args.get('banco')
+	tipo_cuenta = request.args.get('tipo_cuenta')
+	
+	relator = mo.Relator.query.filter()
+
+	if rut != None:
+		relator = relator.filter(mo.Relator.rut==rut)
+	if nombre != None:
+		relator = relator.filter(mo.Relator.nombre==nombre)
+	if apellido_paterno!= None:
+		relator = relator.filter(mo.Relator.apellido_paterno==apellido_paterno)
+	if apellido_materno != None:
+		relator = relator.filter(mo.Relator.apellido_materno==apellido_materno)
+	if titulo != None:
+		relator = relator.filter(mo.Relator.titulo==titulo)
+	if cv != None:
+		relator = relator.filter(mo.Relator.cv==cv)
+	if fecha_nacimiento != None:
+		relator = relator.filter(mo.Relator.fecha_nacimiento==fecha_nacimiento)
+	if numero_cuenta != None:
+		relator = relator.filter(mo.Relator.numero_cuenta==numero_cuenta)
+	if banco != None:
+		relator = relator.filter(mo.Relator.banco==banco)
+	if tipo_cuenta != None:
+		relator = relator.filter(mo.Relator.tipo_cuenta==tipo_cuenta)
+
+	relator_filtrados = relator_schemas.dump(relator)
+	
+	return jsonify(relator_filtrados)
+	
+
+
+
+
+
+
+
+
+
+@app.route("/relator/agregar",methods=["POST"])
+def crear_participante():
+
+	
+
+	rut=request.json['rut']
+	nombre=request.json['nombre']
+	apellido_paterno=request.json['apellido_paterno']
+	apellido_materno=request.json['apellido_materno']
+	titulo=request.json['titulo']
+	#genero=request.json['genero']
+	cv=request.json['cv']
+	fecha_nacimiento=request.json['fecha_nacimiento']
+	numero_cuenta=request.json['numero_cuenta']
+	banco=request.json['banco']
+	tipo_cuenta=request.json['tipo_cuenta']
+	
+	nuevo_relator=mo.Relator(rut,nombre,apellido_paterno,apellido_materno,titulo,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta)
+	
+	db.session.add(nuevo_relator)
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"El relator ya ha sido ingresado"})
+	
+	resultado = relator_schema.dump(nuevo_relator)
+
+	return jsonify(resultado)
+
 
 if __name__ == '__main__':
 	app.run(debug=True)
