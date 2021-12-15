@@ -184,8 +184,6 @@ export default {
     }
   },
   methods:{
-   
-    },
     successMessage:function(){
       alert("El relator se creo exitosamente.")
     },
@@ -221,6 +219,7 @@ export default {
        this.message = 'Ocurrió un error'
       }
     },
+  }
   }
 
 </script>

@@ -263,8 +263,9 @@ export default {
       //lista para submenu
       participantes: [
       ['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
-      ['Ver participantes','mdi-format-list-bulleted-type','/ver_participantes'],
-      ['Subir archivo', 'mdi-file-plus','/subir_archivo']
+      ['Ver participantes','mdi-account-multiple','/ver_participantes'],
+      ['Subir archivo', 'mdi-file-plus','/subir_archivo'],
+      ['Filtrar participantes','mdi-account-multiple','/filtrar_participantes' ]
       ],
       relatores: [
       ['Nuevo relator', 'mdi-account-multiple-plus','/nuevo_relator'],
@@ -274,7 +275,8 @@ export default {
       cursos:[
       ['Crear curso', 'mdi-account-multiple-plus','/crear_curso'],
       ['Ver cursos','mdi-format-list-bulleted-type','/ver_cursos'],
-      ['Asignar relator','mdi-account-multiple','/asignar_relatores']
+      ['Asignar relatores','mdi-account-multiple','/asignar_relator_curso'],
+      ['Asignar participantes','mdi-account-multiple','/matricular_participantes']
       ],
       empresas:[
       ['Nueva empresa', 'mdi-account-multiple-plus','/nueva_empresa'],
@@ -310,6 +312,11 @@ export default {
           icon: 'mdi-plus',
           title: 'Cursos',
           to: '/cursos'
+        },
+        {
+          icon: 'mdi-content-paste',
+          title: 'inscribir participantes a cursos',
+          to:'/matricular_participantes'
         },
         {
           icon: 'mdi-plus',
