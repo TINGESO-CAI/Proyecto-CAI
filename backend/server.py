@@ -1,5 +1,6 @@
 from operator import mod
 from typing import Text
+import requests
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -34,6 +35,43 @@ relator_schemas = mo.RelatorSchema(many=True)
 
 orden_schema= mo.OrdenSchema()
 orden_schemas= mo.OrdenSchema(many=True)
+
+@app.route("/paises/obtener",methods=["GET"])
+def obtener_paises():
+	r = requests.get('https://restcountries.com/v3.1/all?fields=translations',)
+	paises=r.json()
+	respuesta=[]
+	for x in paises:
+		resp=x['translations']['spa']['common']
+		respuesta.append(resp)
+	return jsonify(respuesta)
+"""
+@app.route('/regiones/chile/obtener',methods=["GET"])
+def obtener_regiones_chile():
+	r = requests.get('https://apis.digital.gob.cl/dpa/regiones',)
+	regiones=r.json()
+	respuesta=[]
+	for x in regiones:
+		resp={
+			'codigo':x['codigo'],
+			'nombre': x['nombre']
+		}
+		respuesta.append(resp)
+	return jsonify(respuesta)
+@app.route('/comunas/chile/obtener/region=<codigo>',methods=['GET'])
+def obtener_comuna_por_region(codigo):
+	if int(codigo)<1 and int(codigo)>16:
+		return jsonify({"respuesta":"codigo de region no valido"})
+	url='https://apis.digital.gob.cl/dpa/regiones/'+codigo+'/comunas'
+	print(url)
+	r = requests.get(url=url)
+	comunas=r.json()
+	respuesta=[]
+	for x in comunas:
+		resp=x['nombre']
+		respuesta.append(resp)
+	return jsonify(respuesta)
+"""
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
