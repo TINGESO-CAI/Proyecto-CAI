@@ -130,7 +130,7 @@ class ParticipanteSchema(SQLAlchemyAutoSchema):
         'apellido_paterno','apellido_materno',
         'genero','fecha_nacimiento','nivel_educacional',
         'nacionalidad','tipo_inscripcion','ocupacion',
-        'correo')
+        'correo','fono','razon_social')
 
 class Relator(db.Model):
 	__tablename__ = 'relator'
