@@ -166,26 +166,34 @@ class RelatorSchema(SQLAlchemyAutoSchema):
         'titulo','cv','fecha_nacimiento',
         'numero_cuenta','banco','tipo_cuenta')
 
-t_relator_curso = db.Table(
-    'relator_curso', db.metadata,
-    db.Column('rut', db.ForeignKey('relator.rut')),
-    db.Column('sence', db.ForeignKey('curso.sence'))
-)
+class Relator_Curso(db.Model):
+    __tablename__ = 'relator_curso'
+    rut=db.Column(db.Text, db.ForeignKey('relator.rut'),primary_key=True)
+    sence=db.Column(db.Text, db.ForeignKey('curso.sence'),primary_key=True)
+    def __init__(self,rut,sence):
+        self.rut=rut
+        self.sence=sence
 
-t_participante_curso = db.Table(
-    'participante_curso', db.metadata,
-    db.Column('rut', db.ForeignKey('participante.rut')),
-    db.Column('sence', db.ForeignKey('curso.sence'))
-)
+class Participante_Curso(db.Model):
+    __tablename__ = 'participante_curso'
+    rut = db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True)
+    sence = db.Column(db.Text, db.ForeignKey('curso.sence'),primary_key=True)
+    def __init__(self,rut,sence):
+        self.rut=rut
+        self.sence=sence
 
-t_participante_factura = db.Table(
-    'participante_factura', db.metadata,
-    db.Column('rut', db.ForeignKey('participante.rut')),
-    db.Column('id_factura', db.ForeignKey('factura.id_factura'), nullable=False, server_default=db.text("nextval('participante_factura_id_factura_seq'::regclass)"))
-)
+class Participante_Factura(db.Model):
+    __tablename__ = 'participante_factura'
+    rut=db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True)
+    id_factura=db.Column(db.Integer, db.ForeignKey('factura.id_factura'), nullable=False, server_default=db.text("nextval('participante_factura_id_factura_seq'::regclass)"),primary_key=True)
+    def __init__(self,rut,id_factura):
+        self.rut=rut
+        self.id_factura=id_factura
 
-t_participante_orden = db.Table(
-    'participante_orden', db.metadata,
-    db.Column('rut', db.ForeignKey('participante.rut')),
-    db.Column('id_orden', db.ForeignKey('orden.id_orden'), nullable=False, server_default=db.text("nextval('participante_orden_id_orden_seq'::regclass)"))
-)
+class Participante_Orden(db.Model):
+    __tablename__='participante_orden'
+    rut=db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True)
+    id_orden=db.Column(db.Integer, db.ForeignKey('orden.id_orden'), nullable=False, server_default=db.text("nextval('participante_orden_id_orden_seq'::regclass)"),primary_key=True)
+    def __init__(self,rut,id_orden):
+        self.rut=rut
+        self.id_orden=id_orden

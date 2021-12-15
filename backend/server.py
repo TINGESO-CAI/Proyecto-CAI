@@ -29,8 +29,8 @@ empresa_schemas = mo.EmpresaSchema(many=True)
 relator_schema = mo.RelatorSchema()
 relator_schemas = mo.RelatorSchema(many=True)
 
-factura_schema= mo.BoletaSchema()
-factura_schemas= mo.BoletaSchema(many=True)
+#factura_schema= mo.FacturaSchema()
+#factura_schemas= mo.FacturaSchema(many=True)
 
 orden_schema= mo.OrdenSchema()
 orden_schemas= mo.OrdenSchema(many=True)
@@ -171,6 +171,7 @@ def obtener_curso():
 	resolucion_usach = request.args.get('resolucion_usach')
 	estado = request.args.get('estado')
 	f_vigencia = request.args.get('f_vigencia')
+
 	cursos = mo.Curso.query.filter()
 	
 	if sence != None:
@@ -195,7 +196,8 @@ def obtener_curso():
 		cursos = cursos.filter(mo.Curso.estado==estado)
 	if f_vigencia!= None:
 		cursos = cursos.filter(mo.Curso.f_vigencia==f_vigencia)
-	cursos_filtrado = participante_schemas.dump(cursos)
+		
+	cursos_filtrado = curso_schemas.dump(cursos)
 	
 	return jsonify(cursos_filtrado)
 
@@ -318,20 +320,9 @@ def filtro_relator():
 	relator_filtrados = relator_schemas.dump(relator)
 	
 	return jsonify(relator_filtrados)
-	
-
-
-
-
-
-
-
-
 
 @app.route("/relator/agregar",methods=["POST"])
-def crear_participante():
-
-	
+def crear_relator():
 
 	rut=request.json['rut']
 	nombre=request.json['nombre']
@@ -357,6 +348,31 @@ def crear_participante():
 
 	return jsonify(resultado)
 
+#################################
+#############TABLA INTERMEDIA####
+#################################
+@app.route("/relator_curso/agregar",methods=["POST"])
+def crear_RC():
+	rut=request.json['rut']
+	sence=request.json['sence']
+	nuevo_RC=mo.Relator_Curso(rut,sence)
+	db.session.add(nuevo_RC)
+	try:
+		db.session.commit()
+	except:
+		return jsonify({"respuesta":"Esta relacion ya ha sido ingresado"})
+	return jsonify({"respuesta":"Relator ha sido ingresado"})
 
+@app.route("/participante_curso/agregar",methods=["POST"])
+def crear_PC():
+	rut=request.json['rut']
+	sence=request.json['sence']
+	nuevo_PC=mo.Participante_Curso(rut,sence)
+	db.session.add(nuevo_PC)
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Esta relacion ya ha sido ingresado"})
+	return jsonify({"respuesta":"Participante ha sido ingresado"})
 if __name__ == '__main__':
 	app.run(debug=True)
