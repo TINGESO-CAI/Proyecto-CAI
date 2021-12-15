@@ -7,24 +7,7 @@
       fixed
       app
     >
-      <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-
-      <!--
+     <!--
         Seccion de sub menu
         -->
 
@@ -56,6 +39,24 @@
       <!--
         Seccion de sub menu
         -->
+      <v-list>
+        <v-list-item
+          v-for="(item, i) in items"
+          :key="i"
+          :to="item.to"
+          router
+          exact
+        >
+          <v-list-item-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title v-text="item.title" />
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+
+     
           
     </v-navigation-drawer>
     <v-app-bar color="#EA7600"
@@ -140,22 +141,7 @@ export default {
           icon: 'mdi-apps',
           title: 'Principal',
           to: '/'
-        },
-        {
-          icon: 'mdi-account-multiple-plus',
-          title: 'Nuevo participante',
-          to: '/nuevo_participante'
-        },
-        {
-          icon: 'mdi-account-multiple',
-          title: 'Ver participantes',
-          to: '/ver_participantes'
-        },
-        {
-          icon: 'mdi-file-plus',
-          title: 'Subir archivo',
-          to: '/subir_archivo'
-        },
+        },        
         {
           icon: 'mdi-plus',
           title: 'Cursos',

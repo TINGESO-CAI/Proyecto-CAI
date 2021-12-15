@@ -279,6 +279,10 @@ export default {
     },
   },
 
+  created(){
+    this.getRazones();
+  },
+
 }
 </script>
 <style>

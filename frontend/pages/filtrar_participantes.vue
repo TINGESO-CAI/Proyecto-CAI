@@ -2,7 +2,8 @@
     <v-container class="test">
     <div class="home">
         <h1>Filtro de participantes</h1>
-        <div> Llene solo los parametros que desea filtrar</div>
+        <div v-if="participantes.length==0">
+        <p class="text-center"> Llene solo los parametros que desea filtrar</p>
         <br>
         <div>
         <v-form v-model="valid">
@@ -11,7 +12,6 @@
                 <v-col>
                 <v-text-field
                     v-model="rut"
-                    :rules="rutRules"
                     :counter="16"
                     label="Rut"
                 ></v-text-field>
@@ -20,7 +20,6 @@
                 <v-col>
                 <v-text-field
                     v-model="nombre"
-                    :rules="nombreRules"
                     :counter="20"
                     label="Nombre"
                 ></v-text-field>
@@ -29,7 +28,6 @@
                 <v-col>
                 <v-text-field
                     v-model="apellido_paterno"
-                    :rules="apellido_paternoRules"
                     :counter="20"
                     label="Apellido paterno"
                 ></v-text-field>
@@ -39,7 +37,6 @@
                 <v-col>
                 <v-text-field
                     v-model="apellido_materno"
-                    :rules="apellido_maternoRules"
                     :counter="20"
                     label="Apellido materno"
                 ></v-text-field>
@@ -73,7 +70,6 @@
                 <v-col>
                 <v-text-field
                     v-model="fecha_nacimiento"
-                    :rules="fecha_nacimientoRules"
                     :counter="20"
                     label="fecha_nacimiento"
                 ></v-text-field>
@@ -107,7 +103,6 @@
                 <v-col>
                 <v-text-field
                     v-model="ocupacion"
-                    :rules="ocupacionRules"
                     :counter="20"
                     label="ocupacion"
                 ></v-text-field>
@@ -125,7 +120,6 @@
                 <v-col>
                 <v-text-field
                     v-model="fono"
-                    :rules="fonoRules"
                     :counter="15"
                     label="fono"
                 ></v-text-field>
@@ -147,6 +141,19 @@
         
         <v-btn  color="blue lighten-1" class="mr-4" @click="filtro">Filtrar</v-btn>
         </div>
+        </div>
+        <div v-else>
+      <br>
+        <div>
+          <v-card>
+              <v-data-table
+                :headers="headers"
+                :items="participantes"
+              ></v-data-table>
+            </v-card>
+        </div>
+        <v-btn  color="blue lighten-1" class="mr-4" @click="limpiar">Limpiar</v-btn>
+        </div>
     </div>
     </v-container>
 </template>
@@ -160,11 +167,32 @@ export default {
   name: 'Home',
   data:function(){
     return{
+
+      correoRules: [
+        v => !!v || 'Correo es requerido',
+        v => /.+@.+/.test(v) || 'Correo debe ser válido',
+      ],
+      headers: [
+      {
+        text: 'Rut',
+        align: 'start',
+        filterable: true,
+        value: 'rut',
+      },
+      { text: 'nombre', value: 'nombre' },
+      { text: 'apellido_paterno', value: 'apellido_paterno'},
+      { text: 'apellido_materno', value: 'apellido_materno' },
+      { text: 'correo', value: 'correo'},
+      { text: 'fono', value: 'fono'},
+      { text: 'razon_social', value: 'razon_social'},
+      { text: 'genero', value: 'genero'},
+  
+    ],
       participantes : [],
       generos : ["masculino","femenino"],
       nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
-      paises: [ "Chilena","Otra"],
-      inscripciones: [ "presencial","online"],
+      paises: [ "Chile","Otra"],
+      inscripciones: [ "Presencial","Online"],
       razones: ["ninguna"],
       //FORMULARIO
       valid: false,
@@ -183,39 +211,7 @@ export default {
       correo: '',
       fono: '',
       razon_social: '',
-      //reglas
-      rutRules: [
-        v => !!v || 'Rut es requerido',
-        v => v.length <= 12 || 'Rut debe contener menos de 12 caracteres',
-      ],
-      nombreRules: [
-        v => !!v || 'Nombre es requerido',
-        v => v.length <= 100 || 'Nombre debe contener menos de 100 caracteres',
-      ],
-      apellido_paternoRules: [
-        v => !!v || 'apellido_paterno es requerido',
-        v => v.length <= 100 || 'apellido_paterno debe contener menos de 100 caracteres',
-      ],
-      apellido_maternoRules: [
-        v => !!v || 'apellido_materno es requerido',
-        v => v.length <= 100 || 'apellido_materno debe contener menos de 100 caracteres',
-      ],
-      correoRules: [
-        v => !!v || 'Correo es requerido',
-        v => /.+@.+/.test(v) || 'Correo debe ser válido',
-      ],
-      fecha_nacimientoRules: [
-        v => !!v || 'fecha_nacimiento es requerido',
-        //v => /.+.+/.test(v) || 'fecha_nacimiento debe ser válido',
-      ],
-      fonoRules: [
-        v => !!v || 'fono es requerido',
-        v => v.length <= 12 || 'fono debe contener menos de 12 caracteres',
-      ],
-      razon_socialRules: [
-        v => !!v || 'razon_social es requerido',
-        v => v.length <= 50 || 'razon_social debe contener menos de 50 caracteres',
-      ],
+      
     }
   },
   methods:{
@@ -224,50 +220,95 @@ export default {
         //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
         this.razones = response.data;
-        console.log(response);
       }
       catch (error) {
         console.log('error', error); 
       }
     },
-    successMessage:function(){
-      alert("El participante se creo exitosamente.")
+    limpiar: function(){
+      console.log(this.participantes)
+      this.participantes=[]
+    },
+    empyMessage:function(){
+      alert("No existen participantes con esas caracteristicas.")
     },
 
     async filtro(){ //Filtrar participantes
       
-      let newParticipante ={
-        rut: this.rut,
-        nombre: this.nombre,
-        apellido_paterno: this.apellido_paterno,
-        apellido_materno: this.apellido_materno,
-        genero: this.genero,
-        nivel_educacional: this.nivel_educacional,
-        fecha_nacimiento: this.fecha_nacimiento,
-        nacionalidad: this.nacionalidad,
-        tipo_inscripcion: this.tipo_inscripcion,
-        ocupacion: this.ocupacion,
-        correo: this.correo,
-        fono: this.fono,
-        razon_social: this.razon_social
-      }
-      console.log(newParticipante) 
       try {
-        //se llama el servicio para crear un nuevo participante
-        let response = await axios.get('http://localhost:5000/participante',newParticipante);
-        this.participantes = response.data
-        console.log('response', response.data);
+       let ruta = 'http://localhost:5000/participante/obtener?'
+       if (this.rut != '' ){
+         ruta= ruta + 'rut='+this.rut +'&'
+       }
+       if (this.nombre != '' ){
+         ruta= ruta + 'nombre='+this.nombre +'&'
+       }
+       if (this.apellido_paterno != '' ){
+         ruta= ruta + 'apellido_paterno='+this.apellido_paterno +'&'
+       }
+       if (this.apellido_materno != '' ){
+         ruta= ruta + 'apellido_materno='+this.apellido_materno +'&'
+       }
+       if (this.genero != '' ){
+         ruta= ruta + 'genero='+this.genero +'&'
+       }
+       if (this.nivel_educacional != '' ){
+         ruta= ruta + 'nivel_educacional='+this.nivel_educacional +'&'
+       }
+       if (this.fecha_nacimiento != '' ){
+         ruta= ruta + 'fecha_nacimiento='+this.fecha_nacimiento +'&'
+       }
+       if (this.nacionalidad != '' ){
+         ruta= ruta + 'nacionalidad='+this.nacionalidad +'&'
+       }
+       if (this.tipo_inscripcion != '' ){
+         ruta= ruta + 'tipo_inscripcion='+this.tipo_inscripcion +'&'
+       }
+       if (this.ocupacion != '' ){
+         ruta= ruta + 'ocupacion='+this.ocupacion +'&'
+       }
+       if (this.correo != '' ){
+         ruta= ruta + 'correo='+this.correo +'&'
+       }
+       if (this.fono != '' ){
+         ruta= ruta + 'fono='+this.fono +'&'
+       }
+       if (this.razon_social != '' ){
+         ruta= ruta + 'razon_social='+this.razon_social.razon_social
+       }
+      if (ruta[ruta.length -1] == '&'){
+        ruta[ruta.length -1]==''
+      }
+      
+      let response = await axios.get(ruta)
+      this.participantes= response.data
+      console.log('response', response.data);
                
-        
+      if(this.participantes.length==0){
+        this.empyMessage()
+      }
         //limpiar
         this.nombre = '';
         this.rut = '';
         this.correo = '';
+        this.apellido_paterno=''
+        this.apellido_materno=''
+        this.tipo_inscripcion=''
+        this.ocupacion=''
+        this.genero=''
+        this.razon_social=''
+        this.fono=''
+        this.nivel_educacional=''
+        this.fecha_nacimiento=''
+        this.nacionalidad=''
       }
       catch (error) {
        console.log('error', error); 
       }
     },
+  },
+  created(){
+    this.getRazones();
   },
 
 }

@@ -113,7 +113,7 @@ export default {
     getParticipantes: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/participante');
+        let response = await axios.get('http://localhost:5000/participante/obtener?');
         this.participantes = response.data;
         console.log(response);
       }
@@ -121,43 +121,9 @@ export default {
         console.log('error', error); 
       }
     },
-    async createParticipante(){ //Crear un nuevo PARTICIPANTE
-      this.message = '';
-
-      let newParticipante ={
-        rut: this.rut,
-        nombre: this.nombre,
-        apellido_paterno: this.apellido_paterno,
-        apellido_materno: this.apellido_materno,
-        genero: this.genero,
-        nivel_educacional: this.nivel_educacional,
-        fecha_nacimiento: this.fecha_nacimiento,
-        nacionalidad: this.nacionalidad,
-        tipo_inscripcion: this.tipo_inscripcion,
-        ocupacion: this.ocupacion,
-        correo: this.correo,
-        fono: this.fono,
-        razon_social: this.razon_social
-      }
-      
-      try {
-        //se llama el servicio para crear un nuevo participante
-        let response = await axios.post('http://localhost:5000/participante/agregar',newParticipante);
-        console.log('response', response.data);
-        let id = response.data.id;
-        this.message = `${this.rut} fue creado con éxito con id: ${id}`;
-        
-        //limpiar
-        this.nombre = '';
-        this.rut = '';
-        this.correo = '';
-        this.successMessage();
-      }
-      catch (error) {
-       console.log('error', error); 
-       this.message = 'Ocurrió un error'
-      }
-    }
+  },
+  created(){
+    this.getParticipantes()
   }
 }
 </script>
