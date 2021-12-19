@@ -10,16 +10,20 @@ import json
 
 from sqlalchemy.sql import text
 import db.modelos as mo
+db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
+db.init_app(app)
 
+
+ma = Marshmallow(app)
+migrate= Migrate(app,db)
 participante_schema = mo.ParticipanteSchema()
 participante_schemas = mo.ParticipanteSchema(many=True)
+
 
 curso_schema = mo.CursoSchema()
 curso_schemas = mo.CursoSchema(many=True)
@@ -78,7 +82,6 @@ def obtener_comuna_por_region(codigo):
 
 @app.route("/participante/agregar",methods=["POST"])
 def crear_participante():
-
 	
 
 	rut=request.json['rut']
