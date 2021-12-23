@@ -41,7 +41,6 @@ class Curso(db.Model):
 		self.estado=estado
 		self.f_vigencia=f_vigencia
 
-
 class CursoSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('sence','nombre',
@@ -49,6 +48,7 @@ class CursoSchema(SQLAlchemyAutoSchema):
 		'resolucion_sence','resolucion_usach','estado','f_vigencia')
 
 class Instancia(db.Model):
+	
 	tablename = 'instancia'
 	id_instancia = db.Column(db.Integer, primary_key=True)
 	sence = db.Column(db.ForeignKey('curso.sence'))
@@ -56,21 +56,22 @@ class Instancia(db.Model):
 	malla = db.Column(db.Boolean)
 	fecha_inicio = db.Column(db.Date)
 	fecha_termino = db.Column(db.Date)
+	
 	curso = db.relationship('Curso')
 	
-	def __init__(self,id_orden,sence,direccion,malla,fecha_inicio,fecha_termino):
-		self.id_orden = id_orden
+	def __init__(self,id_instancia,sence,direccion,malla,fecha_inicio,fecha_termino):
+		self.id_instancia = id_instancia
 		self.sence = sence
 		self.direccion = direccion
 		self.malla = malla 
 		self.fecha_inicio = fecha_inicio
 		self.fecha_termino = fecha_termino
+
 class InstanciaSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('id_instancia','sence','direccion',
-		'malla','fecha_inicio','fecha_termino',)		
+		'malla','fecha_inicio','fecha_termino')		
 		
-
 class Orden(db.Model):
 	__tablename__ = 'orden'
 
@@ -260,6 +261,7 @@ class Participante_Orden(db.Model):
 	def __init__(self,rut,id_orden):
 		self.rut=rut
 		self.id_orden=id_orden
+
 def objeto_db():
 	global db
 	return db

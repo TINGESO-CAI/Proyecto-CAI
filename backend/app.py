@@ -21,9 +21,9 @@ db.init_app(app)
 
 ma = Marshmallow(app)
 migrate= Migrate(app,db)
+
 participante_schema = mo.ParticipanteSchema()
 participante_schemas = mo.ParticipanteSchema(many=True)
-
 
 curso_schema = mo.CursoSchema()
 curso_schemas = mo.CursoSchema(many=True)
@@ -39,6 +39,9 @@ relator_schemas = mo.RelatorSchema(many=True)
 
 orden_schema= mo.OrdenSchema()
 orden_schemas= mo.OrdenSchema(many=True)
+
+#instancia_schema= mo.Instancia()
+instancia_schemas= mo.InstanciaSchema(many=True)
 
 @app.route("/paises/obtener",methods=["GET"])
 def obtener_paises():
@@ -249,11 +252,85 @@ def obtener_sences():
 	cursos = curso_schemas.dump(sence_curso)
 	
 	return jsonify(cursos)
+
+# -----------------------------------------------------------------------------------------------------
+# --------------------------------------INSTANCIA------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
+@app.route("/instancia/agregar",methods=["POST"])
+def crear_instancia_curso():
+
+	id_instancia = request.json['id_instancia']
+	sence = request.json['sence']
+	direccion = request.json['direccion']
+	malla = request.json['malla']
+	fecha_inicio = request.json['fecha_inicio']
+	fecha_termino = request.json['fecha_termino']
+
+	nuevo_instancia_curso=mo.Instancia(id_instancia,sence,direccion,malla,fecha_inicio,fecha_termino)
+	db.session.add(nuevo_instancia_curso)
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"La instancia del curso ya ha sido ingresada"})
+	return jsonify({"respuesta":"La instancia del curso ha sido ingresado correctamente!"})
+
+@app.route("/instancia/obtener",methods=["GET"])
+def obtener_instancia_curso():
+
+	id_instancia = request.args.get('id_instancia')
+	sence = request.args.get('sence')
+	direccion = request.args.get('direccion')
+	malla = request.args.get('malla')
+	fecha_inicio = request.args.get('fecha_inicio')
+	fecha_termino = request.args.get('fecha_termino')
+
+	instancias = mo.Instancia.query.filter()
+	
+	if id_instancia != None:
+		instancias = instancias.filter(mo.Instancia.id_instancia==id_instancia)
+	if sence != None:
+		instancias = instancias.filter(mo.Instancia.sence==sence)
+	if direccion!= None:
+		instancias = instancias.filter(mo.Instancia.direccion==direccion)
+	if malla != None:
+		instancias = instancias.filter(mo.Instancia.malla==malla)
+	if fecha_inicio != None:
+		instancias = instancias.filter(mo.Instancia.fecha_inicio==fecha_inicio)
+	if fecha_termino != None:
+		instancias = instancias.filter(mo.Instancia.fecha_termino==fecha_termino)
+	
+		
+	instancias_cursos_filtrado = instancia_schemas.dump(instancias)
+	
+	return jsonify(instancias_cursos_filtrado)
+
+
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
+@app.route("/empresa/agregar",methods=["POST"])
+def crear_empresa():
 
-@app.route("/empresa",methods=["GET"])
+	razon_social = request.json['razon_social']
+	giro = request.json['giro']
+	atencion = request.json['atencion']
+	departamento = request.json['departamento']
+	rut = request.json['rut']
+	direccion = request.json['direccion']
+	comuna = request.json['comuna']
+	correo = request.json['correo']
+	fono = request.json['fono']
+
+	nuevo_empresa=mo.Empresa(razon_social,giro,atencion,departamento,rut,direccion,comuna,correo,fono)
+
+	db.session.add(nuevo_empresa)
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"La empresa ya ha sido ingresada"})
+	return jsonify({"respuesta":"Empresa ingresada correctamente!"})
+
+@app.route("/empresa/obtener",methods=["GET"])
 def filtro_empresas():
 	
 
@@ -288,27 +365,7 @@ def filtro_empresas():
 	
 	return jsonify(empresas_filtrados)
 
-@app.route("/empresa/agregar",methods=["POST"])
-def crear_empresa():
 
-	razon_social = request.json['razon_social']
-	giro = request.json['giro']
-	atencion = request.json['atencion']
-	departamento = request.json['departamento']
-	rut = request.json['rut']
-	direccion = request.json['direccion']
-	comuna = request.json['comuna']
-	correo = request.json['correo']
-	fono = request.json['fono']
-
-	nuevo_empresa=mo.Empresa(razon_social,giro,atencion,departamento,rut,direccion,comuna,correo,fono)
-
-	db.session.add(nuevo_empresa)
-	try:
-		db.session.commit() 
-	except:
-		return jsonify({"respuesta":"La empresa ya ha sido ingresada"})
-	return jsonify({"respuesta":"Empresa ingresada correctamente!"})
 
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
