@@ -48,7 +48,7 @@ insertarDatos(df,"empresa")
 df=procesamiento("participante")
 df["genero"]=pd.to_numeric(df["genero"],downcast= 'integer')
 insertarDatos(df,"participante")
-"""
+
 df=procesamiento("orden")
 df["id_orden"]=pd.to_numeric(df["id_orden"],downcast= 'integer')
 df["cancelacion"]=pd.to_numeric(df["cancelacion"],downcast= 'integer')
@@ -69,4 +69,3 @@ insertarDatos(df,"participante_orden")
 df=procesamiento("participante_curso")
 df["sence"]=pd.to_numeric(df["sence"],downcast= 'integer')
 insertarDatos(df,"participante_curso")
-"""
