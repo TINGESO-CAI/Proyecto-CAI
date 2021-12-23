@@ -208,7 +208,7 @@ class Relator(db.Model):
 	banco = db.Column(db.Text)
 	tipo_cuenta = db.Column(db.Text)
 
-	curso = db.relationship('Instancia', secondary='relator_Instancia')
+	curso = db.relationship('Instancia', secondary='relator_instancia')
 	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,titulo,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta):
 		self.rut = rut
 		self.nombre=nombre
@@ -229,33 +229,33 @@ class RelatorSchema(SQLAlchemyAutoSchema):
 		'numero_cuenta','banco','tipo_cuenta')
 
 class Relator_Instancia(db.Model):
-	__tablename__ = 'relator_curso'
-	rut=db.Column(db.Text, db.ForeignKey('relator.rut'),primary_key=True)
-	id_instancia=db.Column(db.Integer, db.ForeignKey('factura.id_factura'),primary_key=True)
+	__tablename__ = 'relator_instancia'
+	rut=db.Column(db.Text, db.ForeignKey('relator.rut'),primary_key=True,nullable=False,)
+	id_instancia=db.Column(db.Integer, db.ForeignKey('instancia.id_instancia'),primary_key=True,nullable=False,)
 	
 	def __init__(self,rut,id_instancia):
 		self.rut=rut
 		self.id_instancia=id_instancia
 
 class Participante_Curso(db.Model):
-	__tablename__ = 'participante_curso'
-	rut = db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True)
-	sence = db.Column(db.Text, db.ForeignKey('curso.sence'),primary_key=True)
+	__tablename__ = 'participante_curso' 
+	rut = db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True,nullable=False,)
+	sence = db.Column(db.Text, db.ForeignKey('curso.sence'),primary_key=True,nullable=False,)
 	def __init__(self,rut,sence):
 		self.rut=rut
 		self.sence=sence
 
 class Participante_Factura(db.Model):
 	__tablename__ = 'participante_factura'
-	rut=db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True)
-	id_factura=db.Column(db.Integer, db.ForeignKey('factura.id_factura'), nullable=False, server_default=db.text("nextval('participante_factura_id_factura_seq'::regclass)"),primary_key=True)
+	rut=db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True,nullable=False,)
+	id_factura=db.Column(db.Integer, db.ForeignKey('factura.id_factura'), nullable=False,primary_key=True)
 	def __init__(self,rut,id_factura):
 		self.rut=rut
 		self.id_factura=id_factura
 
 class Participante_Orden(db.Model):
 	__tablename__='participante_orden'
-	rut=db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True)
+	rut=db.Column(db.Text, db.ForeignKey('participante.rut'),primary_key=True,nullable=False,)
 	id_orden=db.Column(db.Integer, db.ForeignKey('orden.id_orden'), nullable=False,primary_key=True)
 	def __init__(self,rut,id_orden):
 		self.rut=rut
