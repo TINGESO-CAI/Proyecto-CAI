@@ -30,6 +30,20 @@ partipante_orden=db.Table('participante_orden',
 	db.Column('id_orden',db.Integer, db.ForeignKey('orden.id_orden'))
 )
 
+class Contacto(db.Model):
+	__tablename__ = 'contacto'
+	id_contacto = db.Column(db.Integer, primary_key=True,autoincrement=True)
+	correo = db.Column(db.Text)
+	fono = db.Column(db.Text)
+	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
+	empresa = db.relationship('Empresa')
+	def __init__(self,correo,fono,razon_social):
+		self.correo = correo
+		self.fono = fono
+		self.razon_social=razon_social
+class ContactoSchema(SQLAlchemyAutoSchema):
+	class Meta:
+		fields = ('id_contacto','contacto','fono','razon_social')	
 
 
 class Curso(db.Model):
@@ -63,7 +77,64 @@ class CursoSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('sence','nombre',
 		'modalidad','categoria','horas_curso','valor_efectivo_participante','valor_imputable_participante',
+
 		'resolucion_sence','resolucion_usach','estado','f_vigencia')
+class Empresa(db.Model):
+	__tablename__ = 'empresa'
+
+	razon_social = db.Column(db.Text, primary_key=True)
+	giro = db.Column(db.Text)
+	atencion = db.Column(db.Text)
+	departamento = db.Column(db.Text)
+	rut = db.Column(db.Text)
+	direccion = db.Column(db.Text)
+	comuna = db.Column(db.Text)
+
+
+	def __init__(self,razon_social,giro,atencion,departamento,rut,direccion,comuna):
+		self.razon_social = razon_social
+		self.giro=giro
+		self.atencion=atencion
+		self.departamento=departamento
+		self.rut=rut
+		self.direccion=direccion
+		self.comuna=comuna
+
+
+class EmpresaSchema(SQLAlchemyAutoSchema):
+	class Meta:
+		fields = ('razon_social','giro',
+		'atencion','departamento','rut',
+		'direccion','comuna')
+
+class Factura(db.Model):
+	__tablename__ = 'factura'
+
+	id_factura = db.Column(db.Integer, primary_key=True)
+	sence = db.Column(db.Text)
+	num_registro = db.Column(db.Text)
+	estado = db.Column(db.Integer)
+	tipo_pago = db.Column(db.Integer)
+	num_hes = db.Column(db.Text)
+	fecha_emision = db.Column(db.Date)
+	fecha_vencimiento = db.Column(db.Date)
+	persona_asignada_f = db.relationship('Participante', secondary='participante_orden', backref=db.backref('asignar_factura',lazy='dinamic'))
+	
+	def __init__(self,id_factura,sence,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento):
+		self.id_factura = id_factura
+		self.sence = sence
+		self.num_registro =num_registro
+		self.estado = estado
+		self.tipo_pago = tipo_pago
+		self.num_hes = num_hes
+		self.fecha_emision = fecha_emision
+		self.fecha_vencimiento =fecha_vencimiento
+
+class FacturaSchema(SQLAlchemyAutoSchema):
+	class Meta:
+		fields = ('id_factura','sence','num_registro'
+		'estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento')
+
 
 class Instancia(db.Model):
 	
@@ -112,61 +183,7 @@ class OrdenSchema(SQLAlchemyAutoSchema):
 		fields = ('id_orden','sence',
 		'cancelacion','fecha_emision','fecha_vencimiento')
 
-class Factura(db.Model):
-	__tablename__ = 'factura'
 
-	id_factura = db.Column(db.Integer, primary_key=True)
-	sence = db.Column(db.Text)
-	num_registro = db.Column(db.Text)
-	estado = db.Column(db.Integer)
-	tipo_pago = db.Column(db.Integer)
-	num_hes = db.Column(db.Text)
-	fecha_emision = db.Column(db.Date)
-	fecha_vencimiento = db.Column(db.Date)
-	persona_asignada_f = db.relationship('Participante', secondary='participante_orden', backref=db.backref('asignar_factura',lazy='dinamic'))
-	
-	def __init__(self,id_factura,sence,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento):
-		self.id_factura = id_factura
-		self.sence = sence
-		self.num_registro =num_registro
-		self.estado = estado
-		self.tipo_pago = tipo_pago
-		self.num_hes = num_hes
-		self.fecha_emision = fecha_emision
-		self.fecha_vencimiento =fecha_vencimiento
-
-class OrdenSchema(SQLAlchemyAutoSchema):
-	class Meta:
-		fields = ('id_orden','sence',
-		'cancelacion','fecha_emision','fecha_vencimiento')
-
-class Empresa(db.Model):
-	__tablename__ = 'empresa'
-
-	razon_social = db.Column(db.Text, primary_key=True)
-	giro = db.Column(db.Text)
-	atencion = db.Column(db.Text)
-	departamento = db.Column(db.Text)
-	rut = db.Column(db.Text)
-	direccion = db.Column(db.Text)
-	comuna = db.Column(db.Text)
-
-
-	def __init__(self,razon_social,giro,atencion,departamento,rut,direccion,comuna):
-		self.razon_social = razon_social
-		self.giro=giro
-		self.atencion=atencion
-		self.departamento=departamento
-		self.rut=rut
-		self.direccion=direccion
-		self.comuna=comuna
-
-
-class EmpresaSchema(SQLAlchemyAutoSchema):
-	class Meta:
-		fields = ('razon_social','giro',
-		'atencion','departamento','rut',
-		'direccion','comuna')
 
 class Participante(db.Model):
 	__tablename__ = 'participante'
@@ -190,7 +207,7 @@ class Participante(db.Model):
 
 	empresa = db.relationship('Empresa')
 
-	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,razon_social):
+	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,razon_social,fono_personal,fono_corporativo,correo_corporativo,correo_personal):
 		self.rut = rut
 		self.nombre=nombre
 		self.apellido_paterno=apellido_paterno
@@ -202,6 +219,11 @@ class Participante(db.Model):
 		self.tipo_inscripcion=tipo_inscripcion
 		self.ocupacion=ocupacion
 		self.razon_social=razon_social
+		self.fono_personal=fono_personal
+		self.fono_corporativo=fono_corporativo
+		self.correo_corporativo=correo_corporativo
+		self.correo_personal=correo_personal
+	
 
 class ParticipanteSchema(SQLAlchemyAutoSchema):
 	class Meta:
@@ -209,11 +231,10 @@ class ParticipanteSchema(SQLAlchemyAutoSchema):
 		'apellido_paterno','apellido_materno',
 		'genero','fecha_nacimiento','nivel_educacional',
 		'nacionalidad','tipo_inscripcion','ocupacion',
-		'razon_social')
+		'razon_social','fono_personal','fono_corporativo','correo_corporativo','correo_personal')
 
 class Relator(db.Model):
 	__tablename__ = 'relator'
-
 	rut = db.Column(db.Text, primary_key=True)
 	nombre = db.Column(db.Text)
 	apellido_paterno = db.Column(db.Text)
@@ -249,23 +270,11 @@ class RelatorSchema(SQLAlchemyAutoSchema):
 		fields = ('rut','nombre',
 		'apellido_paterno','apellido_materno',
 		'titulo','cv','fecha_nacimiento',
-		'numero_cuenta','banco','tipo_cuenta')
+		'numero_cuenta','banco','tipo_cuenta','fono_personal','fono_corporativo','correo_corporativo','correo_personal')
+
 		
 
-class Contacto(db.Model):
-	__tablename__ = 'contacto'
-	id_contacto = db.Column(db.Integer, primary_key=True,autoincrement=True)
-	correo = db.Column(db.Text)
-	fono = db.Column(db.Text)
-	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
-	empresa = db.relationship('Empresa')
-	def __init__(self,correo,fono,razon_social):
-		self.correo = correo
-		self.fono = fono
-		self.razon_social=razon_social
-class ContactoSchema(SQLAlchemyAutoSchema):
-	class Meta:
-		fields = ('id_contacto','contacto','fono','razon_social')	
+
 	
 def objeto_db():
 	global db
