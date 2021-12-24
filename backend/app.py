@@ -34,8 +34,8 @@ empresa_schemas = mo.EmpresaSchema(many=True)
 relator_schema = mo.RelatorSchema()
 relator_schemas = mo.RelatorSchema(many=True)
 
-#factura_schema= mo.FacturaSchema()
-#factura_schemas= mo.FacturaSchema(many=True)
+factura_schema= mo.FacturaSchema()
+factura_schemas= mo.FacturaSchema(many=True)
 
 orden_schema= mo.OrdenSchema()
 orden_schemas= mo.OrdenSchema(many=True)
@@ -43,8 +43,8 @@ orden_schemas= mo.OrdenSchema(many=True)
 instancia_schema=mo.InstanciaSchema()
 instancia_schemas=mo.InstanciaSchema(many=True)
 
-#instancia_schema= mo.Instancia()
-instancia_schemas= mo.InstanciaSchema(many=True)
+contacto_schema= mo.ContactoSchema()
+contacto_schemas= mo.ContactoSchema(many=True)
 
 @app.route("/paises/obtener",methods=["GET"])
 def obtener_paises():
@@ -471,9 +471,118 @@ def crear_relator():
 # --------------------------------------CONTACTO-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
-#################################
-#############TABLA INTERMEDIA####
-#################################
+@app.route("/contacto/agregar",methods=["POST"])
+def crear_contacto():
+
+	id_contacto=request.json['id_contacto']
+	correo=request.json['correo']
+	fono=request.json['fono']
+	descripcion=request.json['descripcion'] #PROBLEMAS CON LA DESCRIPCION, SALE NULL
+	razon_social=request.json['razon_social']
+	
+	nuevo_contacto=mo.Contacto(id_contacto,correo,fono,descripcion,razon_social)
+	
+	db.session.add(nuevo_contacto)
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"El contacto ya ha sido ingresado"})
+	resultado = contacto_schema.dump(nuevo_contacto)
+
+	return jsonify(resultado)
+
+@app.route("/contacto/obtener",methods=["GET"])
+def filtro_contacto():
+	
+	id_contacto= request.args.get('id_contacto')
+	razon_social = request.args.get('razon_social')
+	correo = request.args.get('correo')
+	fono = request.args.get('fono')
+	descripcion = request.args.get('descripcion')
+	
+	contacto = mo.Contacto.query.filter()
+
+	if id_contacto != None:
+		contacto = contacto.filter(mo.Contacto.id_contacto==id_contacto)
+	if razon_social != None:
+		contacto = contacto.filter(mo.Contacto.razon_social==razon_social)
+	if correo!= None:
+		contacto = contacto.filter(mo.Contacto.correo==correo)
+	if fono != None:
+		contacto = contacto.filter(mo.Contacto.fono==fono)
+	if descripcion != None:
+		contacto = contacto.filter(mo.Contacto.descripcion==descripcion)
+
+	contacto_filtrados = contacto_schemas.dump(contacto)
+	
+	return jsonify(contacto_filtrados)
+
+# -----------------------------------------------------------------------------------------------------
+# ---------------------------------------FACTURA-------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
+
+@app.route("/factura/agregar",methods=["POST"])
+def crear_factura():
+
+	id_factura=request.json['id_factura']
+	num_registro=request.json['num_registro']
+	estado=request.json['estado']
+	tipo_pago=request.json['tipo_pago']
+	num_hes=request.json['num_hes']
+	fecha_emision=request.json['fecha_emision']
+	fecha_vencimiento=request.json['fecha_vencimiento']
+	sence=request.json['sence']
+	
+	nueva_factura=mo.Factura(id_factura,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento,sence)
+	
+	db.session.add(nueva_factura)
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada"})
+	
+	resultado = factura_schema.dump(nueva_factura)
+
+	return jsonify(resultado)
+
+@app.route("/factura/obtener",methods=["GET"])
+def filtro_factura():
+	
+	id_factura= request.args.get('id_factura')
+	num_registro = request.args.get('num_registro')
+	estado = request.args.get('estado')
+	tipo_pago = request.args.get('tipo_pago')
+	num_hes = request.args.get('num_hes')
+	fecha_emision = request.args.get('fecha_emision')
+	fecha_vencimiento = request.args.get('fecha_vencimiento')
+	sence = request.args.get('sence')
+	
+	factura = mo.Factura.query.filter()
+
+	if id_factura != None:
+		factura = factura.filter(mo.Factura.id_factura==id_factura)
+	if num_registro != None:
+		factura = factura.filter(mo.Factura.num_registro==num_registro)
+	if estado!= None:
+		factura = factura.filter(mo.Factura.estado==estado)
+	if tipo_pago != None:
+		factura = factura.filter(mo.Factura.tipo_pago==tipo_pago)
+	if num_hes != None:
+		factura = factura.filter(mo.Factura.num_hes==num_hes)
+	if fecha_emision != None:
+		factura = factura.filter(mo.Factura.fecha_emision==fecha_emision)
+	if fecha_vencimiento != None:
+		factura = factura.filter(mo.Factura.fecha_vencimiento==fecha_vencimiento)
+	if sence != None:
+		factura = factura.filter(mo.Factura.sence==sence)
+
+	facturas_filtradas = factura_schemas.dump(factura)
+	
+	return jsonify(facturas_filtradas)
+# -----------------------------------------------------------------------------------------------------
+# --------------------------------------TABLAS INTERMEDIAS---------------------------------------------
+# -----------------------------------------------------------------------------------------------------
+
 @app.route("/relator_instancia/agregar",methods=["POST"])
 def crear_RI():
 	request_rut=request.json['rut']

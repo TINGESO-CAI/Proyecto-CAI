@@ -35,15 +35,21 @@ class Contacto(db.Model):
 	id_contacto = db.Column(db.Integer, primary_key=True,autoincrement=True)
 	correo = db.Column(db.Text)
 	fono = db.Column(db.Text)
+	descripcion = db.Column(db.Text)
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
+
 	empresa = db.relationship('Empresa')
-	def __init__(self,correo,fono,razon_social):
+	def __init__(self,id_contacto,correo,fono,descripcion,razon_social):
+		self.id_contacto = id_contacto
 		self.correo = correo
 		self.fono = fono
+		self.descpricion=descripcion
 		self.razon_social=razon_social
+		
+
 class ContactoSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_contacto','contacto','fono','razon_social')	
+		fields = ('id_contacto','correo','fono','descripcion','razon_social')	
 
 
 class Curso(db.Model):
@@ -102,7 +108,6 @@ class Empresa(db.Model):
 		self.rut=rut
 		self.direccion=direccion
 		self.comuna=comuna
-
 
 class EmpresaSchema(SQLAlchemyAutoSchema):
 	class Meta:
