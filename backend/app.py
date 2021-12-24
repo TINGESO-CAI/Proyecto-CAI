@@ -18,7 +18,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)
 
-
 ma = Marshmallow(app)
 migrate= Migrate(app,db)
 
@@ -86,7 +85,6 @@ def obtener_comuna_por_region(codigo):
 @app.route("/participante/agregar",methods=["POST"])
 def crear_participante():
 	
-
 	rut=request.json['rut']
 	nombre=request.json['nombre']
 	apellido_paterno=request.json['apellido_paterno']
@@ -97,11 +95,14 @@ def crear_participante():
 	nacionalidad=request.json['nacionalidad']
 	tipo_inscripcion=request.json['tipo_inscripcion']
 	ocupacion=request.json['ocupacion']
-	correo=request.json['correo']
-	fono=request.json['fono']
+	fono_personal=request.json['fono_personal']
+	fono_corporativo=request.json['fono_corporativo']
+	correo_personal=request.json['correo_personal']
+	correo_corporativo=request.json['correo_corporativo']
 	razon_social=request.json['razon_social']
 	
-	nuevo_participante=mo.Participante(rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,correo,fono,razon_social)
+	nuevo_participante=mo.Participante(rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,
+	ocupacion,fono_personal,fono_corporativo,correo_personal,correo_corporativo,razon_social)
 	
 	db.session.add(nuevo_participante)
 	try:
@@ -112,7 +113,6 @@ def crear_participante():
 	resultado = participante_schema.dump(nuevo_participante)
 
 	return jsonify(resultado)
-
 
 @app.route("/participante/obtener",methods=["GET"])
 def filtro_participante():
@@ -127,11 +127,12 @@ def filtro_participante():
 	nacionalidad=request.args.get('nacionalidad')
 	tipo_inscripcion=request.args.get('tipo_inscripcion')
 	ocupacion=request.args.get('ocupacion')
-	correo=request.args.get('correo')
-	fono=request.args.get('fono')
+	fono_personal=request.args.get('fono_personal')
+	fono_corporativo=request.args.get('fono_corporativo')
+	correo_personal=request.args.get('correo_personal')
+	correo_corporativo=request.args.get('correo_corporativo')
 	razon_social=request.args.get('razon_social')
-
-
+ 
 	participantes = mo.Participante.query.filter()
 
 	if rut != None:
@@ -154,10 +155,14 @@ def filtro_participante():
 		participantes = participantes.filter(mo.Participante.tipo_inscripcion==tipo_inscripcion)
 	if ocupacion!= None:
 		participantes = participantes.filter(mo.Participante.ocupacion==ocupacion)
-	if correo!= None:
-		participantes = participantes.filter(mo.Participante.correo==correo)
-	if fono!= None:
-		participantes = participantes.filter(mo.Participante.fono==fono)
+	if fono_personal!= None:
+		participantes = participantes.filter(mo.Participante.fono_personal==fono_personal)
+	if fono_corporativo!= None:
+		participantes = participantes.filter(mo.Participante.fono_corporativo==fono_corporativo)
+	if correo_personal!= None:
+		participantes = participantes.filter(mo.Participante.correo_personal==correo_personal)
+	if correo_corporativo!= None:
+		participantes = participantes.filter(mo.Participante.correo_corporativo==correo_personal)
 	if razon_social!= None:
 		participantes = participantes.filter(mo.Participante.razon_social==razon_social)
 			
@@ -204,6 +209,7 @@ def crear_curso():
 	
 @app.route("/curso/obtener",methods=["GET"])
 def obtener_curso():
+
 	sence = request.args.get('sence')
 	nombre = request.args.get('nombre')
 	modalidad = request.args.get('modalidad')
@@ -267,6 +273,7 @@ def crear_instancia_curso():
 	fecha_termino = request.json['fecha_termino']
 
 	nuevo_instancia_curso=mo.Instancia(id_instancia,sence,direccion,malla,fecha_inicio,fecha_termino)
+
 	db.session.add(nuevo_instancia_curso)
 	try:
 		db.session.commit() 
@@ -318,10 +325,8 @@ def crear_empresa():
 	rut = request.json['rut']
 	direccion = request.json['direccion']
 	comuna = request.json['comuna']
-	correo = request.json['correo']
-	fono = request.json['fono']
 
-	nuevo_empresa=mo.Empresa(razon_social,giro,atencion,departamento,rut,direccion,comuna,correo,fono)
+	nuevo_empresa=mo.Empresa(razon_social,giro,atencion,departamento,rut,direccion,comuna)
 
 	db.session.add(nuevo_empresa)
 	try:
@@ -332,7 +337,6 @@ def crear_empresa():
 
 @app.route("/empresa/obtener",methods=["GET"])
 def filtro_empresas():
-	
 
 	razon_social = request.args.get('razon_social')
 	giro = request.args.get('giro')
@@ -341,8 +345,7 @@ def filtro_empresas():
 	rut = request.args.get('rut')
 	direccion = request.args.get('direccion')
 	comuna = request.args.get('comuna')
-	correo = request.args.get('correo')
-	fono = request.args.get('fono')
+
 	empresas = mo.Empresa.query.filter()
 	if giro != None:
 		empresas = empresas.filter(mo.Empresa.razon_social==razon_social)
@@ -356,16 +359,10 @@ def filtro_empresas():
 		empresas = empresas.filter(mo.Empresa.direccion==direccion)
 	if comuna != None:
 		empresas = empresas.filter(mo.Empresa.comuna==comuna)
-	if correo != None:
-		empresas = empresas.filter(mo.Empresa.correo==correo)
-	if fono != None:
-		empresas = empresas.filter(mo.Empresa.fono==fono)
 
 	empresas_filtrados = empresa_schemas.dump(empresas)
 	
 	return jsonify(empresas_filtrados)
-
-
 
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
@@ -386,11 +383,16 @@ def filtro_relator():
 	apellido_paterno = request.args.get('apellido_paterno')
 	apellido_materno = request.args.get('apellido_materno')
 	titulo = request.args.get('titulo')
+	genero = request.args.get('genero')
 	cv = request.args.get('cv')
 	fecha_nacimiento = request.args.get('fecha_nacimiento')
 	numero_cuenta = request.args.get('numero_cuenta')
 	banco = request.args.get('banco')
 	tipo_cuenta = request.args.get('tipo_cuenta')
+	fono_personal = request.args.get('fono_personal')
+	fono_corporativo = request.args.get('fono_corporativo')
+	correo_personal = request.args.get('correo_personal')
+	correo_corporativo = request.args.get('correo_corporativo')
 	
 	relator = mo.Relator.query.filter()
 
@@ -404,6 +406,8 @@ def filtro_relator():
 		relator = relator.filter(mo.Relator.apellido_materno==apellido_materno)
 	if titulo != None:
 		relator = relator.filter(mo.Relator.titulo==titulo)
+	if genero != None:
+		relator = relator.filter(mo.Relator.genero==genero)
 	if cv != None:
 		relator = relator.filter(mo.Relator.cv==cv)
 	if fecha_nacimiento != None:
@@ -414,6 +418,14 @@ def filtro_relator():
 		relator = relator.filter(mo.Relator.banco==banco)
 	if tipo_cuenta != None:
 		relator = relator.filter(mo.Relator.tipo_cuenta==tipo_cuenta)
+	if fono_personal != None:
+		relator = relator.filter(mo.Relator.fono_personal==fono_personal)
+	if fono_corporativo != None:
+		relator = relator.filter(mo.Relator.fono_corporativo==fono_corporativo)
+	if correo_personal != None:
+		relator = relator.filter(mo.Relator.correo_personal==correo_personal)
+	if correo_corporativo != None:
+		relator = relator.filter(mo.Relator.correo_corporativo==correo_corporativo)
 
 	relator_filtrados = relator_schemas.dump(relator)
 	
@@ -427,14 +439,19 @@ def crear_relator():
 	apellido_paterno=request.json['apellido_paterno']
 	apellido_materno=request.json['apellido_materno']
 	titulo=request.json['titulo']
-	#genero=request.json['genero']
+	genero=request.json['genero']
 	cv=request.json['cv']
 	fecha_nacimiento=request.json['fecha_nacimiento']
 	numero_cuenta=request.json['numero_cuenta']
 	banco=request.json['banco']
 	tipo_cuenta=request.json['tipo_cuenta']
+	fono_personal=request.json['fono_personal']
+	fono_corporativo=request.json['fono_coperativo']
+	correo_personal=request.json['correo_personal']
+	correo_corporativo=request.json['correo_corporativo']
 	
-	nuevo_relator=mo.Relator(rut,nombre,apellido_paterno,apellido_materno,titulo,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta)
+	nuevo_relator=mo.Relator(rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta,fono_personal,
+	fono_corporativo,correo_personal,correo_corporativo)
 	
 	db.session.add(nuevo_relator)
 	try:
@@ -445,6 +462,11 @@ def crear_relator():
 	resultado = relator_schema.dump(nuevo_relator)
 
 	return jsonify(resultado)
+
+
+# -----------------------------------------------------------------------------------------------------
+# --------------------------------------CONTACTO-------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
 
 #################################
 #############TABLA INTERMEDIA####

@@ -42,7 +42,6 @@ def procesamiento(archivo):
 	df = df. parse(df.sheet_names[0])
 	return df
 
-
 df=procesamiento("empresa")
 insertarDatos(df,"empresa")
 df=procesamiento("participante")
@@ -54,6 +53,7 @@ df["id_orden"]=pd.to_numeric(df["id_orden"],downcast= 'integer')
 df["cancelacion"]=pd.to_numeric(df["cancelacion"],downcast= 'integer')
 df["sence"]=pd.to_numeric(df["sence"],downcast= 'integer')
 insertarDatos(df,"orden")
+
 df=procesamiento("curso")
 df["sence"]=pd.to_numeric(df["sence"],downcast= 'integer')
 df["resolucion_sence"]=pd.to_numeric(df["resolucion_sence"],downcast= 'integer')
