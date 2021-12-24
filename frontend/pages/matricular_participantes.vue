@@ -3,17 +3,58 @@
     <div v-if="page==1">
       <h1>Seleccione participantes</h1>
       <div>
+        <v-container >
+        <v-row >
+        <v-col>
+        <v-text-field
+            hide-details 
+            v-model="rut"
+            label="Rut"
+            filled 
+            rounded 
+            dense 
+            single-line 
+            append-icon="mdi-account-plus"
+            class="shrink mx-4"
+            @click:append="agregarParticipante(rut)"
+        ></v-text-field>
+        </v-col>
+        </v-row>
+        </v-container>
+      <v-data-table :headers="headers1" :items="matriculados">
+      <template v-slot:item="row">
+          <tr>
+            <td>{{row.item.rut}}</td>
+            <td>{{row.item.nombre}}</td>
+            <td>{{row.item.apellido_paterno}}</td>
+            <td>{{row.item.apellido_materno}}</td>
+            <td>{{row.item.correo}}</td>
+            <td>{{row.item.fono}}</td>
+            <td>{{row.item.razon_social}}</td>
+            <td>{{row.item.nacionalidad}}</td>
+            <td>
+                <v-btn class="mx-2" fab dark small color="red" @click="handleClick(row.item)">
+                    <v-icon dark>mdi-account-minus</v-icon>
+                </v-btn>
+            </td>
+          </tr>
+      </template>
+    </v-data-table>
+
+        <!--
         <v-data-table
           v-model="matriculados"
           :headers="headers1"
           :items="participantes"
           item-key="rut"
-          show-select
           @click:row="handleClick"
           class="elevation-1"
         >
-        
+        <tr>
+        <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
+        </tr>
         </v-data-table>
+        !-->
         <v-btn  color="blue lighten-1" class="mr-4" @click="escogerParticipantes">Continuar</v-btn>
       </div>
     </div>
@@ -78,14 +119,14 @@ export default {
     ],
 		selectAll: false,
     page:1,
-    participantes:[],
     matriculados:[],
     cursos:[],
-    curso:[]
+    curso:[],
+    rut:''
   }),
   methods:{
     escogerParticipantes: function(){
-      if(this.matriculados.length==0){
+      if(this.matriculados.length!=1){
         alert('Debe seleccionar almenos 1 participante para matricular')
       }
       else{
@@ -115,6 +156,11 @@ export default {
     },
     handleClick: function(value){
       console.log(value)
+      var index = this.matriculados.indexOf(value);
+      if (index !== -1) {
+        this.matriculados.splice(index, 1);
+      }
+      console.log(index)
     },
     /*
     select: function() {
@@ -144,6 +190,27 @@ export default {
         console.log('error', error); 
       }
     },
+    obtenerParticipante: async function(value){
+      let response= axios.get('http://localhost:5000/participante/obtener?rut='+value)
+      return response
+    },
+    agregarParticipante: async function(value){
+      try{
+        console.log(value)
+        let response= await this.obtenerParticipante(value)
+        console.log('la data es ',response.data)
+        if(response.data.length == 0){
+          alert('No existe participante.')
+        }
+        else{
+          this.matriculados.push(response.data[0])
+          console.log('la respuesta es: ',response.data[0])
+        }
+      }
+      catch(error){
+        console.log('error', error); 
+      }
+    }
   },
   created(){
     this.getParticipantes()
@@ -165,5 +232,4 @@ export default {
 body{
 	padding: 50px
 }
-
 </style>
