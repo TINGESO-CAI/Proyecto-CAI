@@ -186,7 +186,6 @@ class Participante(db.Model):
 	correo_corporativo=db.Column(db.Text)
 	correo_personal=db.Column(db.Text)
 	
-	
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
 
 	empresa = db.relationship('Empresa')
