@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_cors import CORS
+import sqlalchemy.orm.exc
 import json
 
 from sqlalchemy.sql import text
@@ -38,6 +39,9 @@ relator_schemas = mo.RelatorSchema(many=True)
 
 orden_schema= mo.OrdenSchema()
 orden_schemas= mo.OrdenSchema(many=True)
+
+instancia_schema=mo.InstanciaSchema()
+instancia_schemas=mo.InstanciaSchema(many=True)
 
 #instancia_schema= mo.Instancia()
 instancia_schemas= mo.InstanciaSchema(many=True)
@@ -463,7 +467,6 @@ def crear_relator():
 
 	return jsonify(resultado)
 
-
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------CONTACTO-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -471,28 +474,38 @@ def crear_relator():
 #################################
 #############TABLA INTERMEDIA####
 #################################
-@app.route("/relator_curso/agregar",methods=["POST"])
-def crear_RC():
-	rut=request.json['rut']
-	sence=request.json['sence']
-	nuevo_RC=mo.Relator_Curso(rut,sence)
-	db.session.add(nuevo_RC)
-	try:
-		db.session.commit()
-	except:
-		return jsonify({"respuesta":"Esta relacion ya ha sido ingresado"})
-	return jsonify({"respuesta":"Relator ha sido ingresado"})
+@app.route("/relator_instancia/agregar",methods=["POST"])
+def crear_RI():
+	request_rut=request.json['rut']
+	request_id_instancia=request.json['id_instancia']
 
-@app.route("/participante_curso/agregar",methods=["POST"])
-def crear_PC():
-	rut=request.json['rut']
-	sence=request.json['sence']
-	nuevo_PC=mo.Participante_Curso(rut,sence)
-	db.session.add(nuevo_PC)
+	relator = mo.Relator.query.get(request_rut)
+	instancia = mo.Instancia.query.get(request_id_instancia)
+	
+	if not(relator in instancia.profesores):
+		instancia.profesores.append(relator)	
+	else:
+		return jsonify({"respuesta":"El profesor ya dicta este curso"})	
 	try:
-		db.session.commit() 
-	except:
-		return jsonify({"respuesta":"Esta relacion ya ha sido ingresado"})
-	return jsonify({"respuesta":"Participante ha sido ingresado"})
+		db.session.commit()	
+	except sqlalchemy.orm.exc.FlushError:
+		return jsonify({"respuesta":"El profesor o la instancia no existe"})	
+	return jsonify({"respuesta":"El profesor fue asignado con exito"})
+
+@app.route("/participante_instancia/agregar",methods=["POST"])
+def crear_PI():
+	request_rut=request.json['rut']
+	request_id_instancia=request.json['id_instancia']
+
+	participante = mo.Participante.query.get(request_rut)
+	instancia = mo.Instancia.query.get(request_id_instancia)
+	
+	if not(participante in instancia.alumnos):
+		instancia.alumnos.append(participante)
+		db.session.commit()
+	else:
+		return jsonify({"respuesta":"El participante ya esta matriculado en este curso"})
+	return jsonify({"respuesta":"Participante ha sido matriculado con exito"})
+
 if __name__ == '__main__':
 	app.run(debug=True)

@@ -6,6 +6,7 @@ import db.credenciales as creds
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
 
+
 # Set up a connection to the postgres server.
 conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
 +" password="+ creds.PGPASSWORD
@@ -20,7 +21,7 @@ def insertarDatos(df,tabla):
 		i=0
 		while i<len(row)-1:
 			if str(row[i])=="nan":
-				insertdata += str("NULL")+"','"
+				insertdata += "','"
 			else:
 				insertdata += str(row[i])+"','"
 			i+=1
@@ -42,10 +43,14 @@ def procesamiento(archivo):
 	df = df. parse(df.sheet_names[0])
 	return df
 
+
 df=procesamiento("empresa")
 insertarDatos(df,"empresa")
+
 df=procesamiento("participante")
 df["genero"]=pd.to_numeric(df["genero"],downcast= 'integer')
+df["fono_personal"]=pd.to_numeric(df["fono_personal"],downcast= 'integer')
+df["fono_corporativo"]=pd.to_numeric(df["fono_corporativo"],downcast= 'integer')
 insertarDatos(df,"participante")
 
 df=procesamiento("orden")
@@ -62,10 +67,16 @@ df["horas_curso"]=pd.to_numeric(df["horas_curso"],downcast= 'integer')
 df["valor_efectivo_participante"]=pd.to_numeric(df["valor_efectivo_participante"],downcast= 'integer')
 df["valor_imputable_participante"]=pd.to_numeric(df["valor_imputable_participante"],downcast= 'integer')
 insertarDatos(df,"curso")
-df=procesamiento("participante_orden")
-df["id_orden"]=pd.to_numeric(df["id_orden"],downcast= 'integer')
 
-insertarDatos(df,"participante_orden")
-df=procesamiento("participante_curso")
+df=procesamiento("relator")
+df["numero_cuenta"]=pd.to_numeric(df["numero_cuenta"],downcast= 'integer')
+df["genero"]=pd.to_numeric(df["genero"],downcast= 'integer')
+df["fono_personal"]=pd.to_numeric(df["fono_personal"],downcast= 'integer')
+df["fono_corporativo"]=pd.to_numeric(df["fono_corporativo"],downcast= 'integer')
+insertarDatos(df,"relator")
+
+df=procesamiento("instancia")
+df["id_instancia"]=pd.to_numeric(df["id_instancia"],downcast= 'integer')
 df["sence"]=pd.to_numeric(df["sence"],downcast= 'integer')
-insertarDatos(df,"participante_curso")
+df["malla"] = df["malla"].astype('bool')
+insertarDatos(df,"instancia")

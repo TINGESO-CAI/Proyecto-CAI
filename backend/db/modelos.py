@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy 
 from marshmallow import Schema, fields, ValidationError, pre_load
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from sqlalchemy.orm import backref
 
 from sqlalchemy.schema import CreateColumn
 from sqlalchemy.ext.compiler import compiles
@@ -8,7 +9,6 @@ from sqlalchemy.ext.compiler import compiles
 
 
 db=SQLAlchemy()
-
 
 relator_instancia=db.Table('relator_instancia',
 	db.Column('rut',db.Text, db.ForeignKey('relator.rut')),
@@ -20,12 +20,12 @@ participante_instancia=db.Table('participante_instancia',
 	db.Column('id_instancia',db.Integer, db.ForeignKey('instancia.id_instancia'))
 )
 
-partipante_factura= db.Table('participante_factura',
+participante_factura = db.Table('participante_factura',
 	db.Column('rut',db.Text, db.ForeignKey('participante.rut')),
 	db.Column('id_factura',db.Integer, db.ForeignKey('factura.id_factura'))
 )
 
-partipante_orden=db.Table('participante_orden',
+participante_orden=db.Table('participante_orden',
 	db.Column('rut',db.Text, db.ForeignKey('participante.rut')),
 	db.Column('id_orden',db.Integer, db.ForeignKey('orden.id_orden'))
 )
@@ -79,6 +79,7 @@ class CursoSchema(SQLAlchemyAutoSchema):
 		'modalidad','categoria','horas_curso','valor_efectivo_participante','valor_imputable_participante',
 
 		'resolucion_sence','resolucion_usach','estado','f_vigencia')
+
 class Empresa(db.Model):
 	__tablename__ = 'empresa'
 
@@ -90,6 +91,8 @@ class Empresa(db.Model):
 	direccion = db.Column(db.Text)
 	comuna = db.Column(db.Text)
 
+	contactos=db.relationship('Contacto',backref='contacto')
+	empleados=db.relationship('Participante',backref='participante')
 
 	def __init__(self,razon_social,giro,atencion,departamento,rut,direccion,comuna):
 		self.razon_social = razon_social
@@ -118,7 +121,8 @@ class Factura(db.Model):
 	num_hes = db.Column(db.Text)
 	fecha_emision = db.Column(db.Date)
 	fecha_vencimiento = db.Column(db.Date)
-	persona_asignada_f = db.relationship('Participante', secondary='participante_orden', backref=db.backref('asignar_factura',lazy='dinamic'))
+
+	persona_asignada_f = db.relationship('Participante', secondary='participante_factura', backref=db.backref('asignar_factura'))
 	
 	def __init__(self,id_factura,sence,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento):
 		self.id_factura = id_factura
@@ -145,6 +149,7 @@ class Instancia(db.Model):
 	malla = db.Column(db.Boolean)
 	fecha_inicio = db.Column(db.Date)
 	fecha_termino = db.Column(db.Date)
+
 	
 	curso = db.relationship('Curso')
 	
@@ -169,7 +174,7 @@ class Orden(db.Model):
 	cancelacion = db.Column(db.Integer)
 	fecha_inicio = db.Column(db.Date)
 	fecha_termino = db.Column(db.Date)
-	persona_asignada_o = db.relationship('Participante', secondary='participante_orden', backref=db.backref('asignar_orden',lazy='dinamic'))
+	persona_asignada_o = db.relationship('Participante', secondary='participante_orden', backref=db.backref('asignar_orden'))
 	
 	def __init__(self,id_orden,sence,cancelacion,fecha_emision,fecha_vencimiento):
 		self.id_orden = id_orden
@@ -182,8 +187,6 @@ class OrdenSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('id_orden','sence',
 		'cancelacion','fecha_emision','fecha_vencimiento')
-
-
 
 class Participante(db.Model):
 	__tablename__ = 'participante'
@@ -202,9 +205,10 @@ class Participante(db.Model):
 	fono_corporativo=db.Column(db.Text)
 	correo_corporativo=db.Column(db.Text)
 	correo_personal=db.Column(db.Text)
+
+	instancias = db.relationship('Instancia', secondary='participante_instancia', backref=db.backref('alumnos', lazy='dynamic'))
 	
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
-
 	empresa = db.relationship('Empresa')
 
 	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,razon_social,fono_personal,fono_corporativo,correo_corporativo,correo_personal):
@@ -240,6 +244,7 @@ class Relator(db.Model):
 	apellido_paterno = db.Column(db.Text)
 	apellido_materno = db.Column(db.Text)
 	titulo = db.Column(db.Text)
+	genero = db.Column(db.Integer)
 	cv = db.Column(db.Text)
 	fecha_nacimiento = db.Column(db.Date)
 	numero_cuenta = db.Column(db.Text)
@@ -250,15 +255,16 @@ class Relator(db.Model):
 	correo_corporativo=db.Column(db.Text)
 	correo_personal=db.Column(db.Text)
 	
-	inscripciones = db.relationship('Instancia', secondary='relator_instancia', backref=db.backref('inscribir',lazy='dinamic'))
+	dicta_instancia = db.relationship('Instancia', secondary='relator_instancia', backref=db.backref('profesores', lazy='dynamic'))
 	
 
-	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,titulo,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta):
+	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta):
 		self.rut = rut
 		self.nombre=nombre
 		self.apellido_paterno=apellido_paterno
 		self.apellido_materno=apellido_materno
 		self.titulo=titulo
+		self.genero=genero
 		self.cv=cv
 		self.fecha_nacimiento=fecha_nacimiento
 		self.numero_cuenta=numero_cuenta
@@ -269,7 +275,7 @@ class RelatorSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('rut','nombre',
 		'apellido_paterno','apellido_materno',
-		'titulo','cv','fecha_nacimiento',
+		'titulo','genero','cv','fecha_nacimiento',
 		'numero_cuenta','banco','tipo_cuenta','fono_personal','fono_corporativo','correo_corporativo','correo_personal')
 
 		

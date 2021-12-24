@@ -75,6 +75,7 @@ def upgrade():
     sa.Column('apellido_paterno', sa.Text(), nullable=True),
     sa.Column('apellido_materno', sa.Text(), nullable=True),
     sa.Column('titulo', sa.Text(), nullable=True),
+    sa.Column('genero', sa.Integer(), nullable=True),
     sa.Column('cv', sa.Text(), nullable=True),
     sa.Column('fecha_nacimiento', sa.Date(), nullable=True),
     sa.Column('numero_cuenta', sa.Text(), nullable=True),
