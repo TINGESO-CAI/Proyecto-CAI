@@ -63,10 +63,11 @@
                 <v-row>
                 <v-col>
                     <p class="font-weight-bold">Estado:</p>
-                </v-col>                
+                </v-col>               
                 <v-col>
                         {{curso[0].estado}}
                 </v-col>
+                
                 </v-row>
         </v-container>
         </v-col>
@@ -82,14 +83,20 @@
                     label="Direccion"
                     required
                 ></v-text-field>
-                </v-col>      
+                </v-col>
+                <v-row>    
                 <v-col>
-                <v-text-field
-                    v-model="malla"
-                    label="Malla"
-                    required
-                ></v-text-field>
-                </v-col>  
+                <v-select
+                  v-model="malla"
+                  :items="mostrarMalla"
+                  item-text="mostrarmalla"
+                  label="Malla"
+                  persistent-hint
+                  return-object
+                  single-line
+                ></v-select>
+                </v-col>
+                </v-row>
                 <v-col>
                 <v-text-field
                     v-model="fecha_inicio"
@@ -103,6 +110,7 @@
                     label="Fecha de termino"
                     required
                 ></v-text-field>
+                <v-btn  color="blue lighten-1" class="mr-4" @click="crearInstancia">Crear Instancia</v-btn>
                 </v-col>             
             </v-form>
         </v-container>
@@ -124,8 +132,13 @@ import axios from 'axios';
 export default {
   data:()=>( {
     page:1,
-    curso:[1],
-    sense:''
+    curso:[],
+    sence:'',
+    direccion:'',
+    malla:'Malla',
+    fecha_inicio:'',
+    fecha_termino:'',
+    mostrarMalla:['Si','No']
   }),
   methods:{
     escogerParticipantes: function(){
@@ -140,6 +153,30 @@ export default {
     obtenerCurso: async function(value){
       let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
       return response
+    },
+    crearInstancia:async function(){
+      try{
+        if(this.malla=='Si'){
+          this.malla=true
+        }
+        else{
+          this.malla=false
+        }
+        let response = await axios.post('http://localhost:5000/instancia/agregar',{id_instancia:1000,sence: this.sence , direccion: this.direccion , malla: this.malla , fecha_inicio:this.fecha_inicio , fecha_termino:this.fecha_termino})
+        console.log(this.malla)
+        console.log(response.data)
+        alert("Instancia creada con exito")
+        this.sence=''
+        this.malla=''
+        this.direccion=''
+        this.fecha_inicio=''
+        this.fecha_termino=''
+        this.curso=[]
+      }
+      catch(error){
+        console.log(error)
+        alert("Ocurrio un error")
+      }
     },
     buscar: async function(value){
       console.log(value)

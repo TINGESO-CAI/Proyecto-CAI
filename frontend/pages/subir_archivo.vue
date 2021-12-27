@@ -33,6 +33,8 @@
 
 
 <script>
+    import readXlsxFile from 'read-excel-file'
+    import axios from 'axios'
     export default {
         data: function() {
             return {
@@ -40,16 +42,33 @@
             }
         },
         methods: {
-            onChange: function() {
+            onChange: function(event) {
             this.filelist = [...this.$refs.file.files];
             },
             remove: function(i) {
             this.filelist.splice(i, 1);
             },
-            ingresar: function(i){
-                console.log(i) //Función temporal
-                console.log(this.filelist)
-                console.log(this.filelist[i])
+            postParticipante: async function(archivo,j){
+              try{
+              let response=await axios.post('http://localhost:5000/participante/agregar',
+                  {rut:archivo[j][0], nombre:archivo[j][1],apellido_paterno:archivo[j][2],apellido_materno:archivo[j][3],genero:archivo[j][4],
+                  fecha_nacimiento:archivo[j][5],nivel_educacional:archivo[j][6],nacionalidad:archivo[j][7], tipo_inscripcion:archivo[j][8],
+                  ocupacion: archivo[j][9], razon_social: archivo[j][10], fono_personal: archivo[j][11], fono_corporativo: archivo[j][12], correo_personal: archivo[j][13]});
+              return response
+              }
+              catch(error){
+                console.log(error)
+                return error
+              }
+              
+            },
+            ingresar: async function(i){
+                let archivo=await readXlsxFile(this.filelist[i])
+                  for (let j=1; j< archivo.length; j++){
+                    console.log(archivo[j])
+                    let response = this.postParticipante(archivo,j)
+                    console.log(response.data)
+                  }
             },
             dragover: function(event) {
             event.preventDefault();
