@@ -117,7 +117,41 @@ def crear_participante():
 	resultado = participante_schema.dump(nuevo_participante)
 
 	return jsonify(resultado)
+	
+@app.route("/participante/agregar/archivo",methods=["POST"])
+def crear_participante_archivo():
+	#{participantes=[{participabte1},{participabte2},{participabte2}]}
+	participantes=request.json['participantes']
+	lista_participantes_rechazados=[]
+	for persona in  participantes:
+		nuevo_participante=mo.Participante(
+			persona["rut"],
+			persona["nombre"],
+			persona["apellido_paterno"],
+			persona["apellido_materno"],
+			persona["genero"],
+			persona["nivel_educacional"],
+			persona["fecha_nacimiento"],
+			persona["nacionalidad"],
+			persona["tipo_inscripcion"],
+			persona["ocupacion"],
+			persona["razon_social"],
+			persona["fono_personal"],
+			persona["fono_corporativo"],
+			persona["correo_corporativo"],
+			persona["correo_personal"]					
+			)
+		db.session.add(nuevo_participante)
+		try:
+			db.session.commit()
+		except Exception as e:
+			lista_participantes_rechazados.append(nuevo_participante)
+			db.session.rollback()
+	
+	participantes_rechazados=participante_schemas.dump(lista_participantes_rechazados)
 
+	return jsonify({"1.respuesta":"Los siguientes participantes no se han podido ingresar, duplicados o errores, revise:","2.participantes":participantes_rechazados})
+	
 @app.route("/participante/obtener",methods=["GET"])
 def filtro_participante():
 
@@ -181,6 +215,12 @@ def obtener_ruts():
 	participantes = participante_schemas.dump(rut_curso)
 	
 	return jsonify(participantes)
+
+@app.route("/participante/<rut>/instancias",methods=["GET"])
+def obtener_cursos_inscritos_participante(rut):
+	participante = mo.Participante.query.get(rut)
+	instancias = instancia_schemas.dump(participante.instancias)
+	return jsonify(instancias)
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------CURSO------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -269,15 +309,15 @@ def obtener_sences():
 @app.route("/instancia/agregar",methods=["POST"])
 def crear_instancia_curso():
 
-	id_instancia = request.json['id_instancia']
+	#id_instancia = request.json['id_instancia']
 	sence = request.json['sence']
 	direccion = request.json['direccion']
 	malla = request.json['malla']
 	fecha_inicio = request.json['fecha_inicio']
 	fecha_termino = request.json['fecha_termino']
 
-	nuevo_instancia_curso=mo.Instancia(id_instancia,sence,direccion,malla,fecha_inicio,fecha_termino)
-
+	nuevo_instancia_curso=mo.Instancia(sence=sence,direccion=direccion,malla=malla,fecha_inicio=fecha_inicio,fecha_termino=fecha_termino)
+	print(nuevo_instancia_curso)
 	db.session.add(nuevo_instancia_curso)
 	try:
 		db.session.commit() 
@@ -524,15 +564,49 @@ def filtro_contacto():
 @app.route("/factura/agregar",methods=["POST"])
 def crear_factura():
 
-	id_factura=request.json['id_factura']
-	num_registro=request.json['num_registro']
-	estado=request.json['estado']
-	tipo_pago=request.json['tipo_pago']
-	num_hes=request.json['num_hes']
-	fecha_emision=request.json['fecha_emision']
-	fecha_vencimiento=request.json['fecha_vencimiento']
+	#id_factura=request.json['id_factura'] # Como hacer que el id se aumente solo?
+	#num_registro=request.json['num_registro'] #Este numero se debe ingresar o es fijo?
+	#estado=request.json['estado'] # El estado lo definimos nosotros?
+	#tipo_pago=request.json['tipo_pago'] # Segun yo este no va
+	#num_hes=request.json['num_hes'] #Cuando se ingresa, siempre a veces?
+	#fecha_emision=request.json['fecha_emision']
+	#fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento de que?
 	sence=request.json['sence']
+
+	# ----------- INFO GENERAL ---------------------------
+
+	#num_factura = #Lo usan? puede ser id de factura
+	#datos_de = #Sara Perez Rojas - Director Centro USACH - FIJOS
+	#datos_a = #Director Ejecutivo Capacitacion USACH - FIJOS
+	#nombre_proyecto = #Curso de Capacitacion CAI-2006 / Siempre es el mismo?
+	#codigo_proyecto = #CAP-CAI-15 / Siempre es el mismo?
+	#enviar_factura = #3 opciones: USACH, EMPRESA, OTRO
+	#num_orden = #Cuando tiene una orden OTIC asociada
+	#obs = #Agregan un correo o numero de la empresa
+
+	# ----------- INFO DEL CURSO -------------------------
+	curso_factura = mo.Curso.query.get(sence)
 	
+	nombre_curso = curso_factura.nombre
+	sence_curso = curso_factura.sence
+	horas_curso = curso_factura.horas_curso
+	#fecha_incio_instancia = #?
+	#fecha_termino_instancia = #?
+	#num_registro_sence = # de donde sale, es el que esta en curso? 
+	valor_curso = curso_factura.valor_efectivo_participante
+	# En las soli sale participante y un mensaje, ese msj es predeterminado o varia?
+	# En una soli agregaron el nombre de otra empresa y el rut correspondiente, cuando se hace eso?
+
+	# ----------- INFO DE LA EMPRESA ------------------------
+	# duda existencial, la solicitud de factura es difernet cuando es particular? porq si es asi debe haber una relacion entre factura y empresa
+	# razon_social = 
+	# giro_empresa =
+	# atencion_empresa = con que se rellena este campo? Duda a la clienta
+	# departamento_empresa =
+	# rut_empresa = aun no responde la duda la clienta sobre el tema del rut
+	# direccion_empresa =
+	# fono_empresa =
+	'''
 	nueva_factura=mo.Factura(id_factura,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento,sence)
 	
 	db.session.add(nueva_factura)
@@ -542,8 +616,9 @@ def crear_factura():
 		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada"})
 	
 	resultado = factura_schema.dump(nueva_factura)
+	'''
+	return jsonify("Termine")
 
-	return jsonify(resultado)
 
 @app.route("/factura/obtener",methods=["GET"])
 def filtro_factura():
@@ -611,10 +686,60 @@ def crear_PI():
 	
 	if not(participante in instancia.alumnos):
 		instancia.alumnos.append(participante)
-		db.session.commit()
 	else:
 		return jsonify({"respuesta":"El participante ya esta matriculado en este curso"})
+
+	try:
+		db.session.commit()
+	except sqlalchemy.orm.exc.FlushError:
+		return jsonify({"respuesta":"El participante o la instancia no existe"})
+
 	return jsonify({"respuesta":"Participante ha sido matriculado con exito"})
+
+@app.route("/participante_factura/agregar",methods=["POST"])
+def crear_PF():
+	
+	request_rut=request.json['rut']
+	request_id_factura=request.json['id_factura']
+
+	participante = mo.Participante.query.get(request_rut)
+	factura = mo.Factura.query.get(request_id_factura)
+	
+	if not(participante in factura.facturas_alumnos):
+		factura.facturas_alumnos.append(participante)
+	else:
+		return jsonify({"respuesta":"El participante ya esta asociado a esta factura"})
+
+	try:
+		db.session.commit()
+	except sqlalchemy.orm.exc.FlushError:
+		return jsonify({"respuesta":"El participante o la factura no existe"})
+
+	return jsonify({"respuesta":"Participante ha sido asociado a una factura con exito"})
+"""
+No se si esto ira o que
+
+@app.route("/participante_orden/agregar",methods=["POST"])
+def crear_PF()
+	
+	request_rut=request.json['rut']
+	request_id_factura=request.json['id_orden']
+
+	participante = mo.Participante.query.get(request_rut)
+	factura = mo.Factura.query.get(request_id_factura)
+	
+	if not(participante in orden.ordenes_alumnos):
+		orden.ordenes_alumnos.append(participante)
+	else:
+		return jsonify({"respuesta":"El participante ya esta asociado a esta orden "})
+
+	try:
+		db.session.commit()
+	except sqlalchemy.orm.exc.FlushError:
+		return jsonify({"respuesta":"El participante o la orden no existe"})
+
+	return jsonify({"respuesta":"Participante ha sido asociado a una orden con exito"})
+"""
 
 if __name__ == '__main__':
 	app.run(debug=True)

@@ -76,7 +76,6 @@ df["fono_corporativo"]=pd.to_numeric(df["fono_corporativo"],downcast= 'integer')
 insertarDatos(df,"relator")
 
 df=procesamiento("instancia")
-df["id_instancia"]=pd.to_numeric(df["id_instancia"],downcast= 'integer')
 df["sence"]=pd.to_numeric(df["sence"],downcast= 'integer')
 df["malla"] = df["malla"].astype('bool')
-insertarDatos(df,"instancia")
+insertarDatos(df,'"instancia" ( "sence" ,"direccion", "malla", "fecha_inicio", "fecha_termino")')

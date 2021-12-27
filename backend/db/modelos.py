@@ -127,7 +127,6 @@ class Factura(db.Model):
 	fecha_emision = db.Column(db.Date)
 	fecha_vencimiento = db.Column(db.Date)
 
-	persona_asignada_f = db.relationship('Participante', secondary='participante_factura', backref=db.backref('asignar_factura'))
 	
 	def __init__(self,id_factura,sence,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento):
 		self.id_factura = id_factura
@@ -155,11 +154,9 @@ class Instancia(db.Model):
 	fecha_inicio = db.Column(db.Date)
 	fecha_termino = db.Column(db.Date)
 
-	
 	curso = db.relationship('Curso')
 	
-	def __init__(self,id_instancia,sence,direccion,malla,fecha_inicio,fecha_termino):
-		self.id_instancia = id_instancia
+	def __init__(self,sence,direccion,malla,fecha_inicio,fecha_termino):
 		self.sence = sence
 		self.direccion = direccion
 		self.malla = malla 
@@ -210,6 +207,7 @@ class Participante(db.Model):
 	fono_corporativo=db.Column(db.Text)
 	correo_corporativo=db.Column(db.Text)
 	correo_personal=db.Column(db.Text)
+	facturas = db.relationship('Factura', secondary='participante_factura', backref=db.backref('facturas_alumnos'))
 
 	instancias = db.relationship('Instancia', secondary='participante_instancia', backref=db.backref('alumnos', lazy='dynamic'))
 	
