@@ -214,7 +214,7 @@ class Participante(db.Model):
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
 	empresa = db.relationship('Empresa')
 
-	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,razon_social,fono_personal,fono_corporativo,correo_corporativo,correo_personal):
+	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,fono_personal,fono_corporativo,correo_corporativo,correo_personal,razon_social):
 		self.rut = rut
 		self.nombre=nombre
 		self.apellido_paterno=apellido_paterno
@@ -225,11 +225,11 @@ class Participante(db.Model):
 		self.nacionalidad=nacionalidad
 		self.tipo_inscripcion=tipo_inscripcion
 		self.ocupacion=ocupacion
-		self.razon_social=razon_social
 		self.fono_personal=fono_personal
 		self.fono_corporativo=fono_corporativo
 		self.correo_corporativo=correo_corporativo
 		self.correo_personal=correo_personal
+		self.razon_social=razon_social
 	
 
 class ParticipanteSchema(SQLAlchemyAutoSchema):

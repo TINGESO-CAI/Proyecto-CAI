@@ -1,3 +1,4 @@
+from datetime import datetime
 from operator import mod
 from typing import Text
 import requests
@@ -101,8 +102,8 @@ def crear_participante():
 	ocupacion=request.json['ocupacion']
 	fono_personal=request.json['fono_personal']
 	fono_corporativo=request.json['fono_corporativo']
-	correo_personal=request.json['correo_personal']
 	correo_corporativo=request.json['correo_corporativo']
+	correo_personal=request.json['correo_personal']
 	razon_social=request.json['razon_social']
 	
 	nuevo_participante=mo.Participante(rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,
@@ -144,7 +145,7 @@ def crear_participante_archivo():
 		db.session.add(nuevo_participante)
 		try:
 			db.session.commit()
-		except Exception as e:
+		except:
 			lista_participantes_rechazados.append(nuevo_participante)
 			db.session.rollback()
 	
@@ -355,7 +356,15 @@ def obtener_instancia_curso():
 	
 	return jsonify(instancias_cursos_filtrado)
 
-
+# *** TERMINAR ESTO ***
+@app.route("/instancia/<sence>/vigentes",methods=["GET"])
+def obtener_instancias_vigentes(sence):
+	instancias = mo.Instancia.query.filter()
+	instancias = instancias.filter(mo.Instancias.sence==sence)
+	
+	participante = mo.Participante.query.get(rut)
+	instancias = instancia_schemas.dump(participante.instancias)
+	return jsonify(instancias)
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -598,6 +607,11 @@ def crear_factura():
 	# En una soli agregaron el nombre de otra empresa y el rut correspondiente, cuando se hace eso?
 
 	# ----------- INFO DE LA EMPRESA ------------------------
+
+	# con sence, obtener la empresa
+	
+	# empresa.empleados
+
 	# duda existencial, la solicitud de factura es difernet cuando es particular? porq si es asi debe haber una relacion entre factura y empresa
 	# razon_social = 
 	# giro_empresa =
