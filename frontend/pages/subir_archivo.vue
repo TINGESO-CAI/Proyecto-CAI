@@ -42,19 +42,41 @@
             }
         },
         methods: {
-            onChange: function(event) {
+            onChange: function(e) {
             this.filelist = [...this.$refs.file.files];
             },
             remove: function(i) {
             this.filelist.splice(i, 1);
             },
+            todate: function(fecha){
+              var date = new Date(Math.round((fecha - (25567 + 1)) * 86400 * 1000));
+              var converted_date = date.toISOString().split('T')[0];
+              return converted_date
+            },
             postParticipante: async function(archivo,j){
               try{
-              let response=await axios.post('http://localhost:5000/participante/agregar',
-                  {rut:archivo[j][0], nombre:archivo[j][1],apellido_paterno:archivo[j][2],apellido_materno:archivo[j][3],genero:archivo[j][4],
-                  fecha_nacimiento:archivo[j][5],nivel_educacional:archivo[j][6],nacionalidad:archivo[j][7], tipo_inscripcion:archivo[j][8],
-                  ocupacion: archivo[j][9], razon_social:archivo[j][10], fono_personal:archivo[j][11], fono_corporativo:archivo[j][12], 
-                  correo_corporativo:archivo[j][13],correo_personal:archivo[j][14]});
+                console.log(j)
+                console.log(archivo[j])
+                console.log(archivo[j][10])
+              //let response=await axios.post('http://localhost:5000/participante/agregar',
+                  let NewParticipante={rut:archivo[j][0]
+                  ,nombre:archivo[j][1]
+                  ,apellido_paterno:archivo[j][2]
+                  ,apellido_materno:archivo[j][3]
+                  ,genero:archivo[j][4].toString()
+                  ,nivel_educacional:archivo[j][6]
+                  ,fecha_nacimiento: this.todate(archivo[j][5])
+                  ,nacionalidad:archivo[j][7]
+                  ,tipo_inscripcion: archivo[j][8]
+                  ,ocupacion: archivo[j][9]
+                  ,fono_personal: archivo[j][11]
+                  ,fono_corporativo: archivo[j][12]
+                  ,correo_personal: archivo[j][14]
+                  ,correo_corporativo: archivo[j][13]
+                  ,razon_social: archivo[j][10]}//)
+                  console.log(NewParticipante)
+                  let response=await axios.post('http://localhost:5000/participante/agregar',NewParticipante)
+                  
               return response
               }
               catch(error){
@@ -64,12 +86,18 @@
               
             },
             ingresar: async function(i){
-                let archivo=await readXlsxFile(this.filelist[i])
-                  for (let j=1; j< archivo.length; j++){
-                    console.log(archivo[j])
-                    let response = this.postParticipante(archivo,j)
-                    console.log(response.data)
-                  }
+              let schema = {
+                'fecha_nacimiento': {
+                  prop: 'date',
+                  type: Date
+                },
+              }
+              let archivo=await readXlsxFile(this.filelist[i])
+                for (let j=1; j< archivo.length; j++){                    
+                  let response = this.postParticipante(archivo,j)
+                }
+                this.remove(i)
+                alert("Se ha ingresado archivo con exito")
             },
             dragover: function(event) {
             event.preventDefault();
