@@ -49,15 +49,22 @@
             this.filelist.splice(i, 1);
             },
             todate: function(fecha){
-              var date = new Date(Math.round((fecha - (25567 + 1)) * 86400 * 1000));
-              var converted_date = date.toISOString().split('T')[0];
+              console.log("fecha: ",fecha)
+              if (fecha != null){
+                var date = new Date(Math.round((fecha - (25567 + 1)) * 86400 * 1000));
+                var converted_date = date.toISOString().split('T')[0];
+              }
               return converted_date
             },
             postParticipante: async function(archivo,j){
-              try{
-                console.log(j)
-                console.log(archivo[j])
-                console.log(archivo[j][10])
+              
+              
+            },
+            ingresar: async function(i){
+              let errores=[]
+              let archivo=await readXlsxFile(this.filelist[i])
+                for (let j=1; j< archivo.length; j++){  
+                  try{
               //let response=await axios.post('http://localhost:5000/participante/agregar',
                   let NewParticipante={rut:archivo[j][0]
                   ,nombre:archivo[j][1]
@@ -74,30 +81,23 @@
                   ,correo_personal: archivo[j][14]
                   ,correo_corporativo: archivo[j][13]
                   ,razon_social: archivo[j][10]}//)
-                  console.log(NewParticipante)
                   let response=await axios.post('http://localhost:5000/participante/agregar',NewParticipante)
-                  
-              return response
-              }
-              catch(error){
-                console.log(error)
-                return error
-              }
-              
-            },
-            ingresar: async function(i){
-              let schema = {
-                'fecha_nacimiento': {
-                  prop: 'date',
-                  type: Date
-                },
-              }
-              let archivo=await readXlsxFile(this.filelist[i])
-                for (let j=1; j< archivo.length; j++){                    
-                  let response = this.postParticipante(archivo,j)
+                  }
+                  catch(error){
+                    console.log(error)
+                    errores.push(j)
+                  }                  
+                }
+                let mensaje="Se ha ingresado archivo "+this.filelist[i].name+" con exito."
+                if (errores.length!=0){
+                  mensaje=mensaje +'\n errores en los participantes de las lineas:\n'
+                  for (let indice in errores){
+                    mensaje=mensaje + (errores[indice]+1).toString()+'\n'
+                  }
                 }
                 this.remove(i)
-                alert("Se ha ingresado archivo con exito")
+                console.log('errores: ',errores)
+                alert(mensaje)
             },
             dragover: function(event) {
             event.preventDefault();

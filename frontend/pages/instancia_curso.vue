@@ -131,7 +131,6 @@ import axios from 'axios';
 
 export default {
   data:()=>( {
-    page:1,
     curso:[],
     sence:'',
     direccion:'',
@@ -141,15 +140,6 @@ export default {
     mostrarMalla:['Si','No']
   }),
   methods:{
-    escogerParticipantes: function(){
-      if(this.matriculados.length!=1){
-        alert('Debe seleccionar almenos 1 participante para matricular')
-      }
-      else{
-        this.page=2
-      }
-      
-    },
     obtenerCurso: async function(value){
       let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
       return response

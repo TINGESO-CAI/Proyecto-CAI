@@ -288,6 +288,7 @@ export default {
       ['Ver boletas','mdi-format-list-bulleted-type','/ver_boletas'],
       ['Ver facturas','mdi-account-multiple','/ver_facturas'],
       ['Asignar pagos','mdi-account-multiple','/asignar_pagos'],
+      ['Generar Factura','mdi-file-plus','/factura']
       ],
       administracion:[
       ['Asignar permisos', 'mdi-account-multiple-plus','/permisos'],
