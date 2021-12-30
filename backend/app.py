@@ -378,6 +378,7 @@ def obtener_instancias_vigentes(sence):
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
+
 @app.route("/empresa/agregar",methods=["POST"])
 def crear_empresa():
 
@@ -588,18 +589,22 @@ def crear_factura():
 		num_factura=1
 	else:
 		num_factura=num_factura.id_factura+1
+	
 	num_cai=request.json['num_registro'] #Este numero se debe ingresar o es fijo?
-	estado=request.json['estado'] 
+	estado=request.json['estado']
+
 	num_hes=request.json['num_hes'] #Cuando se ingresa, siempre a veces?
 	fecha_emision=request.json['fecha_emision'] #Debe ser simpre la fecha actual?
 	fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento de que?
 	sence=request.json['sence']
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
-
+	
 	# ----------- INFO GENERAL ---------------------------
 	
 	enviar_factura = request.json['enviar_factura']
+	x=["","",""]
+	x[enviar_factura]="X"
 	if enviar_factura == 2:
 		especificar = request.json['especificar']
 	num_orden = request.json['num_orden'] #Cuando tiene una orden OTIC asociada
@@ -613,10 +618,11 @@ def crear_factura():
 	nombre_curso = curso_factura.nombre
 	sence_curso = curso_factura.sence
 	horas_curso = curso_factura.horas_curso
-	fecha_incio_instancia = instancia_factura.fecha_inicio
+	fecha_inicio_instancia = instancia_factura.fecha_inicio
 	fecha_termino_instancia = instancia_factura.fecha_termino
 	num_registro_sence = instancia_factura.id_instancia #es realmente asi?
 	valor_curso = curso_factura.valor_efectivo_participante
+	
 	# En las soli sale participante y un mensaje, ese msj es predeterminado o varia?
 	# En una soli agregaron el nombre de otra empresa y el rut correspondiente, cuando se hace eso?
 
@@ -637,15 +643,56 @@ def crear_factura():
 
 	for participante in lista_participantes['participantes']:
 		lista_rut.append(participante['rut'])	
-		
+	
+	valor_total=valor_curso*len(lista_rut)
 	nueva_factura=mo.Factura(num_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion)
 	db.session.add(nueva_factura)
 	
 	try:
 		db.session.commit() 
-	except:
+	except Exception as e:
+		
 		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada o hay un problema con ella"})
 	
+	tpl=DocxTemplate("backend/db/data/FORMULARIO_No_4_solicitud_de_factura.docx")
+	if estado == 0:
+		estado="cerrado"
+	else:
+		estado="abierto" 
+	parametros={
+		"numero_cai":num_cai,
+		"estado": estado,
+		"id_factura":num_factura,
+		"fecha_emision":fecha_emision,
+		"razon_social": razon_social,
+		"giro":giro_empresa,
+		"atencion":atencion_empresa,
+		"departamento": departamento_empresa,
+		"rut":rut_empresa,
+		"direccion":direccion_empresa,
+		"comuna":comuna_empresa,
+		"fono":fono_empresa,
+		"fecha_vencimiento":fecha_vencimiento,
+		"nombre_curso":nombre_curso,
+		"sence":sence_curso,
+		"horas_curso":horas_curso,
+		"fecha_inicio":fecha_inicio_instancia,
+		"fecha_termino":fecha_termino_instancia,
+		"registro_sence":num_registro_sence,
+		"valor_por_participante":valor_curso,
+		"valor_total":valor_total,
+		"x1":x[0],
+		"x2":x[1],
+		"x3":x[2],
+		"numero_orden":num_orden,
+		"especificar":especificar,
+		"obsevacion":observacion
+	}
+	tpl.render(parametros)
+	tpl.save("backend/db/facturas_generadas/%s.docx"%num_factura)
+
+
+
 	for rut in lista_rut:
 		participante = mo.Participante.query.get(rut)
 		if not(participante in nueva_factura.facturas_alumnos):
