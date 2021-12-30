@@ -8,8 +8,12 @@
             <v-data-table
               :headers="headers"
               :items="participantes"
-            
-            ></v-data-table>
+              dense
+            >
+              <template v-slot:[`item.genero`]="{ item }">
+                <span>{{ mostrarGenero(item.genero) }}</span>
+              </template>
+            </v-data-table>
           </v-card>
       </div>
     
@@ -25,6 +29,7 @@ export default {
 
   data:()=>( {
     busqueda: null,
+    generos:['-','femenino','masculino'],
     headers: [
       {
         text: 'Rut',
@@ -41,22 +46,8 @@ export default {
       { text: 'genero', value: 'genero'},
   
     ],
-    desserts: [
-      {
-        id: 'Frozen Yogurt',
-        descrip: 159,
-        cant_tareas: 6.0,
-
-      },
-      {
-        id: 'Ice cream sandwich',
-        descrip: 237,
-        cant_tareas: 9.0,
-      }
-    ],
     created:function(){
       this.getParticipantes();
-      this.getXRequisitos();
       this.getIdData();
     },
     participantes:[
@@ -74,21 +65,6 @@ export default {
         correo: null,
         fono: null,
         razon_social: null,
-      },
-      {
-        rut: 'a',
-        nombre: 'a',
-        apellido_paterno: 'a',
-        apellido_materno: 'a',
-        genero: 'a',
-        nivel_educacional: 'a',
-        fecha_nacimiento: 'a',
-        nacionalidad: 'a',
-        tipo_inscripcion: 'a',
-        ocupacion: 'a',
-        correo: 'a',
-        fono: 'a',
-        razon_social: 'a',
       }
     ],
 
@@ -115,15 +91,23 @@ export default {
         //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/participante/obtener?');
         this.participantes = response.data;
+
+        
         console.log(response);
       }
       catch (error) {
         console.log('error', error); 
       }
     },
+    mostrarGenero(valor){
+      if (valor == '1' ) return 'femenino'
+      else if (valor == '2' ) return 'masculino'
+      else return 'desconocido'
+    },
   },
   created(){
     this.getParticipantes()
+    //this.mostrarGenero(valor)
   }
 }
 </script>

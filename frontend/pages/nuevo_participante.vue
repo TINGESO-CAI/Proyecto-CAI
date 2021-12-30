@@ -57,6 +57,7 @@
                     persistent-hint
                     return-object
                     single-line   
+                    
                 ></v-select>
                 </v-col>
 
@@ -68,7 +69,7 @@
                   label="nivel_educacional"
                   persistent-hint
                   return-object
-                  single-line   
+                  single-line
                 ></v-select>
                 </v-col>
               </v-row>
@@ -120,20 +121,20 @@
 
                 <v-col>
                 <v-text-field
-                    v-model="correo"
-                    :rules="correoRules"
-                    :counter="20"
-                    label="correo"
+                    v-model="correo_personal"
+                    :rules="correo_personalRules"
+                    :counter="30"
+                    label="correo_personal"
                     required
                 ></v-text-field>
                 </v-col>
 
                 <v-col>
                 <v-text-field
-                    v-model="fono"
-                    :rules="fonoRules"
+                    v-model="fono_personal"
+                    :rules="fono_personalRules"
                     :counter="15"
-                    label="fono"
+                    label="fono_personal"
                     required
                 ></v-text-field>
                 </v-col>
@@ -149,7 +150,28 @@
                 ></v-select>
                 </v-col>
             </v-row>
-            </v-container>
+
+            <v-row>
+              <v-col>
+              <v-text-field
+                      v-model="correo_corporativo"
+                      :rules="correo_corporativoRules"
+                      :counter="20"
+                      label="correo_corporativo"
+                      required
+                ></v-text-field>
+                </v-col>
+                <v-col>
+                <v-text-field
+                    v-model="fono_corporativo"
+                    :rules="fono_corporativoRules"
+                    :counter="15"
+                    label="fono_corporativo"
+                    required
+                ></v-text-field>
+                </v-col>
+            </v-row>
+            </v-container> 
         </v-form>
         
         <v-btn  color="blue lighten-1" class="mr-4" @click="createParticipante">Crear</v-btn>
@@ -168,8 +190,8 @@ export default {
   data:function(){
     return{
       generos : ["masculino","femenino"],
-      nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
-      paises: [ "Chilena","Otra"],
+      nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otra"],
+      paises: [ "Chilena","Extranjera"],
       inscripciones: [ "presencial","online"],
       razones: ["ninguna"],
       //FORMULARIO
@@ -186,8 +208,10 @@ export default {
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo: '',
-      fono: '',
+      correo_corporativo: '',
+      correo_personal: '',
+      fono_personal: '',
+      fono_corporativo: '',
       razon_social: '',
       //reglas
       rutRules: [
@@ -206,7 +230,11 @@ export default {
         v => !!v || 'apellido_materno es requerido',
         v => v.length <= 100 || 'apellido_materno debe contener menos de 100 caracteres',
       ],
-      correoRules: [
+      correo_corporativoRules: [
+        v => !!v || 'Correo es requerido',
+        v => /.+@.+/.test(v) || 'Correo debe ser válido',
+      ],
+      correo_personalRules: [
         v => !!v || 'Correo es requerido',
         v => /.+@.+/.test(v) || 'Correo debe ser válido',
       ],
@@ -214,7 +242,11 @@ export default {
         v => !!v || 'fecha_nacimiento es requerido',
         //v => /.+.+/.test(v) || 'fecha_nacimiento debe ser válido',
       ],
-      fonoRules: [
+      fono_personalRules: [
+        v => !!v || 'fono es requerido',
+        v => v.length <= 12 || 'fono debe contener menos de 12 caracteres',
+      ],
+      fono_corporativoRules: [
         v => !!v || 'fono es requerido',
         v => v.length <= 12 || 'fono debe contener menos de 12 caracteres',
       ],
@@ -236,6 +268,16 @@ export default {
         console.log('error', error); 
       }
     },
+    mostrarGenero(valor){
+      if (valor == '1' ) return 'femenino'
+      else if (valor == '2' ) return 'masculino'
+      else return 'desconocido'
+    },
+    cambiarGenero(valor){
+      if (valor == 'femenino' ) return '1'
+      else if (valor == 'masculino' ) return '2'
+      else return 'error'
+    },
     successMessage:function(){
       alert("El participante se creo exitosamente.")
     },
@@ -254,10 +296,13 @@ export default {
         nacionalidad: this.nacionalidad,
         tipo_inscripcion: this.tipo_inscripcion,
         ocupacion: this.ocupacion,
-        correo: this.correo,
-        fono: this.fono,
+        fono_personal: this.fono_personal,
+        fono_corporativo: this.fono_corporativo,
+        correo_corporativo: this.correo_corporativo,
+        correo_personal: this.correo_personal,
         razon_social: this.razon_social
       }
+      this.genero=cambiarGenero(this.genero);
       
       try {
         //se llama el servicio para crear un nuevo participante
@@ -277,6 +322,7 @@ export default {
        this.message = 'Ocurrió un error'
       }
     },
+    
   },
 
   created(){

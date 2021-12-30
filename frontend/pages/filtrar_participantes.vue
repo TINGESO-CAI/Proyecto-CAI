@@ -45,13 +45,16 @@
                 <v-col>
                 <v-select
                     v-model="genero"
-                    :items="generos"
-                    item-text="genero"
+                    :items="geneross"
+                    item-text="generos"
                     label="genero"
                     persistent-hint
                     return-object
                     single-line   
-                ></v-select>
+                >
+                <template v-slot:[`item`]="{ item }">
+                <span>{{ mostrarGenero(item) }}</span>
+              </template></v-select>
                 </v-col>
 
                 <v-col>
@@ -149,7 +152,10 @@
               <v-data-table
                 :headers="headers"
                 :items="participantes"
-              ></v-data-table>
+                dense
+              ><template v-slot:[`item.genero`]="{ item }">
+                <span>{{ mostrarGenero(item.genero) }}</span>
+              </template></v-data-table>
             </v-card>
         </div>
         <v-btn  color="blue lighten-1" class="mr-4" @click="limpiar">Limpiar</v-btn>
@@ -189,7 +195,8 @@ export default {
   
     ],
       participantes : [],
-      generos : ["masculino","femenino"],
+      generos : ["femenino","masculino"],
+      geneross : ["1","2"],
       nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
       paises: [ "Chile","Otra"],
       inscripciones: [ "Presencial","Online"],
@@ -305,6 +312,11 @@ export default {
       catch (error) {
        console.log('error', error); 
       }
+    },
+    mostrarGenero(valor){
+      if (valor == '1' ) return 'femenino'
+      else if (valor == '2' ) return 'masculino'
+      else return 'desconocido'
     },
   },
   created(){

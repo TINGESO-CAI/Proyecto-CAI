@@ -143,9 +143,9 @@ export default {
     return{
       estados : ["activo","inactivo"],
       nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
-      paises: [ "Chilena","Otra"],
-      modalidades: [ "presencial","online"],
-      categorias: [ "diurna","nocturna"],
+      paises: [ "Chilena","Extranjera"],
+      modalidades: [ "presencial","e-learning","a distancia"],
+      categorias: [ "sincrono","asincrono","presencial"],
       razones: ["ninguna"],
       //FORMULARIO
       valid: false,
