@@ -1,5 +1,6 @@
 from datetime import datetime
 from operator import mod
+import re
 from typing import Text
 import requests
 from flask import Flask, jsonify, request
@@ -9,6 +10,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 import sqlalchemy.orm.exc
 import json
+from docxtpl import DocxTemplate
 
 from sqlalchemy.sql import text
 import db.modelos as mo
@@ -299,11 +301,21 @@ def obtener_curso():
 @app.route("/curso/obtener/sence",methods=["GET"])
 def obtener_sences():
 
-	sence_curso = db.session.query(mo.Curso.rut).all()
+	sence_curso = db.session.query(mo.Curso.sence).all()
 	cursos = curso_schemas.dump(sence_curso)
 	
 	return jsonify(cursos)
+@app.route("/curso/obtener/sences_con_instancia",methods=["GET"])
+def obtener_sences_existente():
+	sence_curso = mo.Curso.query.all()
 
+	cursos_con_inst=[]
+	for c in sence_curso:
+		if len(c.instancias)!=0:
+			cursos_con_inst.append(c)
+	cursos = curso_schemas.dump(cursos_con_inst)
+	return jsonify(cursos)
+	
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------INSTANCIA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -350,7 +362,6 @@ def obtener_instancia_curso():
 		instancias = instancias.filter(mo.Instancia.fecha_inicio==fecha_inicio)
 	if fecha_termino != None:
 		instancias = instancias.filter(mo.Instancia.fecha_termino==fecha_termino)
-	
 		
 	instancias_cursos_filtrado = instancia_schemas.dump(instancias)
 	
@@ -362,8 +373,7 @@ def obtener_instancias_vigentes(sence):
 	instancias = mo.Instancia.query.filter()
 	instancias = instancias.filter(mo.Instancias.sence==sence)
 	
-	participante = mo.Participante.query.get(rut)
-	instancias = instancia_schemas.dump(participante.instancias)
+	instancias = instancia_schemas.dump(instancias)
 	return jsonify(instancias)
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
@@ -573,66 +583,94 @@ def filtro_contacto():
 @app.route("/factura/agregar",methods=["POST"])
 def crear_factura():
 
-	#id_factura=request.json['id_factura'] # Como hacer que el id se aumente solo?
-	#num_registro=request.json['num_registro'] #Este numero se debe ingresar o es fijo?
-	#estado=request.json['estado'] # El estado lo definimos nosotros?
-	#tipo_pago=request.json['tipo_pago'] # Segun yo este no va
-	#num_hes=request.json['num_hes'] #Cuando se ingresa, siempre a veces?
-	#fecha_emision=request.json['fecha_emision']
-	#fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento de que?
+	num_factura=db.session.query(mo.Factura).order_by(mo.Factura.id_factura.desc()).first()
+	if num_factura is None:
+		num_factura=1
+	else:
+		num_factura=num_factura.id_factura+1
+	num_cai=request.json['num_registro'] #Este numero se debe ingresar o es fijo?
+	estado=request.json['estado'] 
+	num_hes=request.json['num_hes'] #Cuando se ingresa, siempre a veces?
+	fecha_emision=request.json['fecha_emision'] #Debe ser simpre la fecha actual?
+	fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento de que?
 	sence=request.json['sence']
+	id_instancia=request.json['id_instancia']
+	razon_social=request.json['razon_social']
 
 	# ----------- INFO GENERAL ---------------------------
-
-	#num_factura = #Lo usan? puede ser id de factura
-	#datos_de = #Sara Perez Rojas - Director Centro USACH - FIJOS
-	#datos_a = #Director Ejecutivo Capacitacion USACH - FIJOS
-	#nombre_proyecto = #Curso de Capacitacion CAI-2006 / Siempre es el mismo?
-	#codigo_proyecto = #CAP-CAI-15 / Siempre es el mismo?
-	#enviar_factura = #3 opciones: USACH, EMPRESA, OTRO
-	#num_orden = #Cuando tiene una orden OTIC asociada
-	#obs = #Agregan un correo o numero de la empresa
+	
+	enviar_factura = request.json['enviar_factura']
+	if enviar_factura == 2:
+		especificar = request.json['especificar']
+	num_orden = request.json['num_orden'] #Cuando tiene una orden OTIC asociada
+	observacion = request.json['obs'] #Agregan un correo o numero de la empresa
 
 	# ----------- INFO DEL CURSO -------------------------
 	curso_factura = mo.Curso.query.get(sence)
+	instancia_factura = mo.Instancia.query.get(id_instancia)
+	empresa_factura = mo.Empresa.query.get(razon_social)
 	
 	nombre_curso = curso_factura.nombre
 	sence_curso = curso_factura.sence
 	horas_curso = curso_factura.horas_curso
-	#fecha_incio_instancia = #?
-	#fecha_termino_instancia = #?
-	#num_registro_sence = # de donde sale, es el que esta en curso? 
+	fecha_incio_instancia = instancia_factura.fecha_inicio
+	fecha_termino_instancia = instancia_factura.fecha_termino
+	num_registro_sence = instancia_factura.id_instancia #es realmente asi?
 	valor_curso = curso_factura.valor_efectivo_participante
 	# En las soli sale participante y un mensaje, ese msj es predeterminado o varia?
 	# En una soli agregaron el nombre de otra empresa y el rut correspondiente, cuando se hace eso?
 
 	# ----------- INFO DE LA EMPRESA ------------------------
 
-	# con sence, obtener la empresa
-	
-	# empresa.empleados
-
 	# duda existencial, la solicitud de factura es difernet cuando es particular? porq si es asi debe haber una relacion entre factura y empresa
-	# razon_social = 
-	# giro_empresa =
-	# atencion_empresa = con que se rellena este campo? Duda a la clienta
-	# departamento_empresa =
-	# rut_empresa = aun no responde la duda la clienta sobre el tema del rut
-	# direccion_empresa =
-	# fono_empresa =
-	'''
-	nueva_factura=mo.Factura(id_factura,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento,sence)
+	giro_empresa = empresa_factura.giro
+	atencion_empresa = empresa_factura.atencion#con que se rellena este campo? Duda a la clienta
+	departamento_empresa = empresa_factura.departamento
+	rut_empresa = empresa_factura.rut # aun no responde la duda la clienta sobre el tema del rut
+	direccion_empresa = empresa_factura.direccion
+	comuna_empresa = empresa_factura.comuna
+	fono_empresa = "1234567"
 	
+	# --------- INFO DE PARTICIPANTES ----------------------
+	lista_participantes = request.get_json()
+	lista_rut=[] # Lista con los ruts de los participante
+
+	for participante in lista_participantes['participantes']:
+		lista_rut.append(participante['rut'])	
+		
+	nueva_factura=mo.Factura(num_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion)
 	db.session.add(nueva_factura)
+	
 	try:
 		db.session.commit() 
 	except:
-		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada"})
+		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada o hay un problema con ella"})
+	
+	for rut in lista_rut:
+		participante = mo.Participante.query.get(rut)
+		if not(participante in nueva_factura.facturas_alumnos):
+			nueva_factura.facturas_alumnos.append(participante)
+		
+	try:
+		db.session.commit()
+	except sqlalchemy.orm.exc.FlushError:
+		return jsonify({"respuesta":"El participante o la factura no existe"})
 	
 	resultado = factura_schema.dump(nueva_factura)
-	'''
-	return jsonify("Termine")
 
+	return jsonify(resultado)
+	
+@app.route("/prueba",methods=["GET"])
+def prueba():
+
+	nombre=request.json['nombre']
+	lista = request.get_json()
+	print(type(lista))
+	ruts=[]
+	for l in lista['lista']:
+		ruts.append(l['rut'])
+	print(ruts)
+	return jsonify(lista['lista'])
 
 @app.route("/factura/obtener",methods=["GET"])
 def filtro_factura():

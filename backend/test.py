@@ -43,7 +43,6 @@ def procesamiento(archivo):
 	df = df. parse(df.sheet_names[0])
 	return df
 
-
 df=procesamiento("empresa")
 insertarDatos(df,"empresa")
 

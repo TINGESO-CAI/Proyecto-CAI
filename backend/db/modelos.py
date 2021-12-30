@@ -65,7 +65,7 @@ class Curso(db.Model):
 	resolucion_usach = db.Column(db.Text)
 	estado = db.Column(db.Text)
 	f_vigencia = db.Column(db.Date)
-
+	instancias = db.relationship('Instancia', backref=db.backref("curso"))
 	def __init__(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia):
 		self.sence = sence
 		self.nombre=nombre
@@ -83,7 +83,6 @@ class CursoSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('sence','nombre',
 		'modalidad','categoria','horas_curso','valor_efectivo_participante','valor_imputable_participante',
-
 		'resolucion_sence','resolucion_usach','estado','f_vigencia')
 
 class Empresa(db.Model):
@@ -97,8 +96,8 @@ class Empresa(db.Model):
 	direccion = db.Column(db.Text)
 	comuna = db.Column(db.Text)
 
-	contactos=db.relationship('Contacto',backref='contacto')
-	empleados=db.relationship('Participante',backref='participante')
+	contactos=db.relationship('Contacto',backref=db.backref('contacto'))
+	empleados=db.relationship('Participante',backref=db.backref('participante'))
 
 	def __init__(self,razon_social,giro,atencion,departamento,rut,direccion,comuna):
 		self.razon_social = razon_social
@@ -120,28 +119,33 @@ class Factura(db.Model):
 
 	id_factura = db.Column(db.Integer, primary_key=True)
 	sence = db.Column(db.Text)
-	num_registro = db.Column(db.Text)
+	num_cai = db.Column(db.Text)
 	estado = db.Column(db.Integer)
-	tipo_pago = db.Column(db.Integer)
 	num_hes = db.Column(db.Text)
 	fecha_emision = db.Column(db.Date)
 	fecha_vencimiento = db.Column(db.Date)
+	enviar_factura = db.Column(db.Integer)
+	especificar = db.Column(db.Text)
+	num_orden = db.Column(db.Text)
+	observacion = db.Column(db.Text)
 
-	
-	def __init__(self,id_factura,sence,num_registro,estado,tipo_pago,num_hes,fecha_emision,fecha_vencimiento):
+	def __init__(self,id_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion):
 		self.id_factura = id_factura
 		self.sence = sence
-		self.num_registro =num_registro
+		self.num_cai =num_cai
 		self.estado = estado
-		self.tipo_pago = tipo_pago
 		self.num_hes = num_hes
 		self.fecha_emision = fecha_emision
 		self.fecha_vencimiento =fecha_vencimiento
+		self.enviar_factura = enviar_factura
+		self.especificar = especificar
+		self.num_orden = num_orden
+		self.observacion = observacion
 
 class FacturaSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_factura','sence','num_registro'
-		'estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento')
+		fields = ('id_factura','sence','num_cai'
+		'estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento','enviar_factura','especificar','num_orden','observacion')
 
 
 class Instancia(db.Model):
@@ -154,7 +158,7 @@ class Instancia(db.Model):
 	fecha_inicio = db.Column(db.Date)
 	fecha_termino = db.Column(db.Date)
 
-	curso = db.relationship('Curso')
+	
 	
 	def __init__(self,sence,direccion,malla,fecha_inicio,fecha_termino):
 		self.sence = sence
