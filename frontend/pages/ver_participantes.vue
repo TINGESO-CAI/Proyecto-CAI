@@ -1,10 +1,9 @@
 <template>
-    <v-container class="test">
+    <v-container class="test" >
       <h1>Ver Participantes</h1>
       <br>
       <div>{{point}}
         <v-card>
-
             <v-data-table
               :headers="headers"
               :items="participantes"
@@ -24,7 +23,6 @@
 
 //librería axios
 import axios from 'axios';
-
 export default {
 
   data:()=>( {

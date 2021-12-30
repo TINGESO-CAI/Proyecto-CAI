@@ -148,13 +148,32 @@
                     required
                 ></v-text-field>
                 </v-col>
+
                 <v-col>
-                <v-text-field
-                    v-model="razon_social"
-                    label="Razon social"
-                    required
-                ></v-text-field>
+                <v-autocomplete
+                      v-model="razon_social"
+                      :items="razones"
+                      dense
+                      item-text="razon_social"
+                      label="razon_social"
+                      persistent-hint
+                      return-object
+                      single-line
+                ></v-autocomplete>
                 </v-col>
+                 <!--
+                <v-col>
+                <h2 class="text-center"> Datos de la empresa</h2>
+                    <v-col>
+                    <p class="font-weight-bold">Sence:</p>
+                    </v-col>                
+                    <v-col>{{empresa.sence}}</v-col>
+                    <v-col>
+                    <p class="font-weight-bold">Nombre:</p>
+                    </v-col>                
+                    <v-col>{{empresa.nombre}}</v-col>
+                </v-col>
+                -->
                 <v-col>
                 <v-text-field
                     v-if="enviar==2"
@@ -164,15 +183,18 @@
                 ></v-text-field>
                 </v-col> 
                 <v-row>
+                <v-col>
                 <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
-
+                </v-col>
+                <v-col>
                 <v-btn  color="blue lighten-1" class="mr-4" @click="continuarPage4">Continuar</v-btn>
+                </v-col>
                 </v-row>         
             </v-form>
         </v-container>
         </v-col>
         </v-row>
-        </v-container>
+      </v-container>
         <v-divider></v-divider>
     </div>
     <div v-else-if="page==4">
@@ -215,8 +237,20 @@ export default {
     instancia:[],
     enviar:[],
     razon_social:'',
+    razones: [],
     participantes:[],
     participantesFacturas:[],
+    empresa:{
+      razon_social: 'test',
+      giro: '',
+      atencion: '',
+      departamento: '',
+      rut: '',
+      direccion: '',
+      comuna: '',
+      correo: '',
+      fono: '',
+    },
     headers: [
       {
         text: 'Id',
@@ -247,10 +281,6 @@ export default {
     ],
   }),
   methods:{
-    obtenerCurso: async function(value){
-      let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
-      return response
-    },
     volver: function(){
       this.page=this.page-1
     },
@@ -276,12 +306,36 @@ export default {
         this.page=4
       }
     },
+    async getRazones(){
+      try {
+        //se llama el servicio para obtener las emergencias 
+        let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
+        this.razones = response.data;
+        console.log(response);
+      }
+      catch (error) {
+        console.log('error', error); 
+      }
+    },
+    getEmpresa: async function(value){
+      let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
+      this.empresa=response.data;
+      console.log(response);
+    },
     handleClick: function(value){
       console.log(value)
+    },
+    obtenerCurso: async function(value){
+      let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
+      return response
     },
 
     obtenerInstancias: async function(value){
       let response= axios.get('http://localhost:5000/instancia/obtener?sence='+value)
+      return response
+    },
+    obtenerDatos: async function(value){
+      let response= axios.get('http://localhost:5000/empresa/obtener?razon_social='+value)
       return response
     },
     buscar: async function(value){
@@ -303,6 +357,10 @@ export default {
         console.log('error', error); 
       }
     }
+  },
+  created(){
+    this.getRazones();
+    this.getEmpresa();
   },
 }
 </script>

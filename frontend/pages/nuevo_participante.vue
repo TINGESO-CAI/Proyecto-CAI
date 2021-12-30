@@ -139,15 +139,16 @@
                 ></v-text-field>
                 </v-col>
                 <v-col>
-                <v-select
-                    v-model="razon_social"
-                    :items="razones"
-                    item-text="razon_social"
-                    label="razon_social"
-                    persistent-hint
-                    return-object
-                    single-line
-                ></v-select>
+                <v-autocomplete
+                      v-model="razon_social"
+                      :items="razones"
+                      dense
+                      item-text="razon_social"
+                      label="razon_social"
+                      persistent-hint
+                      return-object
+                      single-line
+                ></v-autocomplete>
                 </v-col>
             </v-row>
 
@@ -158,7 +159,6 @@
                       :rules="correo_corporativoRules"
                       :counter="20"
                       label="correo_corporativo"
-                      required
                 ></v-text-field>
                 </v-col>
                 <v-col>
@@ -167,7 +167,6 @@
                     :rules="fono_corporativoRules"
                     :counter="15"
                     label="fono_corporativo"
-                    required
                 ></v-text-field>
                 </v-col>
             </v-row>
@@ -290,7 +289,7 @@ export default {
         nombre: this.nombre,
         apellido_paterno: this.apellido_paterno,
         apellido_materno: this.apellido_materno,
-        genero: this.genero,
+        genero: cambiarGenero(this.genero),
         nivel_educacional: this.nivel_educacional,
         fecha_nacimiento: this.fecha_nacimiento,
         nacionalidad: this.nacionalidad,
@@ -302,7 +301,6 @@ export default {
         correo_personal: this.correo_personal,
         razon_social: this.razon_social
       }
-      this.genero=cambiarGenero(this.genero);
       
       try {
         //se llama el servicio para crear un nuevo participante
@@ -321,6 +319,11 @@ export default {
        console.log('error', error); 
        this.message = 'Ocurrió un error'
       }
+    },
+    mostrarGenero(valor){
+      if (valor == '1' ) return 'femenino'
+      else if (valor == '2' ) return 'masculino'
+      else return 'desconocido'
     },
     
   },

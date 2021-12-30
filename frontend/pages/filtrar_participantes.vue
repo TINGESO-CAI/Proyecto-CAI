@@ -128,15 +128,16 @@
                 ></v-text-field>
                 </v-col>
                 <v-col>
-                <v-select
-                    v-model="razon_social"
-                    :items="razones"
-                    item-text="razon_social"
-                    label="razon_social"
-                    persistent-hint
-                    return-object
-                    single-line
-                ></v-select>
+                <v-autocomplete
+                      v-model="razon_social"
+                      :items="razones"
+                      dense
+                      item-text="razon_social"
+                      label="razon_social"
+                      persistent-hint
+                      return-object
+                      single-line
+                ></v-autocomplete>
                 </v-col>
             </v-row>
             </v-container>
