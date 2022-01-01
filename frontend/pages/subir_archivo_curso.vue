@@ -1,7 +1,7 @@
 <template>
 <v-container class="test">
 <div class="flex w-full h-screen items-center justify-center text-center" id="app">
-<h1>Ingresar Excel con participantes</h1>
+<h1>Ingresar Excel con Cursos</h1>
   <div class="p-12 bg-gray-100 border border-gray-300" @dragover="dragover" @dragleave="dragleave" @drop="drop">
     <input type="file" multiple name="fields[assetsFieldHandle][]" 
       class="w-px h-px opacity-0 overflow-hidden absolute" @change="onChange" ref="file" accept=".xlsx" />
@@ -51,8 +51,7 @@
             todate: function(fecha){
               if (fecha != null){
                 var date = new Date(Math.round((fecha - (25567 + 1)) * 86400 * 1000));
-                var converted_date = date.getFullYear().toString()+'-'+(date.getMonth()+1).toString()+'-'+date.getDate().toString()
-                //var converted_date = date.toISOString().split('T')[0];
+                var converted_date = date.getFullYear().toString()+'-'+(date.getMonth()+1).toString()+'-'+date.getDate().toString()  //date.toISOString().split('T')[0];
               }
               return converted_date
             },
@@ -66,22 +65,19 @@
                 for (let j=1; j< archivo.length; j++){  
                   try{
               //let response=await axios.post('http://localhost:5000/participante/agregar',
-                  let NewParticipante={rut:archivo[j][0]
+                  let NewCurso={
+                   sence:archivo[j][0].toString()
                   ,nombre:archivo[j][1]
-                  ,apellido_paterno:archivo[j][2]
-                  ,apellido_materno:archivo[j][3]
-                  ,genero:archivo[j][4].toString()
-                  ,nivel_educacional:archivo[j][6]
-                  ,fecha_nacimiento: this.todate(archivo[j][5])
-                  ,nacionalidad:archivo[j][7]
-                  ,tipo_inscripcion: archivo[j][8]
-                  ,ocupacion: archivo[j][9]
-                  ,fono_personal: archivo[j][11]
-                  ,fono_corporativo: archivo[j][12]
-                  ,correo_personal: archivo[j][14]
-                  ,correo_corporativo: archivo[j][13]
-                  ,razon_social: archivo[j][10]}//)
-                  let response=await axios.post('http://localhost:5000/participante/agregar',NewParticipante)
+                  ,modalidad:archivo[j][2]
+                  ,categoria:archivo[j][3]
+                  ,horas_curso:archivo[j][4].toString()
+                  ,valor_efectivo_participante:archivo[j][5].toString()
+                  ,valor_imputable_participante: archivo[j][6].toString()
+                  ,resolucion_sence:archivo[j][7].toString()
+                  ,resolucion_usach: archivo[j][8].toString()
+                  ,estado: archivo[j][9]
+                  ,f_vigencia: this.todate(archivo[j][10])}
+                  let response=await axios.post('http://localhost:5000/curso/agregar',NewCurso)
                   }
                   catch(error){
                     console.log(error)
@@ -90,12 +86,13 @@
                 }
                 let mensaje="Se ha ingresado archivo "+this.filelist[i].name+" con exito."
                 if (errores.length!=0){
-                  mensaje=mensaje +'\n errores en los participantes de las lineas:\n'
+                  mensaje=mensaje +'\n errores en los cursos de las lineas:\n'
                   for (let indice in errores){
                     mensaje=mensaje + (errores[indice]+1).toString()+'\n'
                   }
                 }
                 this.remove(i)
+                console.log('errores: ',errores)
                 alert(mensaje)
             },
             dragover: function(event) {
