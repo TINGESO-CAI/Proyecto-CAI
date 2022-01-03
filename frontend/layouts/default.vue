@@ -1,4 +1,4 @@
-<template>
+<template >
   <v-app dark>
     <v-navigation-drawer color="#436899"
       v-model="drawer"
@@ -6,6 +6,7 @@
       :clipped="clipped"
       fixed
       app
+      fluid
     >
      <!--
       <v-list>
@@ -285,11 +286,13 @@ export default {
       ['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
       ],
       finanzas:[
+      ['Generar Factura','mdi-file-plus','/factura'],
+      ['Ver facturas','mdi-account-multiple','/ver_facturas'],
+      ['Filtrar facturas','mdi-account-multiple','/filtrar_facturas'],
       ['Generar boleta', 'mdi-account-multiple-plus','/generar_boleta'],
       ['Ver boletas','mdi-format-list-bulleted-type','/ver_boletas'],
-      ['Ver facturas','mdi-account-multiple','/ver_facturas'],
       ['Asignar pagos','mdi-account-multiple','/asignar_pagos'],
-      ['Generar Factura','mdi-file-plus','/factura']
+      
       ],
       administracion:[
       ['Asignar permisos', 'mdi-account-multiple-plus','/permisos'],
