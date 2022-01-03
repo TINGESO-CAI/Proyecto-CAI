@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_cors import CORS
+from sqlalchemy.orm import query
 import sqlalchemy.orm.exc
 import json
 from docxtpl import DocxTemplate
@@ -679,7 +680,7 @@ def crear_factura():
 		"x3":x[2],
 		"numero_orden":num_orden,
 		"especificar":especificar,
-		"obsevacion":observacion
+		"observacion":observacion
 	}
 	tpl.render(parametros)
 	tpl.save("backend/db/facturas_generadas/%s.docx"%num_factura)
@@ -697,7 +698,8 @@ def crear_factura():
 	resultado = factura_schema.dump(nueva_factura)
 
 	return jsonify(resultado)
-	
+
+# Revisar
 @app.route("/factura/obtener",methods=["GET"])
 def filtro_factura():
 	
@@ -784,8 +786,17 @@ def crear_PI():
 
 	return jsonify({"respuesta":"Participante ha sido matriculado con exito"})
 
-# HACER QUERY
-# Todos los participantes de una instancia con una razon social igual
+@app.route("/participante_instancia/obtener",methods=["GET"])
+def obtener_participante_instancia():
+	id_instancia = request.args.get('id_instancia')
+	razon_social = request.args.get('razon_social')
+
+	instancia = mo.Instancia.query.get(id_instancia)
+	participantes = instancia.alumnos.filter(mo.Participante.razon_social==razon_social)
+
+	participantes_filtrados = participante_schemas.dump(participantes)
+
+	return jsonify(participantes_filtrados)
 
 @app.route("/participante_factura/agregar",methods=["POST"])
 def crear_PF():
