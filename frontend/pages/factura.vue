@@ -223,7 +223,7 @@
         <v-divider></v-divider>
     </div>
     <div v-else-if="page==4">
-      <h1>Seleccione Instancia</h1>
+      <h1>Seleccione Participantes</h1>
       <div>
         <v-data-table
           v-model="participantesFactura"
@@ -238,6 +238,9 @@
         </v-data-table>
         <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
         <v-btn  color="blue lighten-1" class="mr-4" @click="generarFactura">Generar factura</v-btn>
+        <!--
+        <v-btn  v-if="factura.length!=0" color="blue lighten-1" class="mr-4" @click="descargar">Descargar factura</v-btn>
+        !-->
       </div>
     </div>
     </v-container>
@@ -250,7 +253,6 @@
 //librería axios
 import axios from 'axios';
 //import func from 'vue-editor-bridge';
-
 export default {
   data:()=>( {
     page:1,
@@ -270,6 +272,7 @@ export default {
     sences:[],
     especificar:'',
     num_orden:'',
+    factura:[],
     empresa:{
       razon_social: 'test',
       giro: '',
@@ -332,28 +335,25 @@ export default {
       }
       return (participantes)
     },
+    descargar: function(){
+      /*
+      var anchor=document.createElement('a');
+      let archivo=this.factura[0].toString() +".docx"
+    	anchor.setAttribute('download','../backend/db/facturas_generadas/'+archivo);
+    	document.body.appendChild(anchor);
+    	anchor.click();
+    	anchor.parentNode.removeChild(anchor);
+      */
+     let archivo=this.factura[0].toString() +".docx"
+     document.getElementById('my_iframe').src = '../backend/db/facturas_generadas/'+archivo;
+    },
     generarFactura: async function(){
       if (this.participantesFactura.length==0){
         alert("Debe seleccionar almenos un participante.")
       }
       else{
         try{
-          console.log("aqui",{
-            num_registro: 1
-            ,estado: 0
-            ,num_hes: this.num_hes
-            ,fecha_emision: '2021/10/10'
-            ,fecha_vencimiento: '2021/10/10'
-            ,sence: this.curso[0].sence
-            ,id_instancia: this.instancia[0].id_instancia
-            ,razon_social: this.razon_social.razon_social
-            ,enviar_factura: parseInt(this.enviar)
-            ,especificar: this.especificar
-            ,num_orden:this.num_orden
-            ,obs:this.observacion
-            ,participantes: this.onlyRut()
-          })
-          let response= axios.post('http://localhost:5000/factura/agregar',
+          let response= await axios.post('http://localhost:5000/factura/agregar',
           {
             num_registro: '1'
             ,estado: 0
@@ -369,6 +369,10 @@ export default {
             ,obs:this.observacion
             ,participantes:this.onlyRut()
           })
+          console.log(response)
+          this.factura.push(response.data.id_factura)
+          alert("Factura generada")
+          
         }
         catch(error){
           console.log(error)
