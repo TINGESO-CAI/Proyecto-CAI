@@ -2,20 +2,23 @@
     <v-container class="test">
       <div v-if="page==1">
         <h1 class="text-center">Ingrese sence del curso</h1>
-        <v-text-field
-            hide-details 
-            v-model="sence"
-            label="Sence"
-            filled 
-            rounded 
-            dense 
-            single-line 
-            append-icon="mdi-magnify"
-            class="center"
-            @click:append="buscar(sence)"
-        ></v-text-field>
+        <v-autocomplete
+                      v-model="sence"
+                      :items="sences"
+                      dense
+                      filled 
+                      rounded
+                      class="center"
+                      item-text="sence"
+                      label="sence"
+                      persistent-hint
+                      single-line
+                      append-icon="mdi-magnify"
+                      @click:append="buscar(sence)"
+                ></v-autocomplete>
         <v-btn v-if="instancias.length!=0" color="blue lighten-1" class="mr-4" @click="avanzarPage2">Continuar</v-btn>
       </div>
+      
     <div v-else-if="page==2">
       <h1>Seleccione Instancia</h1>
       <div>
@@ -240,6 +243,7 @@ export default {
     razones: [],
     participantes:[],
     participantesFacturas:[],
+    sences:[],
     empresa:{
       razon_social: 'test',
       giro: '',
@@ -317,6 +321,17 @@ export default {
         console.log('error', error); 
       }
     },
+    async getSences(){
+      try {
+        //se llama el servicio para obtener las emergencias 
+        let response = await axios.get('http://localhost:5000/curso/obtener/sences_con_instancia');
+        this.sences = response.data;
+        console.log(response);
+      }
+      catch (error) {
+        console.log('error', error); 
+      }
+    },
     getEmpresa: async function(value){
       let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
       this.empresa=response.data;
@@ -361,6 +376,7 @@ export default {
   created(){
     this.getRazones();
     this.getEmpresa();
+    this.getSences();
   },
 }
 </script>

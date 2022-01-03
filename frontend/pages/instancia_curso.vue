@@ -1,18 +1,19 @@
 <template>
     <v-container class="test">
         <h1 class="text-center">Ingrese sence del curso</h1>
-        <v-text-field
-            hide-details 
-            v-model="sence"
-            label="Sence"
-            filled 
-            rounded 
-            dense 
-            single-line 
-            append-icon="mdi-magnify"
-            class="center"
-            @click:append="buscar(sence)"
-        ></v-text-field>
+        <v-autocomplete
+                      v-model="sence"
+                      :items="sences"
+                      dense
+                      filled 
+                      rounded
+                      item-text="sence"
+                      label="sence"
+                      persistent-hint
+                      single-line
+                      append-icon="mdi-magnify"
+                      @click:append="buscar(sence)"
+          ></v-autocomplete>
     <div v-if="curso.length==1">
         <v-container >
         <v-divider></v-divider>
@@ -133,6 +134,7 @@ export default {
   data:()=>( {
     curso:[],
     sence:'',
+    sences:[],
     direccion:'',
     malla:'Malla',
     fecha_inicio:'',
@@ -168,6 +170,17 @@ export default {
         alert("Ocurrio un error")
       }
     },
+    async getSences(){
+      try {
+        //se llama el servicio para obtener las emergencias 
+        let response = await axios.get('http://localhost:5000/curso/obtener/sence');
+        this.sences = response.data;
+        console.log(response);
+      }
+      catch (error) {
+        console.log('error', error); 
+      }
+    },
     buscar: async function(value){
       console.log(value)
       try{
@@ -183,7 +196,11 @@ export default {
       catch(error){
         console.log('error', error); 
       }
-    }
+    },
+    
+  },
+  created(){
+    this.getSences();
   },
 }
 </script>
