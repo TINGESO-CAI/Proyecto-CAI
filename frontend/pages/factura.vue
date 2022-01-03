@@ -144,6 +144,15 @@
                   <label for="1">Empresa</label>
                   <input type="radio" id="2" value="2" v-model="enviar">
                   <label for="2">Otro</label>
+                
+                <v-col>
+                <v-text-field
+                    v-if="enviar==2"
+                    v-model="especificar"
+                    label="Especificar"
+                    required
+                ></v-text-field>
+                </v-col>
                 <v-col>
                 <v-text-field
                     v-model="otic"
@@ -151,7 +160,21 @@
                     required
                 ></v-text-field>
                 </v-col>
+                <v-col>
+                <v-text-field
+                    v-model="num_hes"
+                    label="Numero hes"
+                    required
+                ></v-text-field>
+                </v-col>
 
+                <v-col>
+                <v-text-field
+                    v-model="num_orden"
+                    label="Numero orden"
+                    required
+                ></v-text-field>
+                </v-col>
                 <v-col>
                 <v-autocomplete
                       v-model="razon_social"
@@ -179,9 +202,8 @@
                 -->
                 <v-col>
                 <v-text-field
-                    v-if="enviar==2"
                     v-model="observacion"
-                    label="Observación"
+                    label="observación"
                     required
                 ></v-text-field>
                 </v-col> 
@@ -227,6 +249,7 @@
 
 //librería axios
 import axios from 'axios';
+//import func from 'vue-editor-bridge';
 
 export default {
   data:()=>( {
@@ -239,11 +262,14 @@ export default {
     instancias:[],
     instancia:[],
     enviar:[],
+    num_hes:'',
     razon_social:'',
     razones: [],
     participantes:[],
-    participantesFacturas:[],
+    participantesFactura:[],
     sences:[],
+    especificar:'',
+    num_orden:'',
     empresa:{
       razon_social: 'test',
       giro: '',
@@ -299,9 +325,61 @@ export default {
         this.page=3
       }
     },
+    onlyRut:function(){
+      let participantes=[]
+      for (let i=0; i<this.participantesFactura.length;i++){
+        participantes.push({rut:this.participantesFactura[i].rut})
+      }
+      return (participantes)
+    },
+    generarFactura: async function(){
+      if (this.participantesFactura.length==0){
+        alert("Debe seleccionar almenos un participante.")
+      }
+      else{
+        try{
+          console.log("aqui",{
+            num_registro: 1
+            ,estado: 0
+            ,num_hes: this.num_hes
+            ,fecha_emision: '2021/10/10'
+            ,fecha_vencimiento: '2021/10/10'
+            ,sence: this.curso[0].sence
+            ,id_instancia: this.instancia[0].id_instancia
+            ,razon_social: this.razon_social.razon_social
+            ,enviar_factura: parseInt(this.enviar)
+            ,especificar: this.especificar
+            ,num_orden:this.num_orden
+            ,obs:this.observacion
+            ,participantes: this.onlyRut()
+          })
+          let response= axios.post('http://localhost:5000/factura/agregar',
+          {
+            num_registro: '1'
+            ,estado: 0
+            ,num_hes: this.num_hes
+            ,fecha_emision: '10/12/2021'
+            ,fecha_vencimiento: '21/12/2021'
+            ,sence: this.curso[0].sence
+            ,id_instancia: this.instancia[0].id_instancia
+            ,razon_social: this.razon_social.razon_social
+            ,enviar_factura: parseInt(this.enviar)
+            ,especificar: this.especificar
+            ,num_orden:this.num_orden
+            ,obs:this.observacion
+            ,participantes:this.onlyRut()
+          })
+        }
+        catch(error){
+          console.log(error)
+          alert("ocurrio un error")
+        }
+      }
+    },
     continuarPage4: async function(){
-      let response= await axios.get('http://localhost:5000/participante/obtener?razon_social='+this.razon_social)
+      let response= await axios.get('http://localhost:5000/participante/obtener?razon_social='+this.razon_social.razon_social)
       this.participantes=response.data
+      console.log(this.razon_social.razon_social)
       if(this.participantes.length==0){
         alert("No existen participantes en esta instancia que tengan esta razon social.")
         this.razon_social=''
