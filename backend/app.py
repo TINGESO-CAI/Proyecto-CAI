@@ -1,7 +1,7 @@
 from datetime import datetime
 from operator import mod
 import re
-from typing import Text
+from typing import Sequence, Text
 import requests
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +13,8 @@ import json
 from docxtpl import DocxTemplate
 
 from sqlalchemy.sql import text
+from sqlalchemy.sql.expression import null
+from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 db= mo.objeto_db()
 app= Flask(__name__)
@@ -231,7 +233,6 @@ def obtener_cursos_inscritos_participante(rut):
 @app.route("/curso/agregar",methods=["POST"])
 def crear_curso():
 
-
 	sence = request.json['sence']
 	nombre = request.json['nombre']
 	modalidad = request.json['modalidad']
@@ -305,6 +306,7 @@ def obtener_sences():
 	cursos = curso_schemas.dump(sence_curso)
 	
 	return jsonify(cursos)
+
 @app.route("/curso/obtener/sences_con_instancia",methods=["GET"])
 def obtener_sences_existente():
 	sence_curso = mo.Curso.query.all()
@@ -367,14 +369,6 @@ def obtener_instancia_curso():
 	
 	return jsonify(instancias_cursos_filtrado)
 
-# *** TERMINAR ESTO ***
-@app.route("/instancia/<sence>/vigentes",methods=["GET"])
-def obtener_instancias_vigentes(sence):
-	instancias = mo.Instancia.query.filter()
-	instancias = instancias.filter(mo.Instancias.sence==sence)
-	
-	instancias = instancia_schemas.dump(instancias)
-	return jsonify(instancias)
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -605,8 +599,7 @@ def crear_factura():
 	enviar_factura = request.json['enviar_factura']
 	x=["","",""]
 	x[enviar_factura]="X"
-	if enviar_factura == 2:
-		especificar = request.json['especificar']
+	especificar = request.json['especificar']
 	num_orden = request.json['num_orden'] #Cuando tiene una orden OTIC asociada
 	observacion = request.json['obs'] #Agregan un correo o numero de la empresa
 
@@ -650,7 +643,7 @@ def crear_factura():
 	
 	try:
 		db.session.commit() 
-	except Exception as e:
+	except:
 		
 		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada o hay un problema con ella"})
 	
@@ -691,8 +684,6 @@ def crear_factura():
 	tpl.render(parametros)
 	tpl.save("backend/db/facturas_generadas/%s.docx"%num_factura)
 
-
-
 	for rut in lista_rut:
 		participante = mo.Participante.query.get(rut)
 		if not(participante in nueva_factura.facturas_alumnos):
@@ -707,52 +698,50 @@ def crear_factura():
 
 	return jsonify(resultado)
 	
-@app.route("/prueba",methods=["GET"])
-def prueba():
-
-	nombre=request.json['nombre']
-	lista = request.get_json()
-	print(type(lista))
-	ruts=[]
-	for l in lista['lista']:
-		ruts.append(l['rut'])
-	print(ruts)
-	return jsonify(lista['lista'])
-
 @app.route("/factura/obtener",methods=["GET"])
 def filtro_factura():
 	
 	id_factura= request.args.get('id_factura')
-	num_registro = request.args.get('num_registro')
+	sence = request.args.get('sence')
 	estado = request.args.get('estado')
-	tipo_pago = request.args.get('tipo_pago')
 	num_hes = request.args.get('num_hes')
 	fecha_emision = request.args.get('fecha_emision')
 	fecha_vencimiento = request.args.get('fecha_vencimiento')
-	sence = request.args.get('sence')
+	enviar_factura = request.args.get('enviar_factura')
+	especificar = request.args.get('especificar')
+	num_orden = request.args.get('num_orden')
+	observacion = request.args.get('observacion')
+	num_cai = request.args.get('num_cai')
 	
 	factura = mo.Factura.query.filter()
 
 	if id_factura != None:
 		factura = factura.filter(mo.Factura.id_factura==id_factura)
-	if num_registro != None:
-		factura = factura.filter(mo.Factura.num_registro==num_registro)
+	if sence != None:
+		factura = factura.filter(mo.Factura.sence==sence)
 	if estado!= None:
 		factura = factura.filter(mo.Factura.estado==estado)
-	if tipo_pago != None:
-		factura = factura.filter(mo.Factura.tipo_pago==tipo_pago)
 	if num_hes != None:
 		factura = factura.filter(mo.Factura.num_hes==num_hes)
 	if fecha_emision != None:
 		factura = factura.filter(mo.Factura.fecha_emision==fecha_emision)
 	if fecha_vencimiento != None:
 		factura = factura.filter(mo.Factura.fecha_vencimiento==fecha_vencimiento)
-	if sence != None:
-		factura = factura.filter(mo.Factura.sence==sence)
-
+	if enviar_factura != None:
+		factura = factura.filter(mo.Factura.enviar_factura==enviar_factura)
+	if especificar != None:
+		factura = factura.filter(mo.Factura.especificar==especificar)
+	if num_orden != None:
+		factura = factura.filter(mo.Factura.num_orden==num_orden)
+	if observacion != None:
+		factura = factura.filter(mo.Factura.observacion==observacion)
+	if num_cai != None:
+		factura = factura.filter(mo.Factura.num_cai==num_cai)
+	
 	facturas_filtradas = factura_schemas.dump(factura)
 	
 	return jsonify(facturas_filtradas)
+
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------TABLAS INTERMEDIAS---------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -794,6 +783,9 @@ def crear_PI():
 		return jsonify({"respuesta":"El participante o la instancia no existe"})
 
 	return jsonify({"respuesta":"Participante ha sido matriculado con exito"})
+
+# HACER QUERY
+# Todos los participantes de una instancia con una razon social igual
 
 @app.route("/participante_factura/agregar",methods=["POST"])
 def crear_PF():

@@ -154,7 +154,7 @@ export default {
         else{
           this.malla=false
         }
-        let response = await axios.post('http://localhost:5000/instancia/agregar',{id_instancia:1000,sence: this.sence , direccion: this.direccion , malla: this.malla , fecha_inicio:this.fecha_inicio , fecha_termino:this.fecha_termino})
+        let response = await axios.post('http://localhost:5000/instancia/agregar',{sence: this.sence , direccion: this.direccion , malla: this.malla , fecha_inicio:this.fecha_inicio , fecha_termino:this.fecha_termino})
         console.log(this.malla)
         console.log(response.data)
         alert("Instancia creada con exito")
