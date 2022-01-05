@@ -233,6 +233,71 @@ def obtener_cursos_inscritos_participante(rut):
 	participante = mo.Participante.query.get(rut)
 	instancias = instancia_schemas.dump(participante.instancias)
 	return jsonify(instancias)
+
+@app.route("/participante/editar",methods=["PUT"])
+def editar_participante():
+
+	rut_aux=request.args.get('rut')
+	participante = mo.Participante.query.get(rut_aux) # Capturo al participante
+	
+	# Nuevos datos
+	rut=request.json['rut']
+	nombre=request.json['nombre']
+	apellido_paterno=request.json['apellido_paterno']
+	apellido_materno=request.json['apellido_materno']
+	genero=request.json['genero']
+	nivel_educacional=request.json['nivel_educacional']
+	fecha_nacimiento=request.json['fecha_nacimiento']
+	nacionalidad=request.json['nacionalidad']
+	tipo_inscripcion=request.json['tipo_inscripcion']
+	ocupacion=request.json['ocupacion']
+	fono_personal=request.json['fono_personal']
+	fono_corporativo=request.json['fono_corporativo']
+	correo_corporativo=request.json['correo_corporativo']
+	correo_personal=request.json['correo_personal']
+	razon_social=request.json['razon_social']
+
+	# Actualizacion
+	if rut != participante.rut: # actualizar rut
+		participante.rut = rut
+	if nombre != participante.nombre:
+		participante.nombre = nombre
+	if apellido_paterno != participante.apellido_paterno:
+		participante.apellido_paterno = apellido_paterno
+	if apellido_materno != participante.apellido_materno:
+		participante.apellido_materno = apellido_materno
+	if genero != participante.genero:
+		participante.genero = genero
+	if nivel_educacional != participante.nivel_educacional:
+		participante.nivel_educacional = nivel_educacional
+	if fecha_nacimiento != participante.fecha_nacimiento:
+		participante.fecha_nacimiento = fecha_nacimiento
+	if nacionalidad != participante.nacionalidad:
+		participante.nacionalidad = nacionalidad
+	if tipo_inscripcion != participante.tipo_inscripcion:
+		participante.tipo_inscripcion = tipo_inscripcion
+	if ocupacion != participante.ocupacion:
+		participante.ocupacion = ocupacion
+	if fono_personal != participante.fono_personal:
+		participante.fono_personal = fono_personal
+	if fono_corporativo != participante.fono_corporativo:
+		participante.fono_corporativo = fono_corporativo
+	if correo_corporativo != participante.correo_corporativo:
+		participante.correo_corporativo = correo_corporativo
+	if correo_personal != participante.correo_personal:
+		participante.correo_personal = correo_personal
+	if razon_social != participante.razon_social:
+		participante.razon_social = razon_social
+
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	resultado = participante_schema.dump(participante)
+
+	return jsonify(resultado)
+
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------CURSO------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
