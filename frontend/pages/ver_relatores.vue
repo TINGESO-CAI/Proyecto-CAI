@@ -3,7 +3,7 @@
         <v-card>
             <v-data-table
               :headers="headers"
-              :items="participantes"
+              :items="relatores"
               dense
             >
               <template v-slot:[`item.genero`]="{ item }">
@@ -13,7 +13,7 @@
               <v-toolbar
                 flat
               >
-        <v-toolbar-title> VER PARTICIPANTES</v-toolbar-title>
+        <v-toolbar-title> VER RELATORES</v-toolbar-title>
           <v-divider
             class="mx-4"
             inset
@@ -25,14 +25,14 @@
             max-width="500px"
           >
             <template v-slot:activator="{ on, attrs }">
-              <v-btn to="/nuevo_participante"
+              <v-btn to="/nuevo_relator"
                 color="primary"
                 dark
                 class="mb-2"
                 v-bind="attrs"
                 v-on="on"
               >
-                + Participante
+                + Relator
               </v-btn>
             </template>
           <v-card>
@@ -185,35 +185,20 @@ export default {
         filterable: true,
         value: 'rut',
       },
-      { text: 'nombre', value: 'nombre' },
-      { text: 'apellido_paterno', value: 'apellido_paterno'},
-      { text: 'apellido_materno', value: 'apellido_materno' },
-      { text: 'correo corporativo', value: 'correo_corporativo'},
-      { text: 'fono corporativo', value: 'fono_corporativo'},
-      { text: 'razon_social', value: 'razon_social'},
-      { text: 'genero', value: 'genero'},
+      { text: 'Nombre', value: 'nombre' },
+      { text: 'Apellido_paterno', value: 'apellido_paterno'},
+      { text: 'Apellido_materno', value: 'apellido_materno' },
+      { text: 'Titulo', value: 'titulo'},
+      { text: 'CV', value: 'cv'},
+      { text: 'Numero cuenta', value: 'numero_cuenta'},
+      { text: 'Banco', value: 'banco'},
+      { text: 'Tipo cuenta', value: 'tipo_cuenta'},
 
       { text: 'Editar/Borrar', value: 'actions', sortable: false },
   
     ],
 
-    participantes:[
-      {     
-        rut: null,
-        nombre: null,
-        apellido_paterno: null,
-        apellido_materno: null,
-        genero: null,
-        nivel_educacional: null,
-        fecha_nacimiento: null,
-        nacionalidad: null,
-        tipo_inscripcion: null,
-        ocupacion: null,
-        correo: null,
-        fono: null,
-        razon_social: null,
-      }
-    ],
+    relatores:[ ],
 
     rut: null,
     nombre: null,
@@ -279,14 +264,11 @@ export default {
     },
   },
   methods:{
-    forEach: async function(){
-
-    },
-    getParticipantes: async function(){
+    getRelatores: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/participante/obtener?');
-        this.participantes = response.data;
+        let response = await axios.get('http://localhost:5000/relator/obtener?');
+        this.relatores = response.data;
 
         
         console.log(response);
@@ -349,7 +331,7 @@ export default {
     },
   },
   created(){
-    this.getParticipantes()
+    this.getRelatores()
     this.getRazones()
     //this.mostrarGenero(valor)
   }

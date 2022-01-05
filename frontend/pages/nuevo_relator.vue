@@ -47,7 +47,18 @@
                     required
                 ></v-text-field>
                 </v-col>
-
+                <v-col>
+                <v-select
+                    v-model="genero"
+                    :items="generos"
+                    item-text="genero"
+                    label="genero"
+                    persistent-hint
+                    return-object
+                    single-line   
+                    
+                ></v-select>
+                </v-col>
                 <v-col>
                 <v-text-field
                     v-model="titulo"
@@ -108,6 +119,45 @@
               <v-row>
                 <v-col>
                 <v-text-field
+                    v-model="correo_personal"
+                    :rules="correo_personalRules"
+                    :counter="30"
+                    label="correo_personal"
+                    required
+                ></v-text-field>
+                </v-col>
+
+                <v-col>
+                <v-text-field
+                    v-model="fono_personal"
+                    :rules="fono_personalRules"
+                    :counter="15"
+                    label="fono_personal"
+                    required
+                ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                  <v-col>
+              <v-text-field
+                      v-model="correo_corporativo"
+                      :rules="correo_corporativoRules"
+                      :counter="20"
+                      label="correo_corporativo"
+                ></v-text-field>
+                </v-col>
+                <v-col>
+                <v-text-field
+                    v-model="fono_corporativo"
+                    :rules="fono_corporativoRules"
+                    :counter="15"
+                    label="fono_corporativo"
+                ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                <v-text-field
                     v-model="cv"
                     :rules="cvss"
                     :counter="100"
@@ -156,6 +206,12 @@ export default {
       numero_cuenta: '',
       banco: '',
       tipo_cuenta: '',
+      genero:'',
+      generos : ["masculino","femenino"],
+      correo_corporativo: '',
+      correo_personal: '',
+      fono_personal: '',
+      fono_corporativo: '',
       //reglas
       rutRules: [
         v => !!v || 'Rut es requerido',
@@ -187,10 +243,13 @@ export default {
     successMessage:function(){
       alert("El relator se creo exitosamente.")
     },
-
+    mostrarGenero(valor){
+      if (valor == 'femenino' ) return 1
+      else if (valor == 'masculino' ) return 2
+      else return 'desconocido'
+    },
     async createRelator(){ //Crear un nuevo PARTICIPANTE
       this.message = '';
-
       let newRelator ={
         rut: this.rut,
         nombre: this.nombre,
@@ -201,7 +260,12 @@ export default {
         fecha_nacimiento: this.fecha_nacimiento,
         numero_cuenta: this.numero_cuenta,
         banco: this.banco,
-        tipo_cuenta: this.tipo_cuenta
+        tipo_cuenta: this.tipo_cuenta,
+        genero:this.mostrarGenero(this.genero),
+        fono_personal:this.fono_personal,
+        fono_corporativo:this.fono_corporativo,
+        correo_personal:this.correo_personal,
+        correo_corporativo:this.correo_corporativo
       }
       
       try {
