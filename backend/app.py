@@ -510,7 +510,7 @@ def crear_relator():
 	banco=request.json['banco']
 	tipo_cuenta=request.json['tipo_cuenta']
 	fono_personal=request.json['fono_personal']
-	fono_corporativo=request.json['fono_coperativo']
+	fono_corporativo=request.json['fono_corporativo']
 	correo_personal=request.json['correo_personal']
 	correo_corporativo=request.json['correo_corporativo']
 	
