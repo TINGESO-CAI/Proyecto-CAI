@@ -238,9 +238,7 @@
         </v-data-table>
         <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
         <v-btn  color="blue lighten-1" class="mr-4" @click="generarFactura">Generar factura</v-btn>
-        <!--
-        <v-btn  v-if="factura.length!=0" color="blue lighten-1" class="mr-4" @click="descargar">Descargar factura</v-btn>
-        !-->
+
       </div>
     </div>
     </v-container>
@@ -335,18 +333,6 @@ export default {
       }
       return (participantes)
     },
-    descargar: function(){
-      /*
-      var anchor=document.createElement('a');
-      let archivo=this.factura[0].toString() +".docx"
-    	anchor.setAttribute('download','../backend/db/facturas_generadas/'+archivo);
-    	document.body.appendChild(anchor);
-    	anchor.click();
-    	anchor.parentNode.removeChild(anchor);
-      */
-     let archivo=this.factura[0].toString() +".docx"
-     document.getElementById('my_iframe').src = '../backend/db/facturas_generadas/'+archivo;
-    },
     generarFactura: async function(){
       if (this.participantesFactura.length==0){
         alert("Debe seleccionar almenos un participante.")
@@ -369,9 +355,25 @@ export default {
             ,obs:this.observacion
             ,participantes:this.onlyRut()
           })
-          console.log(response)
-          this.factura.push(response.data.id_factura)
-          alert("Factura generada")
+          window.location.href='http://localhost:5000/factura/descargar/'+response.data.id_factura.toString()
+          this.page=1
+          this.curso=[]
+          this.sence=''
+          this.otic=''
+          this.observacion=''
+          this.mostrarMalla=['Si','No']
+          this.instancias=[]
+          this.instancia=[]
+          this.enviar=[]
+          this.num_hes=''
+          this.razon_social=''
+          this.razones= []
+          this.participantes=[]
+          this.participantesFactura=[]
+          this.sences=[]
+          this.especificar=''
+          this.num_orden=''
+          this.factura=[]
           
         }
         catch(error){
@@ -381,7 +383,7 @@ export default {
       }
     },
     continuarPage4: async function(){
-      let response= await axios.get('http://localhost:5000/participante/obtener?razon_social='+this.razon_social.razon_social)
+      let response= await axios.get('http://localhost:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
       this.participantes=response.data
       console.log(this.razon_social.razon_social)
       if(this.participantes.length==0){

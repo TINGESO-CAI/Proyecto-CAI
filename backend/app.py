@@ -55,7 +55,7 @@ contacto_schemas= mo.ContactoSchema(many=True)
 
 @app.route("/factura/descargar/<id>",methods=["GET"])
 def descargar(id):
-	ruta="backend/db/facturas_generadas/"+str(id)+".docx"
+	ruta="db/facturas_generadas/"+str(id)+".docx"
 	return send_file(ruta,as_attachment=True)
 @app.route("/paises/obtener",methods=["GET"])
 def obtener_paises():

@@ -71,7 +71,9 @@
           @click:row="handleClick"
           class="elevation-1"
         >
-        
+        <template v-slot:[`item.malla`]="{ item }">
+                <span>{{ mostrarMalla(item.malla) }}</span>
+              </template>
         </v-data-table>
         <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
         <v-btn  color="blue lighten-1" class="mr-4" @click="matricular">Matricular</v-btn>
@@ -106,15 +108,16 @@ export default {
     ],
     headers2: [
       {
-        text: 'Sence',
+        text: 'id instancia',
         align: 'start',
         filterable: true,
-        value: 'sence',
+        value: 'id_instancia',
       },
-      { text: 'nombre', value: 'nombre' },
-      { text: 'modalidad', value: 'modalidad'},
-      { text: 'categoria', value: 'categoria' },
-      { text: 'horas_curso', value: 'horas_curso'},
+      { text: 'Sence', value: 'sence' },
+      { text: 'Dirección', value: 'direccion'},
+      { text: 'Malla', value: 'malla' },
+      { text: 'Fecha inicio', value: 'fecha_inicio'},
+      { text: 'Fecha termino', value: 'fecha_termino'},
   
     ],
 		selectAll: false,
@@ -141,7 +144,7 @@ export default {
       //let viejos=''
       for (var i=0; i< this.matriculados.length; i++){
         try{
-          let response = await axios.post('http://localhost:5000/participante_curso/agregar',{rut:this.matriculados[i].rut, sence:this.curso[0].sence});
+          let response = await axios.post('http://localhost:5000/participante_instancia/agregar',{rut:this.matriculados[i].rut, id_instancia:this.curso[0].id_instancia});
           console.log('response', response.data);
         }
         catch (error){
@@ -183,12 +186,18 @@ export default {
     },
     getCursos: async function(){
       try {
-        let response = await axios.get('http://localhost:5000/curso/obtener?');
+        let response = await axios.get('http://localhost:5000/instancia/obtener?');
         this.cursos = response.data;
       }
       catch (error) {
         console.log('error', error); 
       }
+    },
+
+    mostrarMalla(valor){
+      if (valor == true ) return 'SI'
+      else if (valor == false ) return 'NO'
+      else return '?'
     },
     obtenerParticipante: async function(value){
       let response= axios.get('http://localhost:5000/participante/obtener?rut='+value)
