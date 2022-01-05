@@ -271,7 +271,7 @@ export default {
       relatores: [
       ['Nuevo relator', 'mdi-account-multiple-plus','/nuevo_relator'],
       ['Ver relatores','mdi-format-list-bulleted-type','/ver_relatores'],
-      ['Subir archivo', 'mdi-file-plus','/subir_archivo']
+      ['Subir archivo', 'mdi-file-plus','/subir_archivo_relator']
       ],
       cursos:[
       ['Crear curso', 'mdi-account-multiple-plus','/crear_curso'],
