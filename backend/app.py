@@ -3,7 +3,7 @@ from operator import mod
 import re
 from typing import Sequence, Text
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request,send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -52,6 +52,11 @@ instancia_schemas=mo.InstanciaSchema(many=True)
 contacto_schema= mo.ContactoSchema()
 contacto_schemas= mo.ContactoSchema(many=True)
 
+
+@app.route("/factura/descargar/<id>",methods=["GET"])
+def descargar(id):
+	ruta="backend/db/facturas_generadas/"+str(id)+".docx"
+	return send_file(ruta,as_attachment=True)
 @app.route("/paises/obtener",methods=["GET"])
 def obtener_paises():
 	r = requests.get('https://restcountries.com/v3.1/all?fields=translations',)
