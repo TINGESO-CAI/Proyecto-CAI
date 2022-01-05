@@ -218,7 +218,8 @@ class Participante(db.Model):
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
 	empresa = db.relationship('Empresa')
 
-	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,ocupacion,fono_personal,fono_corporativo,correo_corporativo,correo_personal,razon_social):
+	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,
+	ocupacion,fono_personal,fono_corporativo,correo_corporativo,correo_personal,razon_social):
 		self.rut = rut
 		self.nombre=nombre
 		self.apellido_paterno=apellido_paterno
@@ -265,7 +266,8 @@ class Relator(db.Model):
 	dicta_instancia = db.relationship('Instancia', secondary='relator_instancia', backref=db.backref('profesores', lazy='dynamic'))
 	
 
-	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta):
+	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta,
+	fono_personal,fono_corporativo,correo_corporativo,correo_personal):
 		self.rut = rut
 		self.nombre=nombre
 		self.apellido_paterno=apellido_paterno
@@ -277,6 +279,10 @@ class Relator(db.Model):
 		self.numero_cuenta=numero_cuenta
 		self.banco=banco
 		self.tipo_cuenta=tipo_cuenta
+		self.fono_personal=fono_personal
+		self.fono_corporativo=fono_corporativo
+		self.correo_corporativo=correo_corporativo
+		self.correo_personal=correo_personal
 	
 class RelatorSchema(SQLAlchemyAutoSchema):
 	class Meta:

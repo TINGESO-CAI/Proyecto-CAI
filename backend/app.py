@@ -17,6 +17,7 @@ from sqlalchemy.sql import text
 from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
+
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
@@ -511,11 +512,11 @@ def crear_relator():
 	tipo_cuenta=request.json['tipo_cuenta']
 	fono_personal=request.json['fono_personal']
 	fono_corporativo=request.json['fono_corporativo']
-	correo_personal=request.json['correo_personal']
 	correo_corporativo=request.json['correo_corporativo']
+	correo_personal=request.json['correo_personal']
 	
 	nuevo_relator=mo.Relator(rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta,fono_personal,
-	fono_corporativo,correo_personal,correo_corporativo)
+	fono_corporativo,correo_corporativo,correo_personal)
 	
 	db.session.add(nuevo_relator)
 	try:
