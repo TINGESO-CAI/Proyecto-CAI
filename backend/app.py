@@ -1,6 +1,7 @@
 from datetime import datetime
 from operator import mod
 import re
+from sys import meta_path
 from typing import Sequence, Text
 import requests
 from flask import Flask, jsonify, request,send_file
@@ -53,11 +54,13 @@ instancia_schemas=mo.InstanciaSchema(many=True)
 contacto_schema= mo.ContactoSchema()
 contacto_schemas= mo.ContactoSchema(many=True)
 
+# *****REVISAR SINO BORRAR POSTERIORMENTE*******
 
 @app.route("/factura/descargar/<id>",methods=["GET"])
 def descargar(id):
 	ruta="db/facturas_generadas/"+str(id)+".docx"
 	return send_file(ruta,as_attachment=True)
+
 @app.route("/paises/obtener",methods=["GET"])
 def obtener_paises():
 	r = requests.get('https://restcountries.com/v3.1/all?fields=translations',)
@@ -132,7 +135,6 @@ def crear_participante():
 	
 @app.route("/participante/agregar/archivo",methods=["POST"])
 def crear_participante_archivo():
-	#{participantes=[{participabte1},{participabte2},{participabte2}]}
 	participantes=request.json['participantes']
 	lista_participantes_rechazados=[]
 	for persona in  participantes:
@@ -295,6 +297,20 @@ def editar_participante():
 
 	return jsonify(resultado)
 
+@app.route("/participante/eliminar",methods=["DELETE"])
+def eliminar_participante():
+	
+	rut_aux=request.args.get('rut')
+	participante = mo.Participante.query.get(rut_aux) # Capturo al participante
+	
+	try:
+		db.session.delete(participante)
+		db.session.commit()
+		msg="el participante "+participante.rut+" fue eliminado correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"El usuario a eliminar no existe"})
+ 
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------CURSO------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -386,6 +402,20 @@ def obtener_sences_existente():
 			cursos_con_inst.append(c)
 	cursos = curso_schemas.dump(cursos_con_inst)
 	return jsonify(cursos)
+
+@app.route("/curso/eliminar",methods=["DELETE"])
+def eliminar_curso():
+	
+	sence_aux=request.args.get('sence')
+	curso = mo.Curso.query.get(sence_aux) # Capturo al curso
+	
+	try:
+		db.session.delete(curso)
+		db.session.commit()
+		msg="el curso de nombre "+curso.nombre+" fue eliminado correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"El curso a eliminar no existe"})
 	
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------INSTANCIA------------------------------------------------------
@@ -472,6 +502,33 @@ def editar_instancia():
 
 	return jsonify(resultado)
 
+@app.route("/instancia/eliminar",methods=["DELETE"])
+def eliminar_instancias():
+	
+	id_aux=request.args.get('id_instancia')
+	instancia = mo.Instancia.query.get(id_aux) # Capturo al participante
+	
+	try:
+		db.session.delete(instancia)
+		db.session.commit()
+		msg="La instancia de id "+str(instancia.id_instancia)+" fue eliminado correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"La instancia a eliminar no existe"})
+
+	
+@app.route("/instancia/obtener_razones_sociales/<id_instancia>",methods=["GET"])
+def obtener_razones_sociales_validas(id_instancia):
+
+	instancia = mo.Instancia.query.get(id_instancia)
+	aux=[]
+	lista_razones_sociales=[]
+	for i in instancia.alumnos:
+		if not (i.razon_social in aux):
+			lista_razones_sociales.append({"razon_social":i.razon_social})
+			aux.append(i.razon_social)
+	return jsonify(lista_razones_sociales)
+		
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -532,7 +589,19 @@ def obtener_por_razon_social():
 	empresa = empresa_schemas.dump(razon_Social_Empresa)
 	
 	return jsonify(empresa)
-
+@app.route("/empresa/eliminar",methods=["DELETE"])
+def eliminar_empresa():
+	
+	razon_social=request.args.get('razon_social')
+	empresa = mo.Empresa.query.get(razon_social) # Capturo al participante
+	
+	try:
+		db.session.delete(empresa)
+		db.session.commit()
+		msg="el empresa "+empresa.razon_social+" fue eliminado correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"La empresa a eliminar no existe"})
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------RELATOR--------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -684,6 +753,21 @@ def editar_relator():
 	resultado = participante_schema.dump(relator)
 
 	return jsonify(resultado)
+
+@app.route("/relator/eliminar",methods=["DELETE"])
+def eliminar_relator():
+	
+	relator_aux=request.args.get('rut')
+	relator = mo.Relator.query.get(relator_aux) # Capturo el relator
+	
+	try:
+		db.session.delete(relator)
+		db.session.commit()
+		msg="El relator de rut "+relator.rut+" fue eliminado correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"El relator a eliminar no existe"})
+
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------CONTACTO-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -691,13 +775,13 @@ def editar_relator():
 @app.route("/contacto/agregar",methods=["POST"])
 def crear_contacto():
 
-	id_contacto=request.json['id_contacto']
+	#id_contacto=request.json['id_contacto']
 	correo=request.json['correo']
 	fono=request.json['fono']
 	descripcion=request.json['descripcion'] #PROBLEMAS CON LA DESCRIPCION, SALE NULL
 	razon_social=request.json['razon_social']
 	
-	nuevo_contacto=mo.Contacto(id_contacto,correo,fono,descripcion,razon_social)
+	nuevo_contacto=mo.Contacto(correo,fono,descripcion,razon_social)
 	
 	db.session.add(nuevo_contacto)
 	try:
@@ -733,6 +817,20 @@ def filtro_contacto():
 	contacto_filtrados = contacto_schemas.dump(contacto)
 	
 	return jsonify(contacto_filtrados)
+
+@app.route("/contacto/eliminar",methods=["DELETE"])
+def eliminar_contacto():
+	
+	contacto_aux=request.args.get('id_contacto')
+	contacto = mo.Contacto.query.get(contacto_aux) # Capturo el contacto
+	
+	try:
+		db.session.delete(contacto)
+		db.session.commit()
+		msg="El contacto de id "+str(contacto.id_contacto)+" fue eliminado correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"El contacto a eliminar no existe"})
 
 # -----------------------------------------------------------------------------------------------------
 # ---------------------------------------FACTURA-------------------------------------------------------
@@ -906,6 +1004,20 @@ def filtro_factura():
 	
 	return jsonify(facturas_filtradas)
 
+@app.route("/factura/eliminar",methods=["DELETE"])
+def eliminar_factura():
+	
+	id_factura=request.args.get('id_factura')
+	factura = mo.Factura.query.get(id_factura) # Capturo al participante
+	
+	try:
+		db.session.delete(factura)
+		db.session.commit()
+		msg="La factura "+str(factura.id_factura)+" fue eliminada correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"La factura a eliminar no existe"})
+
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------TABLAS INTERMEDIAS---------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -980,6 +1092,7 @@ def crear_PF():
 		return jsonify({"respuesta":"El participante o la factura no existe"})
 
 	return jsonify({"respuesta":"Participante ha sido asociado a una factura con exito"})
+
 """
 No se si esto ira o que
 
