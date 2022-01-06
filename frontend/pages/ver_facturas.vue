@@ -10,7 +10,7 @@
       <v-toolbar
         flat
       >
-        <v-toolbar-title> VISOR FACTURAS</v-toolbar-title>
+        <v-toolbar-title> VISOR SOLICITUD FACTURAS</v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
