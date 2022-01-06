@@ -1,4 +1,6 @@
+from copy import Error
 from datetime import datetime
+from logging import exception
 from operator import mod
 import re
 from sys import meta_path
@@ -19,11 +21,12 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, logout_user, login_required
 
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
+app.config['SECRET_KEY'] = 'loginmaldito'
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
@@ -34,7 +37,8 @@ migrate= Migrate(app,db)
 
 # LOGIN
 
-login_manager = LoginManager(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 participante_schema = mo.ParticipanteSchema()
 participante_schemas = mo.ParticipanteSchema(many=True)
@@ -76,6 +80,7 @@ def obtener_paises():
 		resp=x['translations']['spa']['common']
 		respuesta.append(resp)
 	return jsonify(respuesta)
+
 """
 @app.route('/regiones/chile/obtener',methods=["GET"])
 def obtener_regiones_chile():
@@ -107,13 +112,14 @@ def obtener_comuna_por_region(codigo):
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
-@app.route('/registrar/', methods=['POST'])
+@app.route('/registrar', methods=['POST'])
 def registrar_cuenta():
 	correo = request.json['correo']
 	contrasena = request.json['contrasena']
 	nombre = request.json['nombre']
 	apellido = request.json['apellido']
 	rut = request.json['rut']
+	rol = request.json['rol']
 	rol = request.json['rol']
 
 	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut,rol)
@@ -125,17 +131,37 @@ def registrar_cuenta():
 
 	return jsonify(resultado)
 
-# REVISAR
-@app.route('/entrar/', methods=['POST'])
+@login_manager.user_loader
+def load_user(user_id):
+    # since the user_id is just the primary key of our user table, use it in the query for the user
+    return mo.Cuenta.query.get(int(user_id))
+
+@app.route('/entrar', methods=['POST'])
 def entrar_cuenta():
 	correo = request.json['correo']
 	contrasena = request.json['contrasena']
 	usuario = mo.Cuenta.autenticar(correo,contrasena)
 
-	if not mo.Cuenta:
+	if not usuario:
 		return jsonify({ 'message': 'Invalid credentials', 'authenticated': False }), 401
 
-	return jsonify("Login correcto")
+	try:
+		load_user(usuario.id)
+		login_user(usuario)
+		return jsonify("El usuario de id "+str(usuario.id)+" esta logeado")
+	except Exception as e:
+		return jsonify(str(e))
+
+@app.route('/salir')
+@login_required
+def salir_cuenta():
+    logout_user()
+    return jsonify("deslogeaste jiji")
+
+@app.route('/prueba')
+@login_required
+def prueba():
+	return jsonify("FUNCIONA JIJI")
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
