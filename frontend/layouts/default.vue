@@ -277,6 +277,7 @@ export default {
       ['Crear curso', 'mdi-account-multiple-plus','/crear_curso'],
       ['Ver cursos','mdi-format-list-bulleted-type','/ver_cursos'],
       ['Subir archivo', 'mdi-file-plus','/subir_archivo_curso'],
+      ['Ver Instancias','mdi-format-list-bulleted-type','/ver_instancias'],
       ['Asignar Instancia','mdi-loupe','/Instancia_curso'],
       ['Asignar relatores','mdi-account-multiple','/asignar_relator_instancia'],
       ['Asignar participantes','mdi-account-multiple','/matricular_participantes']
