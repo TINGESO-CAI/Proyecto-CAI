@@ -290,6 +290,7 @@ export default {
       ['Generar Factura','mdi-file-plus','/factura'],
       ['Ver facturas','mdi-account-multiple','/ver_facturas'],
       ['Filtrar facturas','mdi-account-multiple','/filtrar_facturas'],
+      ['Ver participantes por factura','mdi-account-multiple','/ver_participantes_factura'],
       ['Generar boleta', 'mdi-account-multiple-plus','/generar_boleta'],
       ['Ver boletas','mdi-format-list-bulleted-type','/ver_boletas'],
       ['Asignar pagos','mdi-account-multiple','/asignar_pagos'],
