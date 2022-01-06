@@ -6,7 +6,7 @@ from sqlalchemy.orm import backref
 from sqlalchemy.schema import CreateColumn
 from sqlalchemy.ext.compiler import compiles
 
-
+from werkzeug.security import check_password_hash, generate_password_hash
 
 db=SQLAlchemy()
 
@@ -26,7 +26,6 @@ participante_factura = db.Table('participante_factura',
 )
 
 
-
 class Contacto(db.Model):
 	__tablename__ = 'contacto'
 	id_contacto = db.Column(db.Integer, primary_key=True,autoincrement=True)
@@ -35,19 +34,48 @@ class Contacto(db.Model):
 	descripcion = db.Column(db.Text)
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
 
-	empresa = db.relationship('Empresa')
-	def __init__(self,id_contacto,correo,fono,descripcion,razon_social):
-		self.id_contacto = id_contacto
+	def __init__(self,correo,fono,descripcion,razon_social):
 		self.correo = correo
 		self.fono = fono
-		self.descpricion=descripcion
+		self.descripcion=descripcion
 		self.razon_social=razon_social
 		
-
 class ContactoSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_contacto','correo','fono','descripcion','razon_social')	
+		fields = ('id_contacto','correo','fono','descripcion','razon_social')
 
+class Cuenta(db.Model):
+	__tablename__ = 'cuenta'
+	id_cuenta = db.Column(db.Integer, primary_key=True,autoincrement=True)
+	correo = db.Column(db.Text)
+	contrasena = db.Column(db.Text)
+	nombre = db.Column(db.Text)
+	apellido = db.Column(db.Text)
+	rut = db.Column(db.Text)
+	rol = db.Column(db.Text)
+
+	def __init__(self,id_cuenta,correo,contrasena,nombre,apellido,rut,rol):
+		self.id_contacto = id_cuenta
+		self.correo = correo
+		self.contrasena = generate_password_hash(contrasena)
+		self.nombre=nombre
+		self.apellido=apellido
+		self.rut=rut
+		self.rol=rol
+	
+	@classmethod
+	def autenticar(cls,correo,contrasena):
+		if not correo or not contrasena:
+			return None
+
+		cuenta = cls.query.filter_by(correo=correo).first()
+		if not cuenta or not check_password_hash(cuenta.contrasena, contrasena):
+			return None	
+		return cuenta
+
+class CuentaSchema(SQLAlchemyAutoSchema):
+	class Meta:
+		fields = ('id_cuenta','correo','contrasena','nombre','apellido',"rol")	
 
 class Curso(db.Model):
 	__tablename__ = 'curso'
@@ -93,7 +121,7 @@ class Empresa(db.Model):
 	direccion = db.Column(db.Text)
 	comuna = db.Column(db.Text)
 
-	contactos=db.relationship('Contacto',backref=db.backref('contacto'))
+	contactos=db.relationship('Contacto',backref=db.backref('empresa_asociada'))
 	empleados=db.relationship('Participante',backref=db.backref('participante'))
 
 	def __init__(self,razon_social,giro,atencion,departamento,rut,direccion,comuna):
@@ -186,10 +214,10 @@ class Participante(db.Model):
 	fono_corporativo=db.Column(db.Text)
 	correo_corporativo=db.Column(db.Text)
 	correo_personal=db.Column(db.Text)
-	facturas = db.relationship('Factura', secondary='participante_factura', backref=db.backref('facturas_alumnos'))
-
-	instancias = db.relationship('Instancia', secondary='participante_instancia', backref=db.backref('alumnos', lazy='dynamic'))
 	
+	facturas = db.relationship('Factura', secondary='participante_factura', backref=db.backref('facturas_alumnos'))
+	instancias = db.relationship('Instancia', secondary='participante_instancia', backref=db.backref('alumnos', lazy='dynamic'))
+
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
 	empresa = db.relationship('Empresa')
 
@@ -266,10 +294,7 @@ class RelatorSchema(SQLAlchemyAutoSchema):
 		'titulo','genero','cv','fecha_nacimiento',
 		'numero_cuenta','banco','tipo_cuenta','fono_personal','fono_corporativo','correo_corporativo','correo_personal')
 
-		
 
-
-	
 def objeto_db():
 	global db
 	return db

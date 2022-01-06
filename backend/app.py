@@ -19,6 +19,8 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
+from flask_login import LoginManager
+
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
@@ -29,6 +31,10 @@ db.init_app(app)
 
 ma = Marshmallow(app)
 migrate= Migrate(app,db)
+
+# LOGIN
+
+login_manager = LoginManager(app)
 
 participante_schema = mo.ParticipanteSchema()
 participante_schemas = mo.ParticipanteSchema(many=True)
@@ -50,6 +56,9 @@ instancia_schemas=mo.InstanciaSchema(many=True)
 
 contacto_schema= mo.ContactoSchema()
 contacto_schemas= mo.ContactoSchema(many=True)
+
+cuenta_schema= mo.CuentaSchema()
+cuenta_schemas= mo.CuentaSchema(many=True)
 
 # *****REVISAR SINO BORRAR POSTERIORMENTE*******
 
@@ -94,6 +103,40 @@ def obtener_comuna_por_region(codigo):
 		respuesta.append(resp)
 	return jsonify(respuesta)
 """
+# -----------------------------------------------------------------------------------------------------
+# -----------------------------------------CUENTA------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
+
+@app.route('/registrar/', methods=['POST'])
+def registrar_cuenta():
+	correo = request.json['correo']
+	contrasena = request.json['contrasena']
+	nombre = request.json['nombre']
+	apellido = request.json['apellido']
+	rut = request.json['rut']
+	rol = request.json['rol']
+
+	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut,rol)
+
+	db.session.add(nueva_cuenta)
+	db.session.commit()
+
+	resultado = cuenta_schema.dump(nueva_cuenta)
+
+	return jsonify(resultado)
+
+# REVISAR
+@app.route('/entrar/', methods=['POST'])
+def entrar_cuenta():
+	correo = request.json['correo']
+	contrasena = request.json['contrasena']
+	usuario = mo.Cuenta.autenticar(correo,contrasena)
+
+	if not mo.Cuenta:
+		return jsonify({ 'message': 'Invalid credentials', 'authenticated': False }), 401
+
+	return jsonify("Login correcto")
+
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -525,6 +568,14 @@ def obtener_razones_sociales_validas(id_instancia):
 			lista_razones_sociales.append({"razon_social":i.razon_social})
 			aux.append(i.razon_social)
 	return jsonify(lista_razones_sociales)
+	
+@app.route("/instancia/obtener/id",methods=["GET"])
+def obtener_ids():
+
+	ids_instancias = db.session.query(mo.Instancia.id_instancia).all()
+	instancias = instancia_schemas.dump(ids_instancias)
+	
+	return jsonify(instancias )
 		
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
@@ -829,6 +880,18 @@ def eliminar_contacto():
 	except:
 		return jsonify({"respuesta":"El contacto a eliminar no existe"})
 
+@app.route("/contacto/obtener_empresa",methods=["GET"])
+def obtener_contactos_empresa():
+
+	empresas = mo.Empresa.query.all()
+	empresas_contactos=[]
+	for i in empresas:
+		aux=empresa_schema.dump(i)
+		aux["contactos"]=contacto_schemas.dump(i.contactos)
+		empresas_contactos.append(aux)
+
+	return jsonify(empresas_contactos)
+	
 # -----------------------------------------------------------------------------------------------------
 # ---------------------------------------FACTURA-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -1014,7 +1077,15 @@ def eliminar_factura():
 		return jsonify({"respuesta":msg}) 
 	except:
 		return jsonify({"respuesta":"La factura a eliminar no existe"})
+		
+@app.route("/factura/obtener/id",methods=["GET"])
+def obtener_ids_facturas():
 
+	ids_facturas = db.session.query(mo.Factura.id_factura).all()
+	facturas = factura_schemas.dump(ids_facturas)
+	
+	return jsonify(facturas)
+		
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------TABLAS INTERMEDIAS---------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -1089,7 +1160,13 @@ def crear_PF():
 		return jsonify({"respuesta":"El participante o la factura no existe"})
 
 	return jsonify({"respuesta":"Participante ha sido asociado a una factura con exito"})
+	
+@app.route("/participante_factura/obtener/<id_factura>",methods=["GET"])
+def obtener_participante_factura(id_factura):
+	factura = mo.Factura.query.get(id_factura)
+	participantes_filtrados = participante_schemas.dump(factura.facturas_alumnos)
 
+	return jsonify(participantes_filtrados)
 """
 No se si esto ira o que
 
