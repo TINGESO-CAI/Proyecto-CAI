@@ -25,10 +25,7 @@ participante_factura = db.Table('participante_factura',
 	db.Column('id_factura',db.Integer, db.ForeignKey('factura.id_factura'))
 )
 
-participante_orden=db.Table('participante_orden',
-	db.Column('rut',db.Text, db.ForeignKey('participante.rut')),
-	db.Column('id_orden',db.Integer, db.ForeignKey('orden.id_orden'))
-)
+
 
 class Contacto(db.Model):
 	__tablename__ = 'contacto'
@@ -172,28 +169,6 @@ class InstanciaSchema(SQLAlchemyAutoSchema):
 		fields = ('id_instancia','sence','direccion',
 		'malla','fecha_inicio','fecha_termino')		
 		
-class Orden(db.Model):
-	__tablename__ = 'orden'
-
-	id_orden = db.Column(db.Integer, primary_key=True)
-	sence = db.Column(db.Text)
-	cancelacion = db.Column(db.Integer)
-	fecha_inicio = db.Column(db.Date)
-	fecha_termino = db.Column(db.Date)
-	persona_asignada_o = db.relationship('Participante', secondary='participante_orden', backref=db.backref('asignar_orden'))
-	
-	def __init__(self,id_orden,sence,cancelacion,fecha_emision,fecha_vencimiento):
-		self.id_orden = id_orden
-		self.sence=sence
-		self.cancelacion=cancelacion
-		self.fecha_emision=fecha_emision
-		self.fecha_vencimiento=fecha_vencimiento
-
-class OrdenSchema(SQLAlchemyAutoSchema):
-	class Meta:
-		fields = ('id_orden','sence',
-		'cancelacion','fecha_emision','fecha_vencimiento')
-
 class Participante(db.Model):
 	__tablename__ = 'participante'
 

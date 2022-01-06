@@ -45,9 +45,6 @@ relator_schemas = mo.RelatorSchema(many=True)
 factura_schema= mo.FacturaSchema()
 factura_schemas= mo.FacturaSchema(many=True)
 
-orden_schema= mo.OrdenSchema()
-orden_schemas= mo.OrdenSchema(many=True)
-
 instancia_schema=mo.InstanciaSchema()
 instancia_schemas=mo.InstanciaSchema(many=True)
 
