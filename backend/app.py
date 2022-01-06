@@ -241,7 +241,6 @@ def editar_participante():
 	participante = mo.Participante.query.get(rut_aux) # Capturo al participante
 	
 	# Nuevos datos
-	rut=request.json['rut']
 	nombre=request.json['nombre']
 	apellido_paterno=request.json['apellido_paterno']
 	apellido_materno=request.json['apellido_materno']
@@ -258,8 +257,6 @@ def editar_participante():
 	razon_social=request.json['razon_social']
 
 	# Actualizacion
-	if rut != participante.rut: # actualizar rut
-		participante.rut = rut
 	if nombre != participante.nombre:
 		participante.nombre = nombre
 	if apellido_paterno != participante.apellido_paterno:
@@ -441,6 +438,40 @@ def obtener_instancia_curso():
 	
 	return jsonify(instancias_cursos_filtrado)
 
+@app.route("/instancia/editar",methods=["PUT"])
+def editar_instancia():
+
+	id_instancia_aux=request.args.get('id_instancia')
+	instancia = mo.Instancia.query.get(id_instancia_aux) # Captura de instancia
+	
+	# Nuevos datos
+	sence = request.json['sence']
+	direccion = request.json['direccion']
+	malla = request.json['malla']
+	fecha_inicio = request.json['fecha_inicio']
+	fecha_termino = request.json['fecha_termino']
+
+	# Actualizacion
+	if sence != instancia.sence:
+		instancia.sence = sence
+	if direccion != instancia.direccion:
+		instancia.direccion = direccion
+	if malla != instancia.malla:
+		instancia.malla = malla
+	if fecha_inicio != instancia.fecha_inicio:
+		instancia.fecha_inicio = fecha_inicio
+	if fecha_termino != instancia.fecha_termino:
+		instancia.fecha_termino = fecha_termino
+	
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	resultado = instancia_schema.dump(instancia)
+
+	return jsonify(resultado)
+
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -593,6 +624,66 @@ def crear_relator():
 
 	return jsonify(resultado)
 
+@app.route("/relator/editar",methods=["PUT"])
+def editar_relator():
+
+	rut_aux=request.args.get('rut')
+	relator = mo.Relator.query.get(rut_aux) # Capturo al relator
+	
+	# Nuevos datos
+	nombre=request.json['nombre']
+	apellido_paterno=request.json['apellido_paterno']
+	apellido_materno=request.json['apellido_materno']
+	titulo=request.json['titulo']
+	genero=request.json['genero']
+	cv=request.json['cv']
+	fecha_nacimiento=request.json['fecha_nacimiento']
+	numero_cuenta=request.json['numero_cuenta']
+	banco=request.json['banco']
+	tipo_cuenta=request.json['tipo_cuenta']
+	fono_personal=request.json['fono_personal']
+	fono_corporativo=request.json['fono_corporativo']
+	correo_corporativo=request.json['correo_corporativo']
+	correo_personal=request.json['correo_personal']
+
+	# Actualizacion
+	if nombre != relator.nombre:
+		relator.nombre = nombre
+	if apellido_paterno != relator.apellido_paterno:
+		relator.apellido_paterno = apellido_paterno
+	if apellido_materno != relator.apellido_materno:
+		relator.apellido_materno = apellido_materno
+	if genero != relator.genero:
+		relator.genero = genero
+	if titulo != relator.titulo:
+		relator.titulo = titulo
+	if cv != relator.cv:
+		relator.cv = cv
+	if fecha_nacimiento != relator.fecha_nacimiento:
+		relator.fecha_nacimiento = fecha_nacimiento
+	if numero_cuenta != relator.numero_cuenta:
+		relator.numero_cuenta = numero_cuenta
+	if banco != relator.banco:
+		relator.banco = banco
+	if tipo_cuenta != relator.tipo_cuenta:
+		relator.tipo_cuenta = tipo_cuenta
+	if fono_personal != relator.fono_personal:
+		relator.fono_personal = fono_personal
+	if fono_corporativo != relator.fono_corporativo:
+		relator.fono_corporativo = fono_corporativo
+	if correo_corporativo != relator.correo_corporativo:
+		relator.correo_corporativo = correo_corporativo
+	if correo_personal != relator.correo_personal:
+		relator.correo_personal = correo_personal
+
+	try:
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	resultado = participante_schema.dump(relator)
+
+	return jsonify(resultado)
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------CONTACTO-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
