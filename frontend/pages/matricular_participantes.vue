@@ -28,8 +28,8 @@
             <td>{{row.item.nombre}}</td>
             <td>{{row.item.apellido_paterno}}</td>
             <td>{{row.item.apellido_materno}}</td>
-            <td>{{row.item.correo}}</td>
-            <td>{{row.item.fono}}</td>
+            <td>{{row.item.correo_corporativo}}</td>
+            <td>{{row.item.fono_corporativo}}</td>
             <td>{{row.item.razon_social}}</td>
             <td>{{row.item.genero}}</td>
             <td>
@@ -100,8 +100,8 @@ export default {
       { text: 'nombre', value: 'nombre' },
       { text: 'apellido_paterno', value: 'apellido_paterno'},
       { text: 'apellido_materno', value: 'apellido_materno' },
-      { text: 'correo', value: 'correo'},
-      { text: 'fono', value: 'fono'},
+      { text: 'correo corporativo', value: 'correo_corporativo'},
+      { text: 'fono corporativo', value: 'fono_corporativo'},
       { text: 'razon_social', value: 'razon_social'},
       { text: 'genero', value: 'genero'},
   

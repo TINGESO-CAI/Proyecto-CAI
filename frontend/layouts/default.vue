@@ -288,12 +288,9 @@ export default {
       ],
       finanzas:[
       ['Generar Factura','mdi-file-plus','/factura'],
-      ['Ver facturas','mdi-account-multiple','/ver_facturas'],
-      ['Filtrar facturas','mdi-account-multiple','/filtrar_facturas'],
-      ['Ver participantes por factura','mdi-account-multiple','/ver_participantes_factura'],
-      ['Generar boleta', 'mdi-account-multiple-plus','/generar_boleta'],
-      ['Ver boletas','mdi-format-list-bulleted-type','/ver_boletas'],
-      ['Asignar pagos','mdi-account-multiple','/asignar_pagos'],
+      ['Ver facturas','mdi-format-list-bulleted-type','/ver_facturas'],
+      ['Filtrar facturas','mdi-book-open-page-variant','/filtrar_facturas'],
+      ['Ver participantes','mdi-account-multiple','/ver_participantes_factura'],
       
       ],
       administracion:[

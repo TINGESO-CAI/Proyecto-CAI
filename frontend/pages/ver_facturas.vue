@@ -92,9 +92,9 @@
       <v-icon
         small
         class="mr-2"
-        @click="editItem(item)"
+        @click="descargar(item)"
       >
-        mdi-pencil
+        mdi-download
       </v-icon>
       <v-icon
         small
@@ -161,7 +161,7 @@ export default {
       { text: 'obs', value: 'observacion'},
       { text: 'num_cai', value: 'num_cai' },
       
-      { text: 'Editar/Borrar', value: 'actions', sortable: false },
+      { text: 'Descargar/Borrar', value: 'actions', sortable: false },
 
   
     ],
@@ -222,19 +222,25 @@ export default {
         console.log('error', error); 
       }
     },
-    editItem (item) {
-        this.editedIndex = this.facturas.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
+    descargar (item) {
+        window.location.href='http://localhost:5000/factura/descargar/'+item.id_factura.toString()
       },
     deleteItem (item) {
       this.editedIndex = this.facturas.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
+
     },
-    deleteItemConfirm () {
-      this.facturas.splice(this.editedIndex, 1)
-      this.closeDelete()
+    deleteItemConfirm: async function() {
+      try{
+        let response= await axios.delete('http://localhost:5000/factura/eliminar?id_factura='+this.editedItem.id_factura.toString())
+        console.log(response)
+        this.facturas.splice(this.editedIndex, 1)
+        this.closeDelete()
+      }
+      catch(error){
+        alert('No se puede eliminar la factura')
+      }
     },
     close () {
       this.dialog = false
