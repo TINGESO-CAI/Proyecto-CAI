@@ -232,7 +232,7 @@ export default {
         categoria: this.categoria,
         horas_curso: this.transformarVacio(this.horas_curso),
         valor_efectivo_participante: this.transformarVacio(this.valor_efectivo_participante),
-        valor_imputable_participante: this.valor_imputable_participante,
+        valor_imputable_participante: this.transformarVacio(this.valor_imputable_participante),
         resolucion_sence: this.resolucion_sence,
         resolucion_usach: this.resolucion_usach,
         estado: this.transformarVacio(this.estado),
