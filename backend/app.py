@@ -1,3 +1,4 @@
+# IMPORTACIONES	GENERALES
 from copy import Error
 from datetime import datetime
 from logging import exception
@@ -15,6 +16,7 @@ from sqlalchemy.orm import query
 import sqlalchemy.orm.exc
 import json
 from docxtpl import DocxTemplate
+from datetime import datetime
 
 from sqlalchemy.sql import text
 from sqlalchemy.sql.expression import null
@@ -23,23 +25,24 @@ import db.modelos as mo
 
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
+# Configuracion de la app
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = 'loginmaldito'
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SECRET_KEY'] = 'loginmaldito' # secretkey para el login
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+app.config['SQLALCHEMY_ECHO'] = True # Para mostrar las query SQL
 db.init_app(app)
 
-ma = Marshmallow(app)
-migrate= Migrate(app,db)
+ma = Marshmallow(app) # Para el uso de sqlalchemy
+migrate= Migrate(app,db) # Para el uso de los migrate
 
 # LOGIN
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+# Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
 participante_schemas = mo.ParticipanteSchema(many=True)
 
@@ -68,64 +71,84 @@ cuenta_schemas= mo.CuentaSchema(many=True)
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
-
+# Funcion encargada de registar una cuenta
 @app.route('/registrar', methods=['POST'])
 def registrar_cuenta():
+
+	# Request de los json
 	correo = request.json['correo']
 	contrasena = request.json['contrasena']
 	nombre = request.json['nombre']
 	apellido = request.json['apellido']
 	rut = request.json['rut']
 
-
-
+	# Se crea la instancia cuenta con los datos capturados
 	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut)
 
+	# Se agrega y se sube a la db
 	db.session.add(nueva_cuenta)
 	db.session.commit()
 
+	# Se realiza un "dump" de los schemas para moder "jsonifear"
 	resultado = cuenta_schema.dump(nueva_cuenta)
 
 	return jsonify(resultado)
 
+# Funcion que se encarga de cargar una cuenta
 @login_manager.user_loader
 def load_user(user_id):
     # since the user_id is just the primary key of our user table, use it in the query for the user
     return mo.Cuenta.query.get(int(user_id))
 
+# Funcion respecto al login
 @app.route('/entrar', methods=['POST'])
 def entrar_cuenta():
+
+	# Request de los json
 	correo = request.json['correo']
 	contrasena = request.json['contrasena']
+
+	# Se instancia la clase Cuenta con el metodo de autenticar definido
 	usuario = mo.Cuenta.autenticar(correo,contrasena)
 
+	# En caso de que el usario no este en la db
 	if not usuario:
 		return jsonify({ 'message': 'Invalid credentials', 'authenticated': False }), 401
 
 	try:
+		# Se carga el usuario y se logea
 		load_user(usuario.id)
 		login_user(usuario)
 		return jsonify("El usuario de id "+str(usuario.id)+" se ha logeado")
 	except Exception as e:
 		return jsonify(str(e))
 
+# Funcion para el logout
 @app.route('/salir')
 @login_required
 def salir_cuenta():
+	# comando para salirse
     logout_user()
     return jsonify("deslogeaste jiji")
 
+# Funcion usada para las pruebas de login
 @app.route('/prueba')
 @login_required
 def prueba():
 	return jsonify("FUNCIONA JIJI")
+
 @app.route('/cuenta/permisos',methods=["GET"])
 @login_required
 def obtener_permisos():
 	if current_user.is_authenticated:
 		user_id = current_user.get_id()
 	cuenta=mo.Cuenta.query.get(user_id)
-	permiso={"nivel_acceso": cuenta.nivel_acceso}
+	permiso={
+		"nombre": cuenta.nombre + " " + cuenta.apellido,
+		"rut": cuenta.rut,
+		"correo": cuenta.correo,
+		"nivel_acceso": cuenta.nivel_acceso
+		}
 	
 	return jsonify(permiso)
 
@@ -134,10 +157,12 @@ def obtener_permisos():
 # -----------------------------------PARTICIPANTE------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
 
+# Funcion para agregar un participante
 @app.route("/participante/agregar",methods=["POST"])
-@login_required
+#@login_required
 def crear_participante():
 	
+	# Request de los json
 	rut=request.json['rut']
 	nombre=request.json['nombre']
 	apellido_paterno=request.json['apellido_paterno']
@@ -154,55 +179,30 @@ def crear_participante():
 	correo_personal=request.json['correo_personal']
 	razon_social=request.json['razon_social']
 	
+	# Crear instancia de participante con los datos
 	nuevo_participante=mo.Participante(rut,nombre,apellido_paterno,apellido_materno,genero,nivel_educacional,fecha_nacimiento,nacionalidad,tipo_inscripcion,
 	ocupacion,fono_personal,fono_corporativo,correo_personal,correo_corporativo,razon_social)
 	
+	# Agregamos el nuevo participante
 	db.session.add(nuevo_participante)
 	try:
+		# Lo agregamos a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"El participante ya ha sido ingresado"})
 	
+	# Se ejecuta el dump
 	resultado = participante_schema.dump(nuevo_participante)
 
 	return jsonify(resultado)
-	
-@app.route("/participante/agregar/archivo",methods=["POST"])
-def crear_participante_archivo():
-	participantes=request.json['participantes']
-	lista_participantes_rechazados=[]
-	for persona in  participantes:
-		nuevo_participante=mo.Participante(
-			persona["rut"],
-			persona["nombre"],
-			persona["apellido_paterno"],
-			persona["apellido_materno"],
-			persona["genero"],
-			persona["nivel_educacional"],
-			persona["fecha_nacimiento"],
-			persona["nacionalidad"],
-			persona["tipo_inscripcion"],
-			persona["ocupacion"],
-			persona["razon_social"],
-			persona["fono_personal"],
-			persona["fono_corporativo"],
-			persona["correo_corporativo"],
-			persona["correo_personal"]					
-			)
-		db.session.add(nuevo_participante)
-		try:
-			db.session.commit()
-		except:
-			lista_participantes_rechazados.append(nuevo_participante)
-			db.session.rollback()
-	
-	participantes_rechazados=participante_schemas.dump(lista_participantes_rechazados)
 
-	return jsonify({"1.respuesta":"Los siguientes participantes no se han podido ingresar, duplicados o errores, revise:","2.participantes":participantes_rechazados})
-	
+# Funcion para filtrar por algun parametro o entregar todos los participantes
 @app.route("/participante/obtener",methods=["GET"])
 def filtro_participante():
 
+	# Request de los json a traves de la ruta
+	# ej: /participante/obtener?tipo_inscripcion=XX
+	# ej: /participante/obtener?tipo_inscripcion=xxxx&genero=xx
 	rut=request.args.get('rut')
 	nombre=request.args.get('nombre')
 	apellido_paterno=request.args.get('apellido_paterno')
@@ -218,9 +218,11 @@ def filtro_participante():
 	correo_personal=request.args.get('correo_personal')
 	correo_corporativo=request.args.get('correo_corporativo')
 	razon_social=request.args.get('razon_social')
- 
+	
+	# Se instancian todos los participantes
 	participantes = mo.Participante.query.filter()
 
+	# En esta seccion se iran filtrando segun los atributos entregados en la ruta
 	if rut != None:
 		participantes = participantes.filter(mo.Participante.rut==rut)
 	if nombre != None:
@@ -251,32 +253,46 @@ def filtro_participante():
 		participantes = participantes.filter(mo.Participante.correo_corporativo==correo_personal)
 	if razon_social!= None:
 		participantes = participantes.filter(mo.Participante.razon_social==razon_social)
-			
+
+	# Se hace el dump retornando los participantes filtrados segun los parametros dados
 	participantes_filtrado = participante_schemas.dump(participantes)
 	
 	return jsonify(participantes_filtrado)
 
+# Se obtienen todos los ruts de los participantes
 @app.route("/participante/obtener/rut",methods=["GET"])
 def obtener_ruts():
 
+	# Se sacan todos los ruts de los participantes con query().all()
 	rut_curso = db.session.query(mo.Participante.rut).all()
+	# Se hace el dump de los ruts
 	participantes = participante_schemas.dump(rut_curso)
 	
 	return jsonify(participantes)
 
+# Se obtienen todas las instancias de un participante especifico
 @app.route("/participante/<rut>/instancias",methods=["GET"])
 def obtener_cursos_inscritos_participante(rut):
+
+	# Tomamos al participante del rut ingresado
 	participante = mo.Participante.query.get(rut)
+	
+	# Gracias a los backref, se obtienen todas las instancias de este rut
 	instancias = instancia_schemas.dump(participante.instancias)
+
 	return jsonify(instancias)
 
+# Funcion encargada de editar/actualizar los participantes
 @app.route("/participante/editar",methods=["PUT"])
 def editar_participante():
 
+	# Request del rut ingresado por la ruta
+	# ej: /participante/editar/xxxxxxxx-x
 	rut_aux=request.args.get('rut')
-	participante = mo.Participante.query.get(rut_aux) # Capturo al participante
+	# Capturo al participante
+	participante = mo.Participante.query.get(rut_aux) 
 	
-	# Nuevos datos
+	# Capturo los nuevos datos
 	nombre=request.json['nombre']
 	apellido_paterno=request.json['apellido_paterno']
 	apellido_materno=request.json['apellido_materno']
@@ -292,7 +308,7 @@ def editar_participante():
 	correo_personal=request.json['correo_personal']
 	razon_social=request.json['razon_social']
 
-	# Actualizacion
+	# Realizo la Actualizacion de los atributos
 	if nombre != participante.nombre:
 		participante.nombre = nombre
 	if apellido_paterno != participante.apellido_paterno:
@@ -323,21 +339,27 @@ def editar_participante():
 		participante.razon_social = razon_social
 
 	try:
+		# Los agrego a la bd
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
 	
+	# dump para mostrarlos y guardarlos como json
 	resultado = participante_schema.dump(participante)
 
 	return jsonify(resultado)
 
+# Funcion encargada de borrar al participante de la bd
 @app.route("/participante/eliminar",methods=["DELETE"])
 def eliminar_participante():
 	
+	# Request del rut ingresado por la ruta
+	# ej: /participante/editar/xxxxxxxx-x
 	rut_aux=request.args.get('rut')
 	participante = mo.Participante.query.get(rut_aux) # Capturo al participante
 	
 	try:
+		# Borro al participante de la base de dato
 		db.session.delete(participante)
 		db.session.commit()
 		msg="el participante "+participante.rut+" fue eliminado correctamente"
@@ -349,9 +371,11 @@ def eliminar_participante():
 # ------------------------------------------CURSO------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
 
+# Funcion encargada de agregar un curso
 @app.route("/curso/agregar",methods=["POST"])
 def crear_curso():
 
+	# Request de los json
 	sence = request.json['sence']
 	nombre = request.json['nombre']
 	modalidad = request.json['modalidad']
@@ -364,19 +388,25 @@ def crear_curso():
 	estado = request.json['estado']
 	f_vigencia = request.json['f_vigencia']
 
+	# Se instancia el nuevo cuso
 	nuevo_curso=mo.Curso(sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia)
 
+	# Se agrega el nuevo curso ingresado
 	db.session.add(nuevo_curso)
 	try:
+		# Se agrega a la bd
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"El curso ya ha sido ingresado"})
 	return jsonify({"respuesta":"Curso ingresado correctamente!"})
 
-	
+# Funcion encarga de filtar los cursos
 @app.route("/curso/obtener",methods=["GET"])
 def obtener_curso():
 
+	# Request de los json
+	# ej: /curso/obtener?modalidad=xxxx
+	# ej: /curso/obtener?modalidad=xxxx&estado=xxxx
 	sence = request.args.get('sence')
 	nombre = request.args.get('nombre')
 	modalidad = request.args.get('modalidad')
@@ -389,8 +419,10 @@ def obtener_curso():
 	estado = request.args.get('estado')
 	f_vigencia = request.args.get('f_vigencia')
 
+	# Se insancian todos los cursos para posteriormente ser filtrados
 	cursos = mo.Curso.query.filter()
 	
+	# En base al los parmetros ingresados por la ruta, se filtran los datos
 	if sence != None:
 		cursos = cursos.filter(mo.Curso.sence==sence)
 	if nombre != None:
@@ -413,37 +445,48 @@ def obtener_curso():
 		cursos = cursos.filter(mo.Curso.estado==estado)
 	if f_vigencia!= None:
 		cursos = cursos.filter(mo.Curso.f_vigencia==f_vigencia)
-		
+
+	# se realiza los dump	
 	cursos_filtrado = curso_schemas.dump(cursos)
 	
 	return jsonify(cursos_filtrado)
 
+# Funcion que obtiene todos los sence de todos los cursos
 @app.route("/curso/obtener/sence",methods=["GET"])
 def obtener_sences():
-
+	# Se toma todos los curso
 	sence_curso = db.session.query(mo.Curso.sence).all()
+	# Se realiza el dump
 	cursos = curso_schemas.dump(sence_curso)
 	
 	return jsonify(cursos)
 
+# Funcion que retorna todos los sence con instancias
 @app.route("/curso/obtener/sences_con_instancia",methods=["GET"])
 def obtener_sences_existente():
+	# se toman todos los cursos
 	sence_curso = mo.Curso.query.all()
 
 	cursos_con_inst=[]
+	# con el for se agregan todos los cursos que tienen instancias
 	for c in sence_curso:
 		if len(c.instancias)!=0:
 			cursos_con_inst.append(c)
+	# se realiza el dump
 	cursos = curso_schemas.dump(cursos_con_inst)
 	return jsonify(cursos)
 
+# Funcion que se usa para eliminar
 @app.route("/curso/eliminar",methods=["DELETE"])
 def eliminar_curso():
-	
+
+	# Request de los json
+	# ej: /curso/eliminar?sence=xxxx
 	sence_aux=request.args.get('sence')
 	curso = mo.Curso.query.get(sence_aux) # Capturo al curso
 	
 	try:
+		# se elimina de la db
 		db.session.delete(curso)
 		db.session.commit()
 		msg="el curso de nombre "+curso.nombre+" fue eliminado correctamente"
@@ -902,15 +945,15 @@ def crear_factura():
 	else:
 		num_factura=num_factura.id_factura+1
 	
-	num_cai=request.json['num_registro'] #Este numero se debe ingresar o es fijo?
+	num_cai=request.json['num_registro'] 
 	estado=request.json['estado']
-
-	num_hes=request.json['num_hes'] #Cuando se ingresa, siempre a veces?
-	fecha_emision=request.json['fecha_emision'] #Debe ser simpre la fecha actual?
-	fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento de que?
+	num_hes=request.json['num_hes'] 
+	fecha_emision=datetime.today().strftime('%Y-%m-%d') # Arreglar a fecha actual 
+	fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento
 	sence=request.json['sence']
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
+	fono_empresa=request.json['fono_empresa'] # Agregar en front
 	
 	# ----------- INFO GENERAL ---------------------------
 	
@@ -946,11 +989,11 @@ def crear_factura():
 	rut_empresa = empresa_factura.rut # aun no responde la duda la clienta sobre el tema del rut
 	direccion_empresa = empresa_factura.direccion
 	comuna_empresa = empresa_factura.comuna
-	fono_empresa = "1234567"
 	
 	# --------- INFO DE PARTICIPANTES ----------------------
 	lista_participantes = request.get_json()
 	lista_rut=[] # Lista con los ruts de los participante
+
 
 	for participante in lista_participantes['participantes']:
 		lista_rut.append(participante['rut'])	
@@ -975,14 +1018,14 @@ def crear_factura():
 		"estado": estado,
 		"id_factura":num_factura,
 		"fecha_emision":fecha_emision,
-		"razon_social": razon_social,
-		"giro":giro_empresa,
-		"atencion":atencion_empresa,
-		"departamento": departamento_empresa,
-		"rut":rut_empresa,
-		"direccion":direccion_empresa,
-		"comuna":comuna_empresa,
-		"fono":fono_empresa,
+		"razon_social": razon_social, 			# 
+		"giro":giro_empresa, 					#
+		"atencion":atencion_empresa,			#
+		"departamento": departamento_empresa,	#
+		"rut":rut_empresa,						#
+		"direccion":direccion_empresa,			#
+		"comuna":comuna_empresa,				#
+		"fono":fono_empresa,					#
 		"fecha_vencimiento":fecha_vencimiento,
 		"nombre_curso":nombre_curso,
 		"sence":sence_curso,
@@ -1137,7 +1180,10 @@ def obtener_participante_instancia():
 	razon_social = request.args.get('razon_social')
 
 	instancia = mo.Instancia.query.get(id_instancia)
-	participantes = instancia.alumnos.filter(mo.Participante.razon_social==razon_social)
+	if razon_social is None:
+		participantes= instancia.alumnos
+	else:
+		participantes = instancia.alumnos.filter(mo.Participante.razon_social==razon_social)
 
 	participantes_filtrados = participante_schemas.dump(participantes)
 
