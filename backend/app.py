@@ -64,50 +64,6 @@ contacto_schemas= mo.ContactoSchema(many=True)
 cuenta_schema= mo.CuentaSchema()
 cuenta_schemas= mo.CuentaSchema(many=True)
 
-# *****REVISAR SINO BORRAR POSTERIORMENTE*******
-
-@app.route("/factura/descargar/<id>",methods=["GET"])
-def descargar(id):
-	ruta="db/facturas_generadas/"+str(id)+".docx"
-	return send_file(ruta,as_attachment=True)
-
-@app.route("/paises/obtener",methods=["GET"])
-def obtener_paises():
-	r = requests.get('https://restcountries.com/v3.1/all?fields=translations',)
-	paises=r.json()
-	respuesta=[]
-	for x in paises:
-		resp=x['translations']['spa']['common']
-		respuesta.append(resp)
-	return jsonify(respuesta)
-
-"""
-@app.route('/regiones/chile/obtener',methods=["GET"])
-def obtener_regiones_chile():
-	r = requests.get('https://apis.digital.gob.cl/dpa/regiones',)
-	regiones=r.json()
-	respuesta=[]
-	for x in regiones:
-		resp={
-			'codigo':x['codigo'],
-			'nombre': x['nombre']
-		}
-		respuesta.append(resp)
-	return jsonify(respuesta)
-@app.route('/comunas/chile/obtener/region=<codigo>',methods=['GET'])
-def obtener_comuna_por_region(codigo):
-	if int(codigo)<1 and int(codigo)>16:
-		return jsonify({"respuesta":"codigo de region no valido"})
-	url='https://apis.digital.gob.cl/dpa/regiones/'+codigo+'/comunas'
-	print(url)
-	r = requests.get(url=url)
-	comunas=r.json()
-	respuesta=[]
-	for x in comunas:
-		resp=x['nombre']
-		respuesta.append(resp)
-	return jsonify(respuesta)
-"""
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -168,6 +124,7 @@ def prueba():
 # -----------------------------------------------------------------------------------------------------	
 
 @app.route("/participante/agregar",methods=["POST"])
+@login_required
 def crear_participante():
 	
 	rut=request.json['rut']
@@ -495,7 +452,7 @@ def crear_instancia_curso():
 	malla = request.json['malla']
 	fecha_inicio = request.json['fecha_inicio']
 	fecha_termino = request.json['fecha_termino']
-
+	
 	nuevo_instancia_curso=mo.Instancia(sence=sence,direccion=direccion,malla=malla,fecha_inicio=fecha_inicio,fecha_termino=fecha_termino)
 	print(nuevo_instancia_curso)
 	db.session.add(nuevo_instancia_curso)
@@ -1111,6 +1068,11 @@ def obtener_ids_facturas():
 	facturas = factura_schemas.dump(ids_facturas)
 	
 	return jsonify(facturas)
+
+@app.route("/factura/descargar/<id>",methods=["GET"])
+def descargar(id):
+	ruta="db/facturas_generadas/"+str(id)+".docx"
+	return send_file(ruta,as_attachment=True)
 		
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------TABLAS INTERMEDIAS---------------------------------------------

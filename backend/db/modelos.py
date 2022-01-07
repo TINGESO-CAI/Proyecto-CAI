@@ -26,13 +26,12 @@ participante_factura = db.Table('participante_factura',
 	db.Column('id_factura',db.Integer, db.ForeignKey('factura.id_factura'))
 )
 
-
 class Contacto(db.Model):
 	__tablename__ = 'contacto'
-	id_contacto = db.Column(db.Integer, primary_key=True,autoincrement=True)
-	correo = db.Column(db.Text)
-	fono = db.Column(db.Text)
-	descripcion = db.Column(db.Text)
+	id_contacto = db.Column(db.Integer, primary_key=True,autoincrement=True, nullable = False)
+	correo = db.Column(db.Text, nullable = True)
+	fono = db.Column(db.Text, nullable = True)
+	descripcion = db.Column(db.Text, nullable = True)
 	razon_social = db.Column(db.ForeignKey('empresa.razon_social'))
 
 	def __init__(self,correo,fono,descripcion,razon_social):
@@ -47,13 +46,13 @@ class ContactoSchema(SQLAlchemyAutoSchema):
 
 class Cuenta(UserMixin,db.Model):
 	__tablename__ = 'cuenta'
-	id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-	correo = db.Column(db.Text)
-	contrasena = db.Column(db.Text)
-	nombre = db.Column(db.Text)
-	apellido = db.Column(db.Text)
-	rut = db.Column(db.Text)
-	rol = db.Column(db.Text)
+	id = db.Column(db.Integer, primary_key=True,autoincrement=True, nullable = False)
+	correo = db.Column(db.Text, nullable = True)
+	contrasena = db.Column(db.Text, nullable = True)
+	nombre = db.Column(db.Text, nullable = True)
+	apellido = db.Column(db.Text, nullable = True)
+	rut = db.Column(db.Text, nullable = True)
+	rol = db.Column(db.Text, nullable = True)
 
 	def __init__(self,correo,contrasena,nombre,apellido,rut,rol):
 		self.correo = correo
@@ -79,18 +78,20 @@ class CuentaSchema(SQLAlchemyAutoSchema):
 
 class Curso(db.Model):
 	__tablename__ = 'curso'
-	sence = db.Column(db.Text, primary_key=True)
-	nombre = db.Column(db.Text)
-	modalidad = db.Column(db.Text)
-	categoria = db.Column(db.Text)
-	horas_curso = db.Column(db.Integer)
-	valor_efectivo_participante = db.Column(db.Integer)
-	valor_imputable_participante = db.Column(db.Integer)
-	resolucion_sence = db.Column(db.Text)
-	resolucion_usach = db.Column(db.Text)
-	estado = db.Column(db.Text)
+	sence = db.Column(db.Text, primary_key=True, nullable = False)
+	nombre = db.Column(db.Text, nullable = True)
+	modalidad = db.Column(db.Text, nullable = True)
+	categoria = db.Column(db.Text, nullable = True)
+	horas_curso = db.Column(db.Integer, nullable = True)
+	valor_efectivo_participante = db.Column(db.Integer, nullable = True)
+	valor_imputable_participante = db.Column(db.Integer, nullable = True)
+	resolucion_sence = db.Column(db.Text, nullable = True)
+	resolucion_usach = db.Column(db.Text, nullable = True)
+	estado = db.Column(db.Text, nullable = True)
+
 	f_vigencia = db.Column(db.Date)
 	instancias = db.relationship('Instancia', backref=db.backref("curso"))
+	
 	def __init__(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia):
 		self.sence = sence
 		self.nombre=nombre
@@ -113,13 +114,13 @@ class CursoSchema(SQLAlchemyAutoSchema):
 class Empresa(db.Model):
 	__tablename__ = 'empresa'
 
-	razon_social = db.Column(db.Text, primary_key=True)
-	giro = db.Column(db.Text)
-	atencion = db.Column(db.Text)
-	departamento = db.Column(db.Text)
-	rut = db.Column(db.Text)
-	direccion = db.Column(db.Text)
-	comuna = db.Column(db.Text)
+	razon_social = db.Column(db.Text, primary_key=True, nullable = False)
+	giro = db.Column(db.Text, nullable = True)
+	atencion = db.Column(db.Text, nullable = True)
+	departamento = db.Column(db.Text, nullable = True)
+	rut = db.Column(db.Text, nullable = True)
+	direccion = db.Column(db.Text, nullable = True)
+	comuna = db.Column(db.Text, nullable = True)
 
 	contactos=db.relationship('Contacto',backref=db.backref('empresa_asociada'))
 	empleados=db.relationship('Participante',backref=db.backref('participante'))
@@ -142,17 +143,17 @@ class EmpresaSchema(SQLAlchemyAutoSchema):
 class Factura(db.Model):
 	__tablename__ = 'factura'
 
-	id_factura = db.Column(db.Integer, primary_key=True)
-	sence = db.Column(db.Text)
-	num_cai = db.Column(db.Text)
-	estado = db.Column(db.Integer)
-	num_hes = db.Column(db.Text)
-	fecha_emision = db.Column(db.Date)
-	fecha_vencimiento = db.Column(db.Date)
-	enviar_factura = db.Column(db.Integer)
-	especificar = db.Column(db.Text)
-	num_orden = db.Column(db.Text)
-	observacion = db.Column(db.Text)
+	id_factura = db.Column(db.Integer, primary_key=True, nullable = False)
+	sence = db.Column(db.Text, nullable = True)
+	num_cai = db.Column(db.Text, nullable = True)
+	estado = db.Column(db.Integer, nullable = True)
+	num_hes = db.Column(db.Text, nullable = True)
+	fecha_emision = db.Column(db.Date, nullable = True)
+	fecha_vencimiento = db.Column(db.Date, nullable = True)
+	enviar_factura = db.Column(db.Integer, nullable = True)
+	especificar = db.Column(db.Text, nullable = True)
+	num_orden = db.Column(db.Text, nullable = True)
+	observacion = db.Column(db.Text, nullable = True)
 
 	def __init__(self,id_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion):
 		self.id_factura = id_factura
@@ -176,15 +177,13 @@ class FacturaSchema(SQLAlchemyAutoSchema):
 class Instancia(db.Model):
 	
 	__tablename__ = 'instancia'
-	id_instancia = db.Column(db.Integer, primary_key=True)
+	id_instancia = db.Column(db.Integer, primary_key=True, nullable = False)
 	sence = db.Column(db.ForeignKey('curso.sence'))
-	direccion = db.Column(db.Text)
-	malla = db.Column(db.Boolean)
-	fecha_inicio = db.Column(db.Date)
-	fecha_termino = db.Column(db.Date)
+	direccion = db.Column(db.Text, nullable = True)
+	malla = db.Column(db.Boolean, nullable = True)
+	fecha_inicio = db.Column(db.Date, nullable = True)
+	fecha_termino = db.Column(db.Date, nullable = True)
 
-	
-	
 	def __init__(self,sence,direccion,malla,fecha_inicio,fecha_termino):
 		self.sence = sence
 		self.direccion = direccion
@@ -200,20 +199,20 @@ class InstanciaSchema(SQLAlchemyAutoSchema):
 class Participante(db.Model):
 	__tablename__ = 'participante'
 
-	rut = db.Column(db.Text, primary_key=True)
-	nombre = db.Column(db.Text)
-	apellido_paterno = db.Column(db.Text)
-	apellido_materno = db.Column(db.Text)
-	genero = db.Column(db.Integer)
-	fecha_nacimiento = db.Column(db.Date)
-	nivel_educacional = db.Column(db.Text)
-	nacionalidad = db.Column(db.Text)
-	tipo_inscripcion = db.Column(db.Text)
-	ocupacion = db.Column(db.Text)
-	fono_personal=db.Column(db.Text)
-	fono_corporativo=db.Column(db.Text)
-	correo_corporativo=db.Column(db.Text)
-	correo_personal=db.Column(db.Text)
+	rut = db.Column(db.Text, primary_key=True, nullable = False)
+	nombre = db.Column(db.Text, nullable = True)
+	apellido_paterno = db.Column(db.Text, nullable = True)
+	apellido_materno = db.Column(db.Text, nullable = True)
+	genero = db.Column(db.Integer, nullable = True)
+	fecha_nacimiento = db.Column(db.Date, nullable = True)
+	nivel_educacional = db.Column(db.Text, nullable = True)
+	nacionalidad = db.Column(db.Text, nullable = True)
+	tipo_inscripcion = db.Column(db.Text, nullable = True)
+	ocupacion = db.Column(db.Text, nullable = True)
+	fono_personal=db.Column(db.Text, nullable = True)
+	fono_corporativo=db.Column(db.Text, nullable = True)
+	correo_corporativo=db.Column(db.Text, nullable = True)
+	correo_personal=db.Column(db.Text, nullable = True)
 	
 	facturas = db.relationship('Factura', secondary='participante_factura', backref=db.backref('facturas_alumnos'))
 	instancias = db.relationship('Instancia', secondary='participante_instancia', backref=db.backref('alumnos', lazy='dynamic'))
@@ -250,25 +249,24 @@ class ParticipanteSchema(SQLAlchemyAutoSchema):
 
 class Relator(db.Model):
 	__tablename__ = 'relator'
-	rut = db.Column(db.Text, primary_key=True)
-	nombre = db.Column(db.Text)
-	apellido_paterno = db.Column(db.Text)
-	apellido_materno = db.Column(db.Text)
-	titulo = db.Column(db.Text)
-	genero = db.Column(db.Integer)
-	cv = db.Column(db.Text)
-	fecha_nacimiento = db.Column(db.Date)
-	numero_cuenta = db.Column(db.Text)
-	banco = db.Column(db.Text)
-	tipo_cuenta = db.Column(db.Text)
-	fono_personal=db.Column(db.Text)
-	fono_corporativo=db.Column(db.Text)
-	correo_corporativo=db.Column(db.Text)
-	correo_personal=db.Column(db.Text)
+	rut = db.Column(db.Text, primary_key=True, nullable = False)
+	nombre = db.Column(db.Text, nullable = True)
+	apellido_paterno = db.Column(db.Text, nullable = True)
+	apellido_materno = db.Column(db.Text, nullable = True)
+	titulo = db.Column(db.Text, nullable = True)
+	genero = db.Column(db.Integer, nullable = True)
+	cv = db.Column(db.Text, nullable = True)
+	fecha_nacimiento = db.Column(db.Date, nullable = True)
+	numero_cuenta = db.Column(db.Text, nullable = True)
+	banco = db.Column(db.Text, nullable = True)
+	tipo_cuenta = db.Column(db.Text, nullable = True)
+	fono_personal=db.Column(db.Text, nullable = True)
+	fono_corporativo=db.Column(db.Text, nullable = True)
+	correo_corporativo=db.Column(db.Text, nullable = True)
+	correo_personal=db.Column(db.Text, nullable = True)
 	
 	dicta_instancia = db.relationship('Instancia', secondary='relator_instancia', backref=db.backref('profesores', lazy='dynamic'))
 	
-
 	def __init__(self,rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta,
 	fono_personal,fono_corporativo,correo_corporativo,correo_personal):
 		self.rut = rut
