@@ -148,6 +148,7 @@
                     sm="6"
                     md="4"
                   >
+                  
                     <v-select
                       v-model="editedItem.genero"
                       :items="generos"
@@ -158,7 +159,9 @@
                       return-object
                       single-line   
                       
-                    ></v-select>
+                    >
+                    </v-select>
+
                   </v-col>
                   
                   <v-col
@@ -336,32 +339,46 @@ export default {
       }
     },
     cambiarGenero(valor){
-      if (valor == 'femenino' ) return '1'
+      console.log(valor)
+      if (valor ==  'femenino') return '1'
       else if (valor == 'masculino' ) return '2'
-      else return 'error'
+      else return null
+    },
+
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
     },
     editarParticipante: async function(){
       let newParticipante ={
         rut: this.editedItem.rut,
-        nombre: this.editedItem.nombre,
-        apellido_paterno: this.editedItem.apellido_paterno,
-        apellido_materno: this.editedItem.apellido_materno,
-        genero: this.editedItem.genero,
-        nivel_educacional: this.editedItem.nivel_educacional,
-        fecha_nacimiento: this.editedItem.fecha_nacimiento,
-        nacionalidad: this.editedItem.nacionalidad,
-        tipo_inscripcion: this.editedItem.tipo_inscripcion,
-        ocupacion: this.editedItem.ocupacion,
-        correo_corporativo: this.editedItem.correo_corporativo,
-        correo_personal: this.editedItem.correo_personal,
-        fono_personal: this.editedItem.fono_personal,
-        fono_corporativo: this.editedItem.fono_corporativo,
-        razon_social: this.editedItem.razon_social.razon_social
+        nombre: this.transformarVacio(this.editedItem.nombre),
+        apellido_paterno: this.transformarVacio(this.editedItem.apellido_paterno),
+        apellido_materno: this.transformarVacio(this.editedItem.apellido_materno),
+        genero: this.transformarVacio(this.cambiarGenero(this.editedItem.genero)),
+        nivel_educacional: this.transformarVacio(this.editedItem.nivel_educacional),
+        fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
+        nacionalidad: this.transformarVacio(this.editedItem.nacionalidad),
+        tipo_inscripcion: this.transformarVacio(this.editedItem.tipo_inscripcion),
+        ocupacion: this.transformarVacio(this.editedItem.ocupacion),
+        correo_corporativo: this.transformarVacio(this.editedItem.correo_corporativo),
+        correo_personal: this.transformarVacio(this.editedItem.correo_personal),
+        fono_personal: this.transformarVacio(this.editedItem.fono_personal),
+        fono_corporativo: this.transformarVacio(this.editedItem.fono_corporativo),
+        razon_social: this.transformarVacio(this.editedItem.razon_social)
       }
       try {
         let response = await axios.put('http://localhost:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
         console.log(response);
         this.close();
+
+        console.log(this.cambiarGenero(this.editedItem.genero),this.editedItem.genero)
+        this.editedItem.genero=this.cambiarGenero(this.editedItem.genero)
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
       }
       catch (error) {
         console.log('error', error);
@@ -382,11 +399,13 @@ export default {
     mostrarGenero(valor){
       if (valor == '1' ) return 'femenino'
       else if (valor == '2' ) return 'masculino'
-      else return 'desconocido'
+      else return null
     },
     editItem (item) {
         this.editedIndex = this.participantes.indexOf(item)
         this.editedItem = Object.assign({}, item)
+        this.editedItem.genero=this.mostrarGenero(this.editedItem.genero)
+        console.log(this.editedItem.genero)
         this.dialog = true
       },
     deleteItem (item) {

@@ -51,6 +51,17 @@
                       label="id_factura"
                     ></v-text-field>
                   </v-col>
+
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.id_factura"
+                      label="id_factura"
+                    ></v-text-field>
+                  </v-col>
                 <!--hasta aqui-->
                 </v-row>
               </v-container>

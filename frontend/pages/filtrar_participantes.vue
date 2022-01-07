@@ -317,7 +317,7 @@ export default {
     mostrarGenero(valor){
       if (valor == '1' ) return 'femenino'
       else if (valor == '2' ) return 'masculino'
-      else return 'desconocido'
+      else return null
     },
   },
   created(){

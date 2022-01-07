@@ -240,7 +240,7 @@ export default {
     mostrarMalla(valor){
       if (valor == true ) return 'SI'
       else if (valor == false ) return 'NO'
-      else return 'desconocido'
+      else return null
     },
     editItem (item) {
         this.editedIndex = this.instancias.indexOf(item)
