@@ -268,20 +268,20 @@ export default {
       this.message = '';
       let newRelator ={
         rut: this.rut,
-        nombre: this.nombre,
-        apellido_paterno: this.apellido_paterno,
-        apellido_materno: this.apellido_materno,
-        titulo: this.titulo,
-        cv: this.cv,
+        nombre: this.transformarVacio(this.nombre),
+        apellido_paterno: this.transformarVacio(this.apellido_paterno),
+        apellido_materno: this.transformarVacio(this.apellido_materno),
+        titulo: this.transformarVacio(this.titulo),
+        cv: this.transformarVacio(this.cv),
         fecha_nacimiento: this.transformarVacio(this.fecha_nacimiento),
-        numero_cuenta: this.numero_cuenta,
-        banco: this.banco,
-        tipo_cuenta: this.tipo_cuenta,
+        numero_cuenta: this.transformarVacio(this.numero_cuenta),
+        banco: this.transformarVacio(this.banco),
+        tipo_cuenta: this.transformarVacio(this.tipo_cuenta),
         genero:this.transformarVacio(this.mostrarGenero(this.genero)),
-        fono_personal:this.fono_personal,
-        fono_corporativo:this.fono_corporativo,
-        correo_personal:this.correo_personal,
-        correo_corporativo:this.correo_corporativo
+        fono_personal:this.transformarVacio(this.fono_personal),
+        fono_corporativo:this.transformarVacio(this.fono_corporativo),
+        correo_personal:this.transformarVacio(this.correo_personal),
+        correo_corporativo:this.transformarVacio(this.correo_corporativo)
       }
       if(this.rut.split('-').length==2){
         if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){        
