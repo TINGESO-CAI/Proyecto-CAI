@@ -52,15 +52,15 @@ class Cuenta(UserMixin,db.Model):
 	nombre = db.Column(db.Text, nullable = True)
 	apellido = db.Column(db.Text, nullable = True)
 	rut = db.Column(db.Text, nullable = True)
-	rol = db.Column(db.Text, nullable = True)
+	nivel_acceso = db.Column(db.Integer, nullable = False)
 
-	def __init__(self,correo,contrasena,nombre,apellido,rut,rol):
+	def __init__(self,correo,contrasena,nombre,apellido,rut):
 		self.correo = correo
 		self.contrasena = generate_password_hash(contrasena)
 		self.nombre=nombre
 		self.apellido=apellido
 		self.rut=rut
-		self.rol=rol
+		self.nivel_acceso=0
 	
 	@classmethod
 	def autenticar(cls,correo,contrasena):

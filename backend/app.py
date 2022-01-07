@@ -21,7 +21,7 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 db= mo.objeto_db()
 app= Flask(__name__)
@@ -68,6 +68,7 @@ cuenta_schemas= mo.CuentaSchema(many=True)
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
+
 @app.route('/registrar', methods=['POST'])
 def registrar_cuenta():
 	correo = request.json['correo']
@@ -75,10 +76,10 @@ def registrar_cuenta():
 	nombre = request.json['nombre']
 	apellido = request.json['apellido']
 	rut = request.json['rut']
-	rol = request.json['rol']
-	rol = request.json['rol']
 
-	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut,rol)
+
+
+	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut)
 
 	db.session.add(nueva_cuenta)
 	db.session.commit()
@@ -104,7 +105,7 @@ def entrar_cuenta():
 	try:
 		load_user(usuario.id)
 		login_user(usuario)
-		return jsonify("El usuario de id "+str(usuario.id)+" esta logeado")
+		return jsonify("El usuario de id "+str(usuario.id)+" se ha logeado")
 	except Exception as e:
 		return jsonify(str(e))
 
@@ -118,6 +119,16 @@ def salir_cuenta():
 @login_required
 def prueba():
 	return jsonify("FUNCIONA JIJI")
+@app.route('/cuenta/permisos',methods=["GET"])
+@login_required
+def obtener_permisos():
+	if current_user.is_authenticated:
+		user_id = current_user.get_id()
+	cuenta=mo.Cuenta.query.get(user_id)
+	permiso={"nivel_acceso": cuenta.nivel_acceso}
+	
+	return jsonify(permiso)
+
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -844,7 +855,7 @@ def filtro_contacto():
 		contacto = contacto.filter(mo.Contacto.fono==fono)
 	if descripcion != None:
 		contacto = contacto.filter(mo.Contacto.descripcion==descripcion)
-
+	contacto=contacto.order_by(mo.Contacto.id_contacto.desc())
 	contacto_filtrados = contacto_schemas.dump(contacto)
 	
 	return jsonify(contacto_filtrados)
@@ -1042,6 +1053,7 @@ def filtro_factura():
 		factura = factura.filter(mo.Factura.observacion==observacion)
 	if num_cai != None:
 		factura = factura.filter(mo.Factura.num_cai==num_cai)
+	factura=factura.order_by(mo.Factura.id_factura.desc())
 	
 	facturas_filtradas = factura_schemas.dump(factura)
 	
