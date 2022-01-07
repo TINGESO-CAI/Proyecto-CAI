@@ -114,7 +114,7 @@ class CursoSchema(SQLAlchemyAutoSchema):
 class Empresa(db.Model):
 	__tablename__ = 'empresa'
 
-	razon_social = db.Column(db.Text, primary_key=True, nullable = False)
+	razon_social = db.Column(db.Text, primary_key=True, nullable = True)
 	giro = db.Column(db.Text, nullable = True)
 	atencion = db.Column(db.Text, nullable = True)
 	departamento = db.Column(db.Text, nullable = True)

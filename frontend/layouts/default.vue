@@ -262,7 +262,7 @@
                 type="text"
               ></v-text-field>
               <v-text-field
-                v-model="contraseña"
+                v-model="contrasena"
                 id="password"
                 prepend-icon="mdi-lock"
                 name="password"
@@ -287,6 +287,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'default',
   data () {
@@ -396,6 +397,7 @@ export default {
         this.correo = '';
         this.contrasena = '';
         this.successMessage();
+        console.log('response', response.data);
       }
       catch (error){
         console.log('error', error); 
