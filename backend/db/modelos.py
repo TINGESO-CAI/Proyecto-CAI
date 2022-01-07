@@ -170,8 +170,7 @@ class Factura(db.Model):
 
 class FacturaSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_factura','sence','num_cai'
-		'estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento','enviar_factura','especificar','num_orden','observacion')
+		fields = ('id_factura','sence','num_cai','estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento','enviar_factura','especificar','num_orden','observacion')
 
 
 class Instancia(db.Model):
