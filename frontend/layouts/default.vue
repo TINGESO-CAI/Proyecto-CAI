@@ -1,12 +1,13 @@
 <template >
   <v-app dark>
-    <v-navigation-drawer color="#436899"
+    <v-navigation-drawer color="secondary"
       v-model="drawer"
       :mini-variant="miniVariant"
       :clipped="clipped"
       fixed
       app
       fluid
+      max-width="50"
     >
      <!--
       <v-list>
@@ -190,10 +191,13 @@
         
       </v-list-group>
     </v-navigation-drawer>
-    <v-app-bar color="#EA7600"
+    <v-app-bar color="primary"
       :clipped-left="clipped"
+
       fixed
+      height="40"
       app
+      scroll-off-screen="true"
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-btn
@@ -216,34 +220,62 @@
       </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
+      <v-switch
+      
+      color="secondary"
+        height="0"
+        v-model="$vuetify.theme.dark"
+        prepend-icon='mdi-brightness-4'
+      ></v-switch>
+
       <v-btn
         icon
         @click.stop="rightDrawer = !rightDrawer"
       >
         <v-icon>mdi-account</v-icon>
       </v-btn>
+      
     </v-app-bar>
     <v-main>
       <v-container>
         <Nuxt />
       </v-container>
     </v-main>
+    <!--login-->
     <v-navigation-drawer
       v-model="rightDrawer"
       :right="right"
       temporary
       fixed
     >
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              ROL
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>*Datos del perfil*</v-list-item-title>
-        </v-list-item>
-      </v-list>
+      <v-card >
+        <v-toolbar dark color="primary">
+          <v-toolbar-title >INGRESO</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <v-form>
+              <v-text-field
+                v-model="correo"
+                prepend-icon='mdi-email'
+                name="login"
+                label="Correo"
+                type="text"
+              ></v-text-field>
+              <v-text-field
+                v-model="contraseña"
+                id="password"
+                prepend-icon="mdi-lock"
+                name="password"
+                label="Contraseña"
+                type="password"
+              ></v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="ingresar">INGRESAR</v-btn>
+        </v-card-actions>
+    </v-card>
     </v-navigation-drawer>
     <v-footer
       :absolute="!fixed"
@@ -256,11 +288,19 @@
 
 <script>
 export default {
+  name: 'default',
   data () {
     return {
       clipped: false,
       drawer: false,
       fixed: false,
+      message: '',
+
+      correo: '',
+      contraseña: '',
+
+      usuario:'',
+      rol:'',
       //lista para submenu
       participantes: [
       ['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
@@ -338,6 +378,29 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Sistema de gestión administrativa para la capacitación CAI'
+    }
+  },
+  methods:{
+    successMessage:function(){
+      alert("Ingreso exitoso(REVISAR)")
+    },
+    async ingresar(){
+      this.message = '';
+      let credenciales={
+        correo: this.correo,
+        contrasena: this.contrasena
+      }
+      try {
+        let response = await axios.post('http://localhost:5000/entrar',credenciales);
+        //limpiar
+        this.correo = '';
+        this.contrasena = '';
+        this.successMessage();
+      }
+      catch (error){
+        console.log('error', error); 
+        this.message = 'Ocurrió un error'
+      }
     }
   }
 }
