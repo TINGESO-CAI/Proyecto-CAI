@@ -12,6 +12,8 @@
               <template v-slot:top>
               <v-toolbar
                 flat
+                class="test"
+
               >
         <v-toolbar-title> VER PARTICIPANTES</v-toolbar-title>
           <v-divider
@@ -25,6 +27,7 @@
             max-width="500px"
           >
             <template v-slot:activator="{ on, attrs }">
+              
               <v-btn to="/nuevo_participante"
                 color="primary"
                 dark
@@ -32,10 +35,20 @@
                 v-bind="attrs"
                 v-on="on"
               >
-                + Participante
+                Manual
               </v-btn>
+              <v-btn to="/subir_archivo"
+                color="primary"
+                dark
+                class="mb-2"
+                v-bind="attrs"
+                v-on="on"
+              >
+                Planilla
+              </v-btn>
+              <v-text>AÑADIR PARTICIPANTE</v-text>
             </template>
-          <v-card>
+          <v-card max-width="1000px">
             <v-card-title>
               <span class="text-h5">{{ formTitle }}</span>
             </v-card-title>
@@ -74,17 +87,50 @@
                       v-model="editedItem.apellido_paterno"
                       label="apellido paterno"
                     ></v-text-field>
-                  </v-col>  
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.apellido_materno"
+                      label="apellido materno"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.correo_corporativo"
+                      label="correo_corporativo"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.correo_personal"
+                      label="correo_personal"
+                    ></v-text-field>
+                  </v-col>    
                 </v-row>
                 <v-row>
+                  
+          
+                  
                   <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.correo"
-                      label="correo"
+                      v-model="editedItem.fono_personal"
+                      label="fono_personal"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -93,10 +139,28 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.fono"
-                      label="fono"
+                      v-model="editedItem.fono_corporativo"
+                      label="fono_corporativo"
                     ></v-text-field>
                   </v-col>
+                   <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-select
+                      v-model="editedItem.genero"
+                      :items="generos"
+                      dense
+                      item-text="genero"
+                      label="genero"
+                      persistent-hint
+                      return-object
+                      single-line   
+                      
+                    ></v-select>
+                  </v-col>
+                  
                   <v-col
                     cols="12"
                     sm="6"
@@ -129,7 +193,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="save"
+                @click="editarParticipante"
               >
                 Guardar
               </v-btn>
@@ -177,7 +241,7 @@ export default {
 
   data:()=>( {
     busqueda: null,
-    generos:['-','femenino','masculino'],
+    generos:['femenino','masculino'],
     headers: [
       {
         text: 'Rut',
@@ -198,36 +262,8 @@ export default {
     ],
 
     participantes:[
-      {     
-        rut: null,
-        nombre: null,
-        apellido_paterno: null,
-        apellido_materno: null,
-        genero: null,
-        nivel_educacional: null,
-        fecha_nacimiento: null,
-        nacionalidad: null,
-        tipo_inscripcion: null,
-        ocupacion: null,
-        correo: null,
-        fono: null,
-        razon_social: null,
-      }
     ],
-
-    rut: null,
-    nombre: null,
-    apellido_paterno: null,
-    apellido_materno: null,
-    genero: null,
-    nivel_educacional: null,
-    fecha_nacimiento: null,
-    nacionalidad: null,
-    tipo_inscripcion: null,
-    ocupacion: null,
-    correo: null,
-    fono: null,
-    razon_social: null,
+    razones:[],
 
     //datos para editar
     dialog: false,
@@ -244,9 +280,11 @@ export default {
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo: '',
-      fono: '',
-      razon_social: '',
+      correo_corporativo: '',
+      correo_personal: '',
+      fono_personal: '',
+      fono_corporativo: '',
+      razon_social: ''
     },
     defaultItem: {
       rut: '',
@@ -259,15 +297,17 @@ export default {
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo: '',
-      fono: '',
-      razon_social: '',
+      correo_corporativo: '',
+      correo_personal: '',
+      fono_personal: '',
+      fono_corporativo: '',
+      razon_social: ''
     }, 
   }),
   //funciones para editar
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'Nueva participante' : 'Editar participante'
+      return this.editedIndex === -1 ? 'Nuevo participante' : 'Editar participante'
     },
   },
   watch: {
@@ -295,9 +335,40 @@ export default {
         console.log('error', error); 
       }
     },
+    cambiarGenero(valor){
+      if (valor == 'femenino' ) return '1'
+      else if (valor == 'masculino' ) return '2'
+      else return 'error'
+    },
+    editarParticipante: async function(){
+      let newParticipante ={
+        rut: this.editedItem.rut,
+        nombre: this.editedItem.nombre,
+        apellido_paterno: this.editedItem.apellido_paterno,
+        apellido_materno: this.editedItem.apellido_materno,
+        genero: this.editedItem.genero,
+        nivel_educacional: this.editedItem.nivel_educacional,
+        fecha_nacimiento: this.editedItem.fecha_nacimiento,
+        nacionalidad: this.editedItem.nacionalidad,
+        tipo_inscripcion: this.editedItem.tipo_inscripcion,
+        ocupacion: this.editedItem.ocupacion,
+        correo_corporativo: this.editedItem.correo_corporativo,
+        correo_personal: this.editedItem.correo_personal,
+        fono_personal: this.editedItem.fono_personal,
+        fono_corporativo: this.editedItem.fono_corporativo,
+        razon_social: this.editedItem.razon_social.razon_social
+      }
+      try {
+        let response = await axios.put('http://localhost:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
+        console.log(response);
+        this.close();
+      }
+      catch (error) {
+        console.log('error', error);
+      }
+    },
     async getRazones(){
       try {
-        //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
         this.razones = response.data;
         console.log(response);
@@ -306,6 +377,8 @@ export default {
         console.log('error', error); 
       }
     },
+    
+    
     mostrarGenero(valor){
       if (valor == '1' ) return 'femenino'
       else if (valor == '2' ) return 'masculino'
@@ -339,11 +412,19 @@ export default {
         this.editedIndex = -1
       })
     },
-    save () {
+    saveBUP () {
       if (this.editedIndex > -1) {
         Object.assign(this.participantes[this.editedIndex], this.editedItem)
       } else {
         this.participantes.push(this.editedItem)
+      }
+      this.close()
+    },
+    save () {
+      if (this.editedIndex > -1) {
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+      } else {
+        editarParticipante()
       }
       this.close()
     },
