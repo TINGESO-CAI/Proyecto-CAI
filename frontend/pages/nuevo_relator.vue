@@ -74,7 +74,7 @@
                     v-model="fecha_nacimiento"
                     :rules="fecha_nacimientoRules"
                     :counter="20"
-                    label="fecha_nacimiento"
+                    label="fecha_nacimiento (YYYY-MM-DD)"
                     required
                 ></v-text-field>
                 </v-col>
@@ -233,10 +233,10 @@ export default {
         v => !!v || 'titulo es requerido',
         v => v.length <= 100 || 'titulo debe contener menos de 100 caracteres',
       ],
-      fecha_nacimientoRules: [
-        v => !!v || 'fecha_nacimiento es requerido',
-        //v => /.+.+/.test(v) || 'fecha_nacimiento debe ser válido',
-      ]
+      //fecha_nacimientoRules: [
+        //v => !!v || 'fecha_nacimiento es requerido',
+        //v => /.+-+/+-+/test(v) || 'fecha_nacimiento debe ser válido',
+      //]
     }
   },
   methods:{
@@ -247,6 +247,14 @@ export default {
       if (valor == 'femenino' ) return 1
       else if (valor == 'masculino' ) return 2
       else return 'desconocido'
+    },
+    comprobarFecha:function(fecha){
+      if (fecha.split('-').length == 3){
+        return true
+      }
+      else{
+        return false
+      }
     },
     async createRelator(){ //Crear un nuevo PARTICIPANTE
       this.message = '';
@@ -267,22 +275,31 @@ export default {
         correo_personal:this.correo_personal,
         correo_corporativo:this.correo_corporativo
       }
-      
-      try {
-        //se llama el servicio para crear un nuevo relator
-        let response = await axios.post('http://localhost:5000/relator/agregar',newRelator);
-        console.log('response', response.data);
-        let id = response.data.id;
-        this.message = `${this.rut} fue creado con éxito con id: ${id}`;
-        
-        //limpiar
-        this.successMessage();
+      if(this.rut.split('-').length==2){
+        if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){        
+          try {
+            //se llama el servicio para crear un nuevo relator
+            let response = await axios.post('http://localhost:5000/relator/agregar',newRelator);
+            console.log('response', response.data);
+            let id = response.data.id;
+            this.message = `${this.rut} fue creado con éxito con id: ${id}`;
+            
+            //limpiar
+            this.successMessage();
+          }
+          catch (error) {
+          console.log('error', error); 
+          this.message = 'Ocurrió un error'
+          }
+        }
+        else{
+          alert("Error formato fecha.")
+        }
       }
-      catch (error) {
-       console.log('error', error); 
-       this.message = 'Ocurrió un error'
+      else{
+        alert("Debe ingresar el rut de manera correcta")
       }
-    },
+    }
   }
   }
 

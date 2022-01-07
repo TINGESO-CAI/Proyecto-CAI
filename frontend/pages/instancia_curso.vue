@@ -101,14 +101,14 @@
                 <v-col>
                 <v-text-field
                     v-model="fecha_inicio"
-                    label="Fecha de inicio"
+                    label="Fecha de inicio (YYYY-MM-DD)"
                     required
                 ></v-text-field>
                 </v-col> 
                 <v-col>
                 <v-text-field
                     v-model="fecha_termino"
-                    label="Fecha de termino"
+                    label="Fecha de termino (YYYY-MM-DD)"
                     required
                 ></v-text-field>
                 <v-btn  color="blue lighten-1" class="mr-4" @click="crearInstancia">Crear Instancia</v-btn>
@@ -146,28 +146,50 @@ export default {
       let response= axios.get('http://localhost:5000/curso/obtener?sence='+value)
       return response
     },
-    crearInstancia:async function(){
-      try{
-        if(this.malla=='Si'){
-          this.malla=true
-        }
-        else{
-          this.malla=false
-        }
-        let response = await axios.post('http://localhost:5000/instancia/agregar',{sence: this.sence , direccion: this.direccion , malla: this.malla , fecha_inicio:this.fecha_inicio , fecha_termino:this.fecha_termino})
-        console.log(this.malla)
-        console.log(response.data)
-        alert("Instancia creada con exito")
-        this.sence=''
-        this.malla=''
-        this.direccion=''
-        this.fecha_inicio=''
-        this.fecha_termino=''
-        this.curso=[]
+
+    comprobarFecha:function(fecha){
+      if (fecha.split('-').length == 3 || fecha==''){
+        return true
       }
-      catch(error){
-        console.log(error)
-        alert("Ocurrio un error")
+      else{
+        return false
+      }
+    },
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
+    },
+    crearInstancia:async function(){
+      if(this.comprobarFecha(this.fecha_inicio) && this.comprobarFecha(this.fecha_termino)){ 
+       try{
+          if(this.malla=='Si'){
+            this.malla=true
+          }
+          else{
+            this.malla=false
+          }
+          let response = await axios.post('http://localhost:5000/instancia/agregar',{sence: this.sence , direccion: this.direccion , malla: this.malla , fecha_inicio:this.transformarVacio(this.fecha_inicio) , fecha_termino:this.transformarVacio(this.fecha_termino)})
+          console.log(this.malla)
+          console.log(response.data)
+          alert("Instancia creada con exito")
+          this.sence=''
+          this.malla=''
+          this.direccion=''
+          this.fecha_inicio=''
+          this.fecha_termino=''
+          this.curso=[]
+        }
+        catch(error){
+          console.log(error)
+          alert("Ocurrio un error")
+        }
+      }
+      else{
+        alert("Error en formato de fecha.")
       }
     },
     async getSences(){

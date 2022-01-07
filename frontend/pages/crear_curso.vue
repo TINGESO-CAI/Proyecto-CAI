@@ -99,7 +99,7 @@
                     v-model="f_vigencia"
                     :rules="f_vigenciaRules"
                     :counter="20"
-                    label="f_vigencia"
+                    label="f_vigencia (YYYY-MM-DD)"
                     required
                 ></v-text-field>
                 </v-col>
@@ -205,7 +205,23 @@ export default {
     successMessage:function(){
       alert("El curso se creo exitosamente.")
     },
+    comprobarFecha:function(fecha){
+      if (fecha.split('-').length == 3){
+        return true
+      }
+      else{
+        return false
+      }
+    },
 
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
+    },
     async createCurso(){ //Crear un nuevo CURSO
       this.message = '';
 
@@ -214,30 +230,39 @@ export default {
         nombre: this.nombre,
         modalidad: this.modalidad,
         categoria: this.categoria,
-        horas_curso: this.horas_curso,
-        valor_efectivo_participante: this.valor_efectivo_participante,
+        horas_curso: this.transformarVacio(this.horas_curso),
+        valor_efectivo_participante: this.transformarVacio(this.valor_efectivo_participante),
         valor_imputable_participante: this.valor_imputable_participante,
         resolucion_sence: this.resolucion_sence,
         resolucion_usach: this.resolucion_usach,
-        estado: this.estado,
-        f_vigencia: this.f_vigencia
+        estado: this.transformarVacio(this.estado),
+        f_vigencia: this.transformarVacio(this.f_vigencia)
       }
-      
-      try {
-        //se llama el servicio para crear un nuevo curso
-        let response = await axios.post('http://localhost:5000/curso/agregar',newCurso);
-        console.log('response', response.data);
-        let id = response.data.id;
-        this.message = `${this.sence} fue creado con éxito con id: ${id}`;
-        
-        //limpiar
-        this.sence = '';
-        this.resolucion_sence = '';
-        this.successMessage();
+      if(this.sence!=''){
+        if(this.comprobarFecha(this.f_vigencia) || this.f_vigencia==''){
+          try {
+            //se llama el servicio para crear un nuevo curso
+            let response = await axios.post('http://localhost:5000/curso/agregar',newCurso);
+            console.log('response', response.data);
+            let id = response.data.id;
+            this.message = `${this.sence} fue creado con éxito con id: ${id}`;
+            
+            //limpiar
+            this.sence = '';
+            this.resolucion_sence = '';
+            this.successMessage();
+          }
+          catch (error) {
+          console.log('error', error); 
+          this.message = 'Ocurrió un error'
+          }
+        }
+        else{
+          alert("Error en el formato de fecha")
+        }
       }
-      catch (error) {
-       console.log('error', error); 
-       this.message = 'Ocurrió un error'
+      else{
+        alert("Es necesario ingresar un sence.")
       }
     },
   },

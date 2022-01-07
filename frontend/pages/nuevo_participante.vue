@@ -280,7 +280,14 @@ export default {
     successMessage:function(){
       alert("El participante se creo exitosamente.")
     },
-
+    comprobarFecha:function(fecha){
+      if (fecha.split('-').length == 3){
+        return true
+      }
+      else{
+        return false
+      }
+    },
     async createParticipante(){ //Crear un nuevo PARTICIPANTE
       this.message = '';
 
@@ -289,7 +296,7 @@ export default {
         nombre: this.nombre,
         apellido_paterno: this.apellido_paterno,
         apellido_materno: this.apellido_materno,
-        genero: cambiarGenero(this.genero),
+        genero: this.cambiarGenero(this.genero),
         nivel_educacional: this.nivel_educacional,
         fecha_nacimiento: this.fecha_nacimiento,
         nacionalidad: this.nacionalidad,
@@ -301,23 +308,32 @@ export default {
         correo_personal: this.correo_personal,
         razon_social: this.razon_social
       }
-      
-      try {
-        //se llama el servicio para crear un nuevo participante
-        let response = await axios.post('http://localhost:5000/participante/agregar',newParticipante);
-        console.log('response', response.data);
-        let id = response.data.id;
-        this.message = `${this.rut} fue creado con éxito con id: ${id}`;
-        
-        //limpiar
-        this.nombre = '';
-        this.rut = '';
-        this.correo = '';
-        this.successMessage();
+      if(this.rut.split('-').length==2){
+        if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){         
+          try {
+            //se llama el servicio para crear un nuevo participante
+            let response = await axios.post('http://localhost:5000/participante/agregar',newParticipante);
+            console.log('response', response.data);
+            let id = response.data.id;
+            this.message = `${this.rut} fue creado con éxito con id: ${id}`;
+            
+            //limpiar
+            this.nombre = '';
+            this.rut = '';
+            this.correo = '';
+            this.successMessage();
+          }
+          catch (error) {
+          console.log('error', error); 
+          this.message = 'Ocurrió un error'
+          }
+        }
+        else{
+          alert("Error formato fecha.")
+        }
       }
-      catch (error) {
-       console.log('error', error); 
-       this.message = 'Ocurrió un error'
+      else{
+        alert("Debe ingresar el rut de manera correcta")
       }
     },
     mostrarGenero(valor){
