@@ -7,6 +7,7 @@ from sqlalchemy.schema import CreateColumn
 from sqlalchemy.ext.compiler import compiles
 
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import UserMixin
 
 db=SQLAlchemy()
 
@@ -44,9 +45,9 @@ class ContactoSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('id_contacto','correo','fono','descripcion','razon_social')
 
-class Cuenta(db.Model):
+class Cuenta(UserMixin,db.Model):
 	__tablename__ = 'cuenta'
-	id_cuenta = db.Column(db.Integer, primary_key=True,autoincrement=True)
+	id = db.Column(db.Integer, primary_key=True,autoincrement=True)
 	correo = db.Column(db.Text)
 	contrasena = db.Column(db.Text)
 	nombre = db.Column(db.Text)
@@ -54,8 +55,7 @@ class Cuenta(db.Model):
 	rut = db.Column(db.Text)
 	rol = db.Column(db.Text)
 
-	def __init__(self,id_cuenta,correo,contrasena,nombre,apellido,rut,rol):
-		self.id_contacto = id_cuenta
+	def __init__(self,correo,contrasena,nombre,apellido,rut,rol):
 		self.correo = correo
 		self.contrasena = generate_password_hash(contrasena)
 		self.nombre=nombre
