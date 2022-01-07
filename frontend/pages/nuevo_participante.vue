@@ -275,7 +275,7 @@ export default {
     cambiarGenero(valor){
       if (valor == 'femenino' ) return '1'
       else if (valor == 'masculino' ) return '2'
-      else return 'error'
+      else return ''
     },
     successMessage:function(){
       alert("El participante se creo exitosamente.")
@@ -288,6 +288,15 @@ export default {
         return false
       }
     },
+
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
+    },
     async createParticipante(){ //Crear un nuevo PARTICIPANTE
       this.message = '';
 
@@ -296,9 +305,9 @@ export default {
         nombre: this.nombre,
         apellido_paterno: this.apellido_paterno,
         apellido_materno: this.apellido_materno,
-        genero: this.cambiarGenero(this.genero),
+        genero: this.transformarVacio(this.cambiarGenero(this.genero)),
         nivel_educacional: this.nivel_educacional,
-        fecha_nacimiento: this.fecha_nacimiento,
+        fecha_nacimiento: this.transformarVacio(this.fecha_nacimiento),
         nacionalidad: this.nacionalidad,
         tipo_inscripcion: this.tipo_inscripcion,
         ocupacion: this.ocupacion,
@@ -306,7 +315,7 @@ export default {
         fono_corporativo: this.fono_corporativo,
         correo_corporativo: this.correo_corporativo,
         correo_personal: this.correo_personal,
-        razon_social: this.razon_social
+        razon_social: this.transformarVacio(this.razon_social)
       }
       if(this.rut.split('-').length==2){
         if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){         
@@ -318,10 +327,27 @@ export default {
             this.message = `${this.rut} fue creado con éxito con id: ${id}`;
             
             //limpiar
-            this.nombre = '';
-            this.rut = '';
-            this.correo = '';
-            this.successMessage();
+            this.rut= ''
+            this.nombre= ''
+            this.apellido_paterno= ''
+            this.apellido_materno= ''
+            this.genero= ''
+            this.nivel_educacional= ''
+            this.fecha_nacimiento= ''
+            this.nacionalidad= ''
+            this.tipo_inscripcion= ''
+            this.ocupacion= ''
+            this.correo_corporativo= ''
+            this.correo_personal= ''
+            this.fono_personal= ''
+            this.fono_corporativo= ''
+            this.razon_social= ''
+            if(response.data.respuesta=="El curso ya ha sido ingresado"){
+              alert("El participante ya existe.")
+            }
+            else{
+              this.successMessage();
+            }
           }
           catch (error) {
           console.log('error', error); 

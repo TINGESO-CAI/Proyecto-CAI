@@ -169,8 +169,11 @@ export default {
           if(this.malla=='Si'){
             this.malla=true
           }
-          else{
+          else if(this.malla=='No'){
             this.malla=false
+          }
+          else{
+            this.malla=null
           }
           let response = await axios.post('http://localhost:5000/instancia/agregar',{sence: this.sence , direccion: this.direccion , malla: this.malla , fecha_inicio:this.transformarVacio(this.fecha_inicio) , fecha_termino:this.transformarVacio(this.fecha_termino)})
           console.log(this.malla)

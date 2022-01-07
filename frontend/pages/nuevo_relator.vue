@@ -246,7 +246,7 @@ export default {
     mostrarGenero(valor){
       if (valor == 'femenino' ) return 1
       else if (valor == 'masculino' ) return 2
-      else return 'desconocido'
+      else return ''
     },
     comprobarFecha:function(fecha){
       if (fecha.split('-').length == 3){
@@ -254,6 +254,14 @@ export default {
       }
       else{
         return false
+      }
+    },
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
       }
     },
     async createRelator(){ //Crear un nuevo PARTICIPANTE
@@ -265,11 +273,11 @@ export default {
         apellido_materno: this.apellido_materno,
         titulo: this.titulo,
         cv: this.cv,
-        fecha_nacimiento: this.fecha_nacimiento,
+        fecha_nacimiento: this.transformarVacio(this.fecha_nacimiento),
         numero_cuenta: this.numero_cuenta,
         banco: this.banco,
         tipo_cuenta: this.tipo_cuenta,
-        genero:this.mostrarGenero(this.genero),
+        genero:this.transformarVacio(this.mostrarGenero(this.genero)),
         fono_personal:this.fono_personal,
         fono_corporativo:this.fono_corporativo,
         correo_personal:this.correo_personal,
@@ -285,7 +293,27 @@ export default {
             this.message = `${this.rut} fue creado con éxito con id: ${id}`;
             
             //limpiar
-            this.successMessage();
+            this.rut= ''
+            this.nombre= ''
+            this.apellido_paterno= ''
+            this.apellido_materno= ''
+            this.titulo= ''
+            this.cv= ''
+            this.fecha_nacimiento= ''
+            this.numero_cuenta= ''
+            this.banco= ''
+            this.tipo_cuenta= ''
+            this.genero=''
+            this.correo_corporativo= ''
+            this.correo_personal= ''
+            this.fono_personal= ''
+            this.fono_corporativo= ''
+            if(response.data.respuesta=="El curso ya ha sido ingresado"){
+              alert("El relator ya existe.")
+            }
+            else{
+              this.successMessage();
+            }
           }
           catch (error) {
           console.log('error', error); 

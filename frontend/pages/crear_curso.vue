@@ -159,9 +159,7 @@ export default {
       valor_efectivo_participante: '',
       valor_imputable_participante: '',
       estado: '',
-      f_vigencia: '',
-      
-      
+      f_vigencia: '',     
       resolucion_sence: '',
       resolucion_usach: '',
       //reglas
@@ -248,9 +246,24 @@ export default {
             this.message = `${this.sence} fue creado con éxito con id: ${id}`;
             
             //limpiar
-            this.sence = '';
-            this.resolucion_sence = '';
-            this.successMessage();
+            this.sence= ''
+            this.nombre= ''
+            this.modalidad= ''
+            this.categoria= ''
+            this.horas_curso= ''
+            this.valor_efectivo_participante= ''
+            this.valor_imputable_participante= ''
+            this.estado= ''
+            this.f_vigencia= ''
+            this.resolucion_sence= ''
+            this.resolucion_usach= ''
+            if(response.data.respuesta=="El curso ya ha sido ingresado"){
+              alert("El curso ya existe.")
+            }
+            else{
+              this.successMessage();
+            }
+            
           }
           catch (error) {
           console.log('error', error); 
