@@ -607,8 +607,11 @@ def filtro_empresas():
 	comuna = request.args.get('comuna')
 
 	empresas = mo.Empresa.query.filter()
-	if giro != None:
+
+	if razon_social != None:
 		empresas = empresas.filter(mo.Empresa.razon_social==razon_social)
+	if giro != None:
+		empresas = empresas.filter(mo.Empresa.giro==giro)
 	if atencion != None:
 		empresas = empresas.filter(mo.Empresa.atencion==atencion)
 	if departamento!= None:

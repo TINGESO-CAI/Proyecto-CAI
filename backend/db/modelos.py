@@ -88,8 +88,8 @@ class Curso(db.Model):
 	resolucion_sence = db.Column(db.Text, nullable = True)
 	resolucion_usach = db.Column(db.Text, nullable = True)
 	estado = db.Column(db.Text, nullable = True)
-
-	f_vigencia = db.Column(db.Date)
+	f_vigencia = db.Column(db.Date, nullable = True)
+	
 	instancias = db.relationship('Instancia', backref=db.backref("curso"))
 	
 	def __init__(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia):
