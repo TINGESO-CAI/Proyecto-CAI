@@ -302,19 +302,19 @@ export default {
 
       let newParticipante ={
         rut: this.rut,
-        nombre: this.nombre,
-        apellido_paterno: this.apellido_paterno,
-        apellido_materno: this.apellido_materno,
+        nombre: this.transformarVacio(this.nombre),
+        apellido_paterno: this.transformarVacio(this.apellido_paterno),
+        apellido_materno: this.transformarVacio(this.apellido_materno),
         genero: this.transformarVacio(this.cambiarGenero(this.genero)),
-        nivel_educacional: this.nivel_educacional,
+        nivel_educacional: this.transformarVacio(this.nivel_educacional),
         fecha_nacimiento: this.transformarVacio(this.fecha_nacimiento),
-        nacionalidad: this.nacionalidad,
-        tipo_inscripcion: this.tipo_inscripcion,
-        ocupacion: this.ocupacion,
-        fono_personal: this.fono_personal,
-        fono_corporativo: this.fono_corporativo,
-        correo_corporativo: this.correo_corporativo,
-        correo_personal: this.correo_personal,
+        nacionalidad: this.transformarVacio(this.nacionalidad),
+        tipo_inscripcion: this.transformarVacio(this.tipo_inscripcion),
+        ocupacion: this.transformarVacio(this.ocupacion),
+        fono_personal: this.transformarVacio(this.fono_personal),
+        fono_corporativo: this.transformarVacio(this.fono_corporativo),
+        correo_corporativo: this.transformarVacio(this.correo_corporativo),
+        correo_personal: this.transformarVacio(this.correo_personal),
         razon_social: this.transformarVacio(this.razon_social)
       }
       if(this.rut.split('-').length==2){
@@ -342,7 +342,7 @@ export default {
             this.fono_personal= ''
             this.fono_corporativo= ''
             this.razon_social= ''
-            if(response.data.respuesta=="El curso ya ha sido ingresado"){
+            if(response.data.respuesta=="El participante ya ha sido ingresado"){
               alert("El participante ya existe.")
             }
             else{

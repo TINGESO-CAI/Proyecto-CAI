@@ -308,7 +308,7 @@ export default {
             this.correo_personal= ''
             this.fono_personal= ''
             this.fono_corporativo= ''
-            if(response.data.respuesta=="El curso ya ha sido ingresado"){
+            if(response.data.respuesta=="El relator ya ha sido ingresado"){
               alert("El relator ya existe.")
             }
             else{

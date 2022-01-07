@@ -225,14 +225,14 @@ export default {
 
       let newCurso ={
         sence: this.sence,
-        nombre: this.nombre,
-        modalidad: this.modalidad,
-        categoria: this.categoria,
+        nombre: this.transformarVacio(this.nombre),
+        modalidad: this.transformarVacio(this.modalidad),
+        categoria: this.transformarVacio(this.categoria),
         horas_curso: this.transformarVacio(this.horas_curso),
         valor_efectivo_participante: this.transformarVacio(this.valor_efectivo_participante),
         valor_imputable_participante: this.transformarVacio(this.valor_imputable_participante),
-        resolucion_sence: this.resolucion_sence,
-        resolucion_usach: this.resolucion_usach,
+        resolucion_sence: this.transformarVacio(this.resolucion_sence),
+        resolucion_usach: this.transformarVacio(this.resolucion_usach),
         estado: this.transformarVacio(this.estado),
         f_vigencia: this.transformarVacio(this.f_vigencia)
       }

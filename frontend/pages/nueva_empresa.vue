@@ -199,44 +199,65 @@ export default {
       alert("El contacto se creo exitosamente.")
     },
 
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
+    },
     async createEmpresa(){ //Crear un nuevo empresa
       this.message = '';
-
-      let newEmpresa ={
+      if(this.razon_social!=''){
+        let newEmpresa ={
+          
+          razon_social: this.razon_social,
+          giro: this.transformarVacio(this.giro),
+          atencion: this.transformarVacio(this.atencion),
+          departamento: this.transformarVacio(this.departamento),
+          rut: this.transformarVacio(this.rut),
+          direccion: this.transformarVacio(this.direccion),
+          comuna: this.transformarVacio(this.comuna)
+        }
         
-        razon_social: this.razon_social,
-        giro: this.giro,
-        atencion: this.atencion,
-        departamento: this.departamento,
-        rut: this.rut,
-        direccion: this.direccion,
-        comuna: this.comuna
+        try {
+          //se llama el servicio para crear una nueva empresa
+          let response = await axios.post('http://localhost:5000/empresa/agregar' ,newEmpresa);
+          console.log('response', response.data);
+          let id = response.data.id;
+          this.message = `${this.razon_social} fue creado con éxito con id: ${id}`;
+          //limpiar
+          if(response.data.respuesta == "La empresa ya ha sido ingresada"){
+            alert("La empresa ya existe.")
+          }
+          else{
+            this.successMessage();
+          }
+        }
+        catch (error) {
+        console.log('error', error); 
+        alert('Ocurrió un error')
+        }
       }
-      
-      try {
-        //se llama el servicio para crear una nueva empresa
-        let response = await axios.post('http://localhost:5000/empresa/agregar',newEmpresa);
-        console.log('response', response.data);
-        let id = response.data.id;
-        this.message = `${this.razon_social} fue creado con éxito con id: ${id}`;
-        //limpiar
-        this.successMessage();
-      }
-      catch (error) {
-       console.log('error', error); 
-       this.message = 'Ocurrió un error'
+      else{
+        alert("Es necesario ingresar la razon social")
       }
     },
     async createContacto(){ //Crear un nuevo contacto apra empresa
       this.message = '';
+
+      console.log(this.razon_social != '')
       let newContacto={ 
         id_contacto: this.razon_social+'1',
-        correo: this.correo,
-        fono: this.fono,
-        descripcion: this.descripcion,
+        correo: this.transformarVacio(this.correo),
+        fono: this.transformarVacio(this.fono),
+        descripcion: this.transformarVacio(this.descripcion),
         razon_social: this.razon_social
       }
-      if (this.razon_social != '' ){
+      let check= await axios.get('http://localhost:5000/empresa/obtener?razon_social='+this.razon_social)
+      console.log(check.data)
+      if (check.data.length==1){
         try {
           //se llama el servicio para crear un nuevo contacto
           let response = await axios.post('http://localhost:5000/contacto/agregar',newContacto);
@@ -244,20 +265,19 @@ export default {
           let id = response.data.id;
           this.message = `${this.id_contacto} fue creado con éxito con id: ${id}`;
           //limpiar
-          this.correo='',
-          this.fono='',
-          this.descripcion='',
-
-          this.successMessageC();
-          contador++;
+          this.correo=''
+          this.fono=''
+          this.descripcion=''
+          alert("Contacto creado con exito.")
+          this.contador++;
         }
         catch (error) {
         console.log('error', error); 
-        this.message = 'Ocurrió un error'
+        alert('Ocurrió un error')
         }
       }
       else{
-        this.message = 'Debe ingresar una razon social'
+        alert('Debe ingresar una razon social valida')
       }
     },
   },
