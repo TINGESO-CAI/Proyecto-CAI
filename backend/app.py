@@ -23,24 +23,28 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+#from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_jwt_extended import JWTManager,jwt_required, create_access_token, get_jwt_identity
 
 # Configuracion de la app
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = 'loginmaldito' # secretkey para el login
+#app.config['SECRET_KEY'] = 'loginmaldito' # secretkey para el login
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = True # Para mostrar las query SQL
+app.config['JWT_SECRET_KEY'] = 'Super_Secret_JWT_KEY'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 db.init_app(app)
 
 ma = Marshmallow(app) # Para el uso de sqlalchemy
 migrate= Migrate(app,db) # Para el uso de los migrate
 
 # LOGIN
-login_manager = LoginManager()
-login_manager.init_app(app)
+jwt = JWTManager(app)
+#login_manager = LoginManager()
+#login_manager.init_app(app)
 
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
@@ -95,10 +99,10 @@ def registrar_cuenta():
 	return jsonify(resultado)
 
 # Funcion que se encarga de cargar una cuenta
-@login_manager.user_loader
-def load_user(user_id):
+#@login_manager.user_loader
+#def load_user(user_id):
 	# since the user_id is just the primary key of our user table, use it in the query for the user
-	return mo.Cuenta.query.get(int(user_id))
+	#return mo.Cuenta.query.get(int(user_id))
 
 # Funcion respecto al login
 @app.route('/entrar', methods=['POST'])
@@ -117,32 +121,39 @@ def entrar_cuenta():
 
 	try:
 		# Se carga el usuario y se logea
-		load_user(usuario.id)
-		login_user(usuario)
-		return jsonify("El usuario de id "+str(usuario.id)+" se ha logeado")
+		#load_user(usuario.id)
+		#login_user(usuario)
+		access_token = create_access_token(identity=correo)
+		#return jsonify("El usuario de id "+str(usuario.id)+" se ha logeado")
+		return jsonify({'success': True, 'token': access_token}), 200
 	except Exception as e:
 		return jsonify(str(e))
 
+@app.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
 # Funcion para el logout
 @app.route('/salir')
-@login_required
+#@login_required
 def salir_cuenta():
 	# comando para salirse
-	logout_user()
+	#logout_user()
 	return jsonify("deslogeaste jiji")
 
 # Funcion usada para las pruebas de login
 @app.route('/prueba')
-@login_required
+#@login_required
 def prueba():
 	return jsonify("FUNCIONA JIJI")
 
 @app.route('/cuenta/permisos',methods=["GET"])
-@login_required
+@jwt_required()
 def obtener_permisos():
-	if current_user.is_authenticated:
-		user_id = current_user.get_id()
-	cuenta=mo.Cuenta.query.get(user_id)
+
+	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
 	permiso={
 		"nombre": cuenta.nombre + " " + cuenta.apellido,
 		"rut": cuenta.rut,
@@ -496,28 +507,36 @@ def eliminar_curso():
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------INSTANCIA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+
+# Funcion que se encarga de agregar una instancia
 @app.route("/instancia/agregar",methods=["POST"])
 def crear_instancia_curso():
 
-	#id_instancia = request.json['id_instancia']
 	sence = request.json['sence']
 	direccion = request.json['direccion']
 	malla = request.json['malla']
 	fecha_inicio = request.json['fecha_inicio']
 	fecha_termino = request.json['fecha_termino']
 	
+	# Crea la instancia de instancia XD
 	nuevo_instancia_curso=mo.Instancia(sence=sence,direccion=direccion,malla=malla,fecha_inicio=fecha_inicio,fecha_termino=fecha_termino)
-	print(nuevo_instancia_curso)
+
+	# se agrega la instancia
 	db.session.add(nuevo_instancia_curso)
 	try:
+		# se sube a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"La instancia del curso ya ha sido ingresada"})
 	return jsonify({"respuesta":"La instancia del curso ha sido ingresado correctamente!"})
 
+# Funcion para filtrar las instancias
 @app.route("/instancia/obtener",methods=["GET"])
 def obtener_instancia_curso():
 
+	# Request de los json
+	# ej: /instacia/obtener?sence=xxxx
+	# ej: /instancia/obtener?fecha_inicio=xxxx&malla=xxxx
 	id_instancia = request.args.get('id_instancia')
 	sence = request.args.get('sence')
 	direccion = request.args.get('direccion')
@@ -525,8 +544,10 @@ def obtener_instancia_curso():
 	fecha_inicio = request.args.get('fecha_inicio')
 	fecha_termino = request.args.get('fecha_termino')
 
+	# Se traen todas las instancias
 	instancias = mo.Instancia.query.filter()
 	
+	# En base al los parmetros ingresados por la ruta, se filtran los datos
 	if id_instancia != None:
 		instancias = instancias.filter(mo.Instancia.id_instancia==id_instancia)
 	if sence != None:
@@ -539,16 +560,21 @@ def obtener_instancia_curso():
 		instancias = instancias.filter(mo.Instancia.fecha_inicio==fecha_inicio)
 	if fecha_termino != None:
 		instancias = instancias.filter(mo.Instancia.fecha_termino==fecha_termino)
-		
+	
+	# Se crea el dump
 	instancias_cursos_filtrado = instancia_schemas.dump(instancias)
 	
 	return jsonify(instancias_cursos_filtrado)
 
+# Funcion que se encarga de editar o actualizar una instancia
 @app.route("/instancia/editar",methods=["PUT"])
 def editar_instancia():
 
+	# Request de los json
+	# ej: /instacia/editar?id_instancia=xxxx
 	id_instancia_aux=request.args.get('id_instancia')
-	instancia = mo.Instancia.query.get(id_instancia_aux) # Captura de instancia
+	# Captura de instancia
+	instancia = mo.Instancia.query.get(id_instancia_aux) 
 	
 	# Nuevos datos
 	sence = request.json['sence']
@@ -570,21 +596,27 @@ def editar_instancia():
 		instancia.fecha_termino = fecha_termino
 	
 	try:
+		# Se agrega a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
 	
+	# Se crea el dump
 	resultado = instancia_schema.dump(instancia)
 
 	return jsonify(resultado)
 
+# Funcion que elimina la instancia
 @app.route("/instancia/eliminar",methods=["DELETE"])
 def eliminar_instancias():
 	
+	# Request de los json
+	# ej: /instacia/eliminar?id_instancia=xxxx
 	id_aux=request.args.get('id_instancia')
 	instancia = mo.Instancia.query.get(id_aux) # Capturo al participante
 	
 	try:
+		# se borra de la db
 		db.session.delete(instancia)
 		db.session.commit()
 		msg="La instancia de id "+str(instancia.id_instancia)+" fue eliminado correctamente"
@@ -592,10 +624,11 @@ def eliminar_instancias():
 	except:
 		return jsonify({"respuesta":"La instancia a eliminar no existe"})
 
-	
+# Funcion que se encarga de obtener todas las razones sociales asociada a un id
 @app.route("/instancia/obtener_razones_sociales/<id_instancia>",methods=["GET"])
 def obtener_razones_sociales_validas(id_instancia):
 
+	# Capturamos la instancia segun el id ingresado
 	instancia = mo.Instancia.query.get(id_instancia)
 	aux=[]
 	lista_razones_sociales=[]
@@ -604,22 +637,27 @@ def obtener_razones_sociales_validas(id_instancia):
 			lista_razones_sociales.append({"razon_social":i.razon_social})
 			aux.append(i.razon_social)
 	return jsonify(lista_razones_sociales)
-	
+
+# Funcion que obtiene todos los id de las instancias que existan
 @app.route("/instancia/obtener/id",methods=["GET"])
 def obtener_ids():
 
+	# capturamos todas las instancias 
 	ids_instancias = db.session.query(mo.Instancia.id_instancia).all()
+	# se hace el dump para capturar como json
 	instancias = instancia_schemas.dump(ids_instancias)
 	
-	return jsonify(instancias )
+	return jsonify(instancias)
 		
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
 
+# Funcion para crear una empresa
 @app.route("/empresa/agregar",methods=["POST"])
 def crear_empresa():
 
+	# Request de los json
 	razon_social = request.json['razon_social']
 	giro = request.json['giro']
 	atencion = request.json['atencion']
@@ -628,18 +666,25 @@ def crear_empresa():
 	direccion = request.json['direccion']
 	comuna = request.json['comuna']
 
+	# Se crea la instancia de empresa
 	nuevo_empresa=mo.Empresa(razon_social,giro,atencion,departamento,rut,direccion,comuna)
 
+	# Se agrega la instancia
 	db.session.add(nuevo_empresa)
 	try:
+		# Se agrega a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"La empresa ya ha sido ingresada"})
 	return jsonify({"respuesta":"Empresa ingresada correctamente!"})
 
+# Funcion que se encarga de filtar las empresas
 @app.route("/empresa/obtener",methods=["GET"])
 def filtro_empresas():
 
+	# Request de los json
+	# ej: /empresa/obtener?giro=xxxx
+	# ej: /empresa/obtener?giro=xxxx&departamento=xxxx
 	razon_social = request.args.get('razon_social')
 	giro = request.args.get('giro')
 	atencion = request.args.get('atencion')
@@ -648,8 +693,10 @@ def filtro_empresas():
 	direccion = request.args.get('direccion')
 	comuna = request.args.get('comuna')
 
+	# Se traen todas las empresas
 	empresas = mo.Empresa.query.filter()
 
+	# En base al los parmetros ingresados por la ruta, se filtran los datos
 	if razon_social != None:
 		empresas = empresas.filter(mo.Empresa.razon_social==razon_social)
 	if giro != None:
@@ -665,36 +712,51 @@ def filtro_empresas():
 	if comuna != None:
 		empresas = empresas.filter(mo.Empresa.comuna==comuna)
 
+	# Se hace el dump
 	empresas_filtrados = empresa_schemas.dump(empresas)
 	
 	return jsonify(empresas_filtrados)
 
+# Funcion que trae todas las razones sociales de las empresas
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
 
+	# Se traen todas las razones sociales
 	razon_Social_Empresa = db.session.query(mo.Empresa.razon_social).all()
+	# Se hace el dump
 	empresa = empresa_schemas.dump(razon_Social_Empresa)
 	
 	return jsonify(empresa)
+
+# Funcion que elimina una empresa
 @app.route("/empresa/eliminar",methods=["DELETE"])
 def eliminar_empresa():
 	
+	# Request de los json
+	# ej: /empresa/eliminar?razon_social=xxxx
 	razon_social=request.args.get('razon_social')
-	empresa = mo.Empresa.query.get(razon_social) # Capturo al participante
+	empresa = mo.Empresa.query.get(razon_social) # Capturo a la empresa
 	
 	try:
+		# Se elimina de la db
 		db.session.delete(empresa)
 		db.session.commit()
 		msg="el empresa "+empresa.razon_social+" fue eliminado correctamente"
 		return jsonify({"respuesta":msg}) 
 	except:
 		return jsonify({"respuesta":"La empresa a eliminar no existe"})
+
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------RELATOR--------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+
+# Funcion que se encarga de obtener un relator
 @app.route("/relator/obtener",methods=["GET"])
 def filtro_relator():
-	
+
+	# Request de los json
+	# ej: /relator/obtener?genero=xxxx
+	# ej: /relator/obtener?genero=xxxx&banco=xxxx
 	rut= request.args.get('rut')
 	nombre = request.args.get('nombre')
 	apellido_paterno = request.args.get('apellido_paterno')
@@ -711,8 +773,10 @@ def filtro_relator():
 	correo_personal = request.args.get('correo_personal')
 	correo_corporativo = request.args.get('correo_corporativo')
 	
+	# Se obtienen todos los relatores
 	relator = mo.Relator.query.filter()
 
+	# En base al los parmetros ingresados por la ruta, se filtran los datos
 	if rut != None:
 		relator = relator.filter(mo.Relator.rut==rut)
 	if nombre != None:
@@ -744,13 +808,16 @@ def filtro_relator():
 	if correo_corporativo != None:
 		relator = relator.filter(mo.Relator.correo_corporativo==correo_corporativo)
 
+	# Se hace el dump
 	relator_filtrados = relator_schemas.dump(relator)
 	
 	return jsonify(relator_filtrados)
 
+# Funcion que agrega un relator
 @app.route("/relator/agregar",methods=["POST"])
 def crear_relator():
 
+	# Request json
 	rut=request.json['rut']
 	nombre=request.json['nombre']
 	apellido_paterno=request.json['apellido_paterno']
@@ -767,22 +834,29 @@ def crear_relator():
 	correo_corporativo=request.json['correo_corporativo']
 	correo_personal=request.json['correo_personal']
 	
+	# Se crea la instancia de relator
 	nuevo_relator=mo.Relator(rut,nombre,apellido_paterno,apellido_materno,titulo,genero,cv,fecha_nacimiento,numero_cuenta,banco,tipo_cuenta,fono_personal,
 	fono_corporativo,correo_corporativo,correo_personal)
 	
+	# Se arega la instancia
 	db.session.add(nuevo_relator)
 	try:
+		# Se agrega a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"El relator ya ha sido ingresado"})
 	
+	# Se crea el dump
 	resultado = relator_schema.dump(nuevo_relator)
 
 	return jsonify(resultado)
 
+# Funcion encargada de editar o actualizar los datos de un relator
 @app.route("/relator/editar",methods=["PUT"])
 def editar_relator():
 
+	# Request de los json
+	# ej: /relator/obtener?rut=xxxx
 	rut_aux=request.args.get('rut')
 	relator = mo.Relator.query.get(rut_aux) # Capturo al relator
 	
@@ -833,21 +907,27 @@ def editar_relator():
 		relator.correo_personal = correo_personal
 
 	try:
+		# Se agregan a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
 	
+	# Se hace el dump
 	resultado = participante_schema.dump(relator)
 
 	return jsonify(resultado)
 
+# Funcion que se encarga de eliminar un relator
 @app.route("/relator/eliminar",methods=["DELETE"])
 def eliminar_relator():
 	
+	# Request de los json
+	# ej: /relator/eliminar?rut=xxxx
 	relator_aux=request.args.get('rut')
 	relator = mo.Relator.query.get(relator_aux) # Capturo el relator
 	
 	try:
+		# Se eliminan de la db
 		db.session.delete(relator)
 		db.session.commit()
 		msg="El relator de rut "+relator.rut+" fue eliminado correctamente"
@@ -859,18 +939,23 @@ def eliminar_relator():
 # --------------------------------------CONTACTO-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
+# Funcion que se encarga de agregar un contacto
 @app.route("/contacto/agregar",methods=["POST"])
 def crear_contacto():
 
+	# Request de los json
 	correo=request.json['correo']
 	fono=request.json['fono']
 	descripcion=request.json['descripcion']
 	razon_social=request.json['razon_social']
 	
+	# Se crea la instancia
 	nuevo_contacto=mo.Contacto(correo,fono,descripcion,razon_social)
 	
+	# Se agrega la instancia
 	db.session.add(nuevo_contacto)
 	try:
+		# Se agrega a la db
 		db.session.commit() 
 	except:
 		return jsonify({"respuesta":"El contacto ya ha sido ingresado"})
@@ -878,17 +963,22 @@ def crear_contacto():
 
 	return jsonify(resultado)
 
+# Funcion que se encarga de filtrar los contactos
 @app.route("/contacto/obtener",methods=["GET"])
 def filtro_contacto():
 	
+	# Request de los json
+	# ej: /contacto/obtener?razon_social=xxxx
 	id_contacto= request.args.get('id_contacto')
 	correo = request.args.get('correo')
 	fono = request.args.get('fono')
 	descripcion = request.args.get('descripcion')
 	razon_social = request.args.get('razon_social')
 	
+	# Se capturar todos los contactos
 	contacto = mo.Contacto.query.filter()
 
+	# En base al los parmetros ingresados por la ruta, se filtran los datos
 	if id_contacto != None:
 		contacto = contacto.filter(mo.Contacto.id_contacto==id_contacto)
 	if correo!= None:
@@ -900,18 +990,23 @@ def filtro_contacto():
 	if razon_social != None:
 		contacto = contacto.filter(mo.Contacto.razon_social==razon_social)
 
+	# Se ordenan de mayor a menor id 
 	contacto=contacto.order_by(mo.Contacto.id_contacto.desc())
 	contacto_filtrados = contacto_schemas.dump(contacto)
 	
 	return jsonify(contacto_filtrados)
 
+# Funcion que elimina los contactos
 @app.route("/contacto/eliminar",methods=["DELETE"])
 def eliminar_contacto():
 	
+	# Request de los json
+	# ej: /contacto/eliminar?id_contacto=xxxx
 	contacto_aux=request.args.get('id_contacto')
 	contacto = mo.Contacto.query.get(contacto_aux) # Capturo el contacto
 	
 	try:
+		# Se elimina el contacto de la db
 		db.session.delete(contacto)
 		db.session.commit()
 		msg="El contacto de id "+str(contacto.id_contacto)+" fue eliminado correctamente"
@@ -919,9 +1014,11 @@ def eliminar_contacto():
 	except:
 		return jsonify({"respuesta":"El contacto a eliminar no existe"})
 
+# Funcion que obtiene todas las empresas con sus contacos pertinentes
 @app.route("/contacto/obtener_empresa",methods=["GET"])
 def obtener_contactos_empresa():
 
+	# Se obtienen todas las empresas
 	empresas = mo.Empresa.query.all()
 	empresas_contactos=[]
 	for i in empresas:
@@ -930,25 +1027,36 @@ def obtener_contactos_empresa():
 		empresas_contactos.append(aux)
 
 	return jsonify(empresas_contactos)
-	
+
+# Funcion que entrega los contactos asociados a una razon social
+@app.route("/contacto/obtener/<razon_social>",methods=["GET"])
+def obtener_contactos_razon_social(razon_social):
+	empresa = mo.Empresa.query.get(razon_social)
+	contactos=[]
+	for i in empresa.contactos:
+		contactos.append({"fono":i.fono,"descripcion":i.descripcion})
+	return jsonify(contactos)
 # -----------------------------------------------------------------------------------------------------
 # ---------------------------------------FACTURA-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
+# Funcion de agreagar una factura
 @app.route("/factura/agregar",methods=["POST"])
 def crear_factura():
 
+	# Se obtiene el id
 	num_factura=db.session.query(mo.Factura).order_by(mo.Factura.id_factura.desc()).first()
 	if num_factura is None:
 		num_factura=1
 	else:
 		num_factura=num_factura.id_factura+1
 	
+	# Request de los json
 	num_cai=request.json['num_registro'] 
 	estado=request.json['estado']
 	num_hes=request.json['num_hes'] 
-	fecha_emision=datetime.today().strftime('%Y-%m-%d') # Arreglar a fecha actual 
-	fecha_vencimiento=request.json['fecha_vencimiento'] # Esta la definen en base al vencimiento
+	fecha_emision=datetime.today().strftime('%Y-%m-%d') 
+	fecha_vencimiento=request.json['fecha_vencimiento'] 
 	sence=request.json['sence']
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
@@ -960,58 +1068,72 @@ def crear_factura():
 	x=["","",""]
 	x[enviar_factura]="X"
 	especificar = request.json['especificar']
-	num_orden = request.json['num_orden'] #Cuando tiene una orden OTIC asociada
-	observacion = request.json['obs'] #Agregan un correo o numero de la empresa
+	num_orden = request.json['num_orden'] 
+	observacion = request.json['obs']
 
 	# ----------- INFO DEL CURSO -------------------------
 	curso_factura = mo.Curso.query.get(sence)
 	instancia_factura = mo.Instancia.query.get(id_instancia)
-	empresa_factura = mo.Empresa.query.get(razon_social)
 	
 	nombre_curso = curso_factura.nombre
 	sence_curso = curso_factura.sence
 	horas_curso = curso_factura.horas_curso
 	fecha_inicio_instancia = instancia_factura.fecha_inicio
 	fecha_termino_instancia = instancia_factura.fecha_termino
-	num_registro_sence = instancia_factura.id_instancia #es realmente asi?
+	num_registro_sence = instancia_factura.id_instancia
 	valor_curso = curso_factura.valor_efectivo_participante
-	
-	# En las soli sale participante y un mensaje, ese msj es predeterminado o varia?
-	# En una soli agregaron el nombre de otra empresa y el rut correspondiente, cuando se hace eso?
-
-	# ----------- INFO DE LA EMPRESA ------------------------
-
-	# duda existencial, la solicitud de factura es difernet cuando es particular? porq si es asi debe haber una relacion entre factura y empresa
-	giro_empresa = empresa_factura.giro
-	atencion_empresa = empresa_factura.atencion#con que se rellena este campo? Duda a la clienta
-	departamento_empresa = empresa_factura.departamento
-	rut_empresa = empresa_factura.rut # aun no responde la duda la clienta sobre el tema del rut
-	direccion_empresa = empresa_factura.direccion
-	comuna_empresa = empresa_factura.comuna
 	
 	# --------- INFO DE PARTICIPANTES ----------------------
 	lista_participantes = request.get_json()
 	lista_rut=[] # Lista con los ruts de los participante
 
-
+	# Se le asignan la solicitud a todos los participantes de la instancia
 	for participante in lista_participantes['participantes']:
-		lista_rut.append(participante['rut'])	
-	
+		lista_rut.append(participante['rut'])
+
+	# ----------- INFO DE LA EMPRESA ------------------------
+	if razon_social is None:
+		participante=mo.Participante.query.get(lista_rut[0])
+		razon_social=participante.nombre+" "+participante.apellido_paterno+" "+ participante.apellido_materno
+		giro_empresa= ""
+		atencion_empresa= ""
+		departamento_empresa = ""
+		rut_empresa=participante.rut
+		direccion_empresa="" # Preguntar a sara
+		comuna_empresa="" # PReguntar a sara
+		fono_empresa=participante.fono_personal
+	else:
+		empresa_factura = mo.Empresa.query.get(razon_social)
+		giro_empresa = empresa_factura.giro
+		atencion_empresa = empresa_factura.atencion
+		departamento_empresa = empresa_factura.departamento
+		rut_empresa = empresa_factura.rut
+		direccion_empresa = empresa_factura.direccion
+		comuna_empresa = empresa_factura.comuna
+		
+	# Se calcula el valor total del curso, multiplicando el num de participantes por el valor
 	valor_total=valor_curso*len(lista_rut)
-	nueva_factura=mo.Factura(num_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion)
-	db.session.add(nueva_factura)
 	
+	# Se instancia la factura
+	nueva_factura=mo.Factura(num_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion)
+	# Se agrega la factura
+	db.session.add(nueva_factura)
 	try:
+		# Se agrega a la db
 		db.session.commit() 
 	except:
-		
 		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada o hay un problema con ella"})
 	
+	# PARA EL FORMULARIO DEL WORD
 	tpl=DocxTemplate("backend/db/data/FORMULARIO_No_4_solicitud_de_factura.docx")
+	# Se define el estado
 	if estado == 0:
 		estado="cerrado"
 	else:
 		estado="abierto" 
+	
+	# para los casos particulares
+
 	parametros={
 		"numero_cai":num_cai,
 		"estado": estado,
@@ -1058,10 +1180,13 @@ def crear_factura():
 
 	return jsonify(resultado)
 
-# Revisar
+# Funcion para filtrar u obtener las facturas
 @app.route("/factura/obtener",methods=["GET"])
 def filtro_factura():
 	
+	# Request de los json
+	# ej: /factura/obtener?sence=xxxx
+	# ej: /factura/obtener?sence=xxxx&estado=xxxx
 	id_factura= request.args.get('id_factura')
 	sence = request.args.get('sence')
 	estado = request.args.get('estado')
@@ -1074,8 +1199,10 @@ def filtro_factura():
 	observacion = request.args.get('observacion')
 	num_cai = request.args.get('num_cai')
 	
+	# Se llaman a todas las facturas
 	facturas = mo.Factura.query.filter()
 
+	# En base al los parmetros ingresados por la ruta, se filtran los datos
 	if id_factura != None:
 		facturas = facturas.filter(mo.Factura.id_factura==id_factura)
 	if sence != None:
