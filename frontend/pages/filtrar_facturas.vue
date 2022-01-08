@@ -9,13 +9,7 @@
         <v-form v-model="valid">
             <v-container >
             <v-row >
-                <v-col>
-                <v-text-field
-                    v-model="sence"
-                    :counter="16"
-                    label="sence" 
-                ></v-text-field>
-                </v-col>
+                
 
                 <v-col>
                 <v-text-field
@@ -27,13 +21,31 @@
 
                 <v-col>
                 <v-text-field
+                    v-model="sence"
+                    :counter="16"
+                    label="sence" 
+                ></v-text-field>
+                </v-col>
+
+                <v-col>
+                <v-text-field
+                    v-model="estado"
+                    :counter="16"
+                    label="estado" 
+                ></v-text-field>
+                </v-col>
+
+                
+              </v-row>
+              <v-row>
+                <v-col>
+                <v-text-field
                     v-model="num_hes"
                     :counter="20"
                     label="num_hes"
                 ></v-text-field>
                 </v-col>
-              </v-row>
-              <v-row>
+                
                 <v-col>
                 <v-text-field
                     v-model="fecha_emision"
@@ -44,20 +56,47 @@
 
                 <v-col>
                 <v-text-field
-                  v-model="enviar_factura"
-                  label="enviar_factura"
-                ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                <v-text-field
                     v-model="fecha_vencimiento"
                     :counter="20"
                     label="fecha_vencimiento"
                 ></v-text-field>
                 </v-col>
 
+              </v-row>
+              <v-row>
+                <v-col>
+                <v-text-field
+                  v-model="enviar_factura"
+                  label="enviar_factura"
+                ></v-text-field>
+                </v-col>
+
+                <v-col>
+                <v-text-field
+                    v-model="especificar"
+                    :counter="20"
+                    label="especificar"
+                ></v-text-field>
+                </v-col>
+
+                <v-col>
+                <v-text-field
+                  v-model="num_orden"
+                  label="num_orden"
+ 
+                ></v-text-field>
+                </v-col>
+
+                <v-col>
+                <v-text-field
+                    v-model="observacion"
+                    :counter="20"
+                    label="observacion"
+                ></v-text-field>
+                </v-col>
+
+              </v-row>
+              <v-row>
                 <v-col>
                 <v-text-field
                   v-model="num_cai"
@@ -65,10 +104,6 @@
  
                 ></v-text-field>
                 </v-col>
-
-              </v-row>
-              <v-row>
-
                 <v-col>
                 <v-text-field
                     v-model="estado"
@@ -192,21 +227,24 @@ export default {
          ruta= ruta + 'fecha_emision='+this.fecha_emision +'&'
        }
        if (this.fecha_vencimiento != '' ){
-         ruta= ruta + 'genero='+this.fecha_vencimiento +'&'
+         ruta= ruta + 'fecha_vencimiento='+this.fecha_vencimiento +'&'
        }
        if (this.enviar_factura != '' ){
          ruta= ruta + 'enviar_factura='+this.enviar_factura +'&'
        }
-       if (this.fecha_vencimiento != '' ){
-         ruta= ruta + 'fecha_vencimiento='+this.fecha_vencimiento +'&'
+       if (this.especificar != '' ){
+         ruta= ruta + 'especificar='+this.especificar +'&'
+       }
+       if (this.num_orden != '' ){
+         ruta= ruta + 'num_orden='+this.num_orden +'&'
+       }
+       if (this.observacion != '' ){
+         ruta= ruta + 'observacion='+this.observacion +'&'
        }
        if (this.num_cai != '' ){
          ruta= ruta + 'num_cai='+this.num_cai +'&'
        }
-       if (this.estado != '' ){
-         ruta= ruta + 'estado='+this.estado +'&'
-       }
-
+       
       if (ruta[ruta.length -1] == '&'){
         ruta[ruta.length -1]==''
       }
@@ -224,7 +262,10 @@ export default {
         this.estado = '';
         this.num_hes=''
         this.fecha_emision=''
+        this.fecha_vencimiento=''
         this.enviar_factura=''
+        this.especificar=''
+        this.num_orden=''
         this.fecha_vencimiento=''
         this.num_cai=''
       }
