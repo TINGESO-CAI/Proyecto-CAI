@@ -129,7 +129,7 @@ export default {
   }),
   methods:{
     escogerParticipantes: function(){
-      if(this.matriculados.length!=1){
+      if(this.matriculados.length==0){
         alert('Debe seleccionar almenos 1 participante para matricular')
       }
       else{
