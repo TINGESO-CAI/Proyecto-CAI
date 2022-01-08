@@ -178,7 +178,7 @@
                 <v-col>
                 <v-autocomplete
                       v-model="razon_social"
-                      :items="razones"
+                      :items="razonesV"
                       dense
                       item-text="razon_social"
                       label="razon_social"
@@ -265,6 +265,7 @@ export default {
     num_hes:'',
     razon_social:'',
     razones: [],
+    razonesV: [],
     participantes:[],
     participantesFactura:[],
     sences:[],
@@ -368,6 +369,7 @@ export default {
           this.num_hes=''
           this.razon_social=''
           this.razones= []
+          this.razonesV= []
           this.participantes=[]
           this.participantesFactura=[]
           this.sences=[]
@@ -399,6 +401,17 @@ export default {
         //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
         this.razones = response.data;
+        console.log(response);
+      }
+      catch (error) {
+        console.log('error', error); 
+      }
+    },
+    async getRazonesValidas(){
+      try {
+        //se llama el servicio para obtener las emergencias 
+        let response = await axios.get('http://localhost:5000/instancia/obtener_razones_sociales/'+this.instancia[0].id_instancia);
+        this.razonesV = response.data;
         console.log(response);
       }
       catch (error) {

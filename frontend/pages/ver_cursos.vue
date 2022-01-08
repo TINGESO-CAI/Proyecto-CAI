@@ -4,20 +4,17 @@
 
             <v-data-table
               :headers="headers"
-              :items="participantes"
+              :items="cursos"
               :search="search"
               dense
             >
-              <template v-slot:[`item.genero`]="{ item }">
-                <span>{{ mostrarGenero(item.genero) }}</span>
-              </template>
               <template v-slot:top>
               <v-toolbar
                 flat
                 class="test"
 
               >
-        <v-toolbar-title> VER PARTICIPANTES</v-toolbar-title>
+        <v-toolbar-title> VER CURSOS</v-toolbar-title>
 
           <v-spacer></v-spacer>
           <v-text-field
@@ -34,7 +31,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               
-              <v-btn to="/nuevo_participante"
+              <v-btn to="/crear_curso"
                 color="primary"
                 dark
                 class="mb-2"
@@ -45,7 +42,7 @@
                 
               </v-btn>
               <v-spacer></v-spacer>
-              <v-btn to="/subir_archivo"
+              <v-btn to="/subir_archivo_curso"
                 color="primary"
                 dark
                 class="mb-2"
@@ -70,8 +67,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.rut"
-                      label="rut"
+                      v-model="editedItem.sence"
+                      label="sence"
                     ></v-text-field>
                   </v-col>
                 <!--hasta aqui-->
@@ -91,7 +88,7 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.apellido_paterno"
+                      v-model="editedItem.modalidad"
                       label="apellido paterno"
                     ></v-text-field>
                   </v-col>
@@ -101,7 +98,7 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.apellido_materno"
+                      v-model="editedItem.categoria"
                       label="apellido materno"
                     ></v-text-field>
                   </v-col>
@@ -111,8 +108,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.correo_corporativo"
-                      label="correo_corporativo"
+                      v-model="editedItem.horas_curso"
+                      label="horas_curso"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -146,8 +143,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.fono_corporativo"
-                      label="fono_corporativo"
+                      v-model="editedItem.valor_efectivo_participante"
+                      label="valor_efectivo_participante"
                     ></v-text-field>
                   </v-col>
                    <v-col
@@ -156,18 +153,11 @@
                     md="4"
                   >
                   
-                    <v-select
-                      v-model="editedItem.genero"
-                      :items="generos"
-                      dense
-                      item-text="genero"
-                      label="genero"
-                      persistent-hint
-                      return-object
-                      single-line   
-                      
+                    <v-text-field
+                      v-model="editedItem.resolucion_sence"
+                      label="resolucion_sence"
                     >
-                    </v-select>
+                    ></v-text-field>
 
                   </v-col>
                   
@@ -176,11 +166,11 @@
                     sm="6"
                     md="4"
                   ><v-autocomplete
-                      v-model="editedItem.razon_social"
+                      v-model="editedItem.valor_imputable_participante"
                       :items="razones"
                       dense
-                      item-text="razon_social"
-                      label="razon_social"
+                      item-text="valor_imputable_participante"
+                      label="valor_imputable_participante"
                       persistent-hint
                       return-object
                       single-line
@@ -203,7 +193,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="editarParticipante"
+                @click="editarcurso"
               >
                 Guardar
               </v-btn>
@@ -252,27 +242,26 @@ export default {
   data:()=>( {
     busqueda: null,
     search: '',
-    generos:['femenino','masculino'],
     headers: [
       {
-        text: 'Rut',
+        text: 'sence',
         align: 'start',
         filterable: true,
-        value: 'rut',
+        value: 'sence',
       },
       { text: 'nombre', value: 'nombre' },
-      { text: 'apellido_paterno', value: 'apellido_paterno'},
-      { text: 'apellido_materno', value: 'apellido_materno' },
-      { text: 'correo corporativo', value: 'correo_corporativo'},
-      { text: 'fono corporativo', value: 'fono_corporativo'},
-      { text: 'razon_social', value: 'razon_social'},
-      { text: 'genero', value: 'genero'},
+      { text: 'modalidad', value: 'modalidad'},
+      { text: 'categoria', value: 'categoria' },
+      { text: 'horas curso', value: 'horas_curso'},
+      { text: 'valor efec', value: 'valor_efectivo_participante'},
+      { text: 'valor imput', value: 'valor_imputable_participante'},
+      { text: 'res_sence', value: 'resolucion_sence'},
 
       { text: 'Editar/Borrar', value: 'actions', sortable: false },
   
     ],
 
-    participantes:[
+    cursos:[
     ],
     razones:[],
 
@@ -281,44 +270,44 @@ export default {
     dialogDelete: false,
     editedIndex: -1,
     editedItem: {
-      rut: '',
+      sence: '',
       nombre: '',
-      apellido_paterno: '',
-      apellido_materno: '',
-      genero: '',
+      modalidad: '',
+      categoria: '',
+      resolucion_sence: '',
       nivel_educacional: '',
       fecha_nacimiento: '',
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo_corporativo: '',
+      horas_curso: '',
       correo_personal: '',
       fono_personal: '',
-      fono_corporativo: '',
-      razon_social: ''
+      valor_efectivo_participante: '',
+      valor_imputable_participante: ''
     },
     defaultItem: {
-      rut: '',
+      sence: '',
       nombre: '',
-      apellido_paterno: '',
-      apellido_materno: '',
-      genero: '',
+      modalidad: '',
+      categoria: '',
+      resolucion_sence: '',
       nivel_educacional: '',
       fecha_nacimiento: '',
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo_corporativo: '',
+      horas_curso: '',
       correo_personal: '',
       fono_personal: '',
-      fono_corporativo: '',
-      razon_social: ''
+      valor_efectivo_participante: '',
+      valor_imputable_participante: ''
     }, 
   }),
   //funciones para editar
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'Nuevo participante' : 'Editar participante'
+      return this.editedIndex === -1 ? 'Nuevo curso' : 'Editar curso'
     },
   },
   watch: {
@@ -333,11 +322,11 @@ export default {
     forEach: async function(){
 
     },
-    getParticipantes: async function(){
+    getcursos: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/participante/obtener?');
-        this.participantes = response.data;
+        let response = await axios.get('http://localhost:5000/curso/obtener?');
+        this.cursos = response.data;
 
         
         console.log(response);
@@ -345,12 +334,6 @@ export default {
       catch (error) {
         console.log('error', error); 
       }
-    },
-    cambiarGenero(valor){
-      console.log(valor)
-      if (valor ==  'femenino') return '1'
-      else if (valor == 'masculino' ) return '2'
-      else return null
     },
 
     transformarVacio: function(valor){
@@ -361,32 +344,32 @@ export default {
         return valor
       }
     },
-    editarParticipante: async function(){
-      let newParticipante ={
-        rut: this.editedItem.rut,
+    editarcurso: async function(){
+      let newcurso ={
+        sence: this.editedItem.sence,
         nombre: this.transformarVacio(this.editedItem.nombre),
-        apellido_paterno: this.transformarVacio(this.editedItem.apellido_paterno),
-        apellido_materno: this.transformarVacio(this.editedItem.apellido_materno),
-        genero: this.transformarVacio(this.cambiarGenero(this.editedItem.genero)),
+        modalidad: this.transformarVacio(this.editedItem.modalidad),
+        categoria: this.transformarVacio(this.editedItem.categoria),
+        resolucion_sence: this.transformarVacio(this.resolucion_sence),
         nivel_educacional: this.transformarVacio(this.editedItem.nivel_educacional),
         fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
         nacionalidad: this.transformarVacio(this.editedItem.nacionalidad),
         tipo_inscripcion: this.transformarVacio(this.editedItem.tipo_inscripcion),
         ocupacion: this.transformarVacio(this.editedItem.ocupacion),
-        correo_corporativo: this.transformarVacio(this.editedItem.correo_corporativo),
+        horas_curso: this.transformarVacio(this.editedItem.horas_curso),
         correo_personal: this.transformarVacio(this.editedItem.correo_personal),
         fono_personal: this.transformarVacio(this.editedItem.fono_personal),
-        fono_corporativo: this.transformarVacio(this.editedItem.fono_corporativo),
-        razon_social: this.transformarVacio(this.editedItem.razon_social)
+        valor_efectivo_participante: this.transformarVacio(this.editedItem.valor_efectivo_participante),
+        valor_imputable_participante: this.transformarVacio(this.editedItem.valor_imputable_participante)
       }
       try {
-        let response = await axios.put('http://localhost:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
+        let response = await axios.put('http://localhost:5000/curso/editar?sence='+newcurso.sence,newcurso);
         console.log(response);
         this.close();
 
-        console.log(this.cambiarGenero(this.editedItem.genero),this.editedItem.genero)
-        this.editedItem.genero=this.cambiarGenero(this.editedItem.genero)
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+        console.log(this.editedItem.resolucion_sence,this.editedItem.resolucion_sence)
+        this.editedItem.resolucion_sence=this.editedItem.resolucion_sence
+        Object.assign(this.cursos[this.editedIndex], this.editedItem)
       }
       catch (error) {
         console.log('error', error);
@@ -394,7 +377,7 @@ export default {
     },
     async getRazones(){
       try {
-        let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
+        let response = await axios.get('http://localhost:5000/empresa/obtener/valor_imputable_participante');
         this.razones = response.data;
         console.log(response);
       }
@@ -403,26 +386,19 @@ export default {
       }
     },
     
-    
-    mostrarGenero(valor){
-      if (valor == '1' ) return 'femenino'
-      else if (valor == '2' ) return 'masculino'
-      else return null
-    },
     editItem (item) {
-        this.editedIndex = this.participantes.indexOf(item)
+        this.editedIndex = this.cursos.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.editedItem.genero=this.mostrarGenero(this.editedItem.genero)
-        console.log(this.editedItem.genero)
+        console.log(this.editedItem.resolucion_sence)
         this.dialog = true
       },
     deleteItem (item) {
-      this.editedIndex = this.participantes.indexOf(item)
+      this.editedIndex = this.cursos.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
     deleteItemConfirm () {
-      this.participantes.splice(this.editedIndex, 1)
+      this.cursos.splice(this.editedIndex, 1)
       this.closeDelete()
     },
     close () {
@@ -441,25 +417,25 @@ export default {
     },
     saveBUP () {
       if (this.editedIndex > -1) {
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+        Object.assign(this.cursos[this.editedIndex], this.editedItem)
       } else {
-        this.participantes.push(this.editedItem)
+        this.cursos.push(this.editedItem)
       }
       this.close()
     },
     save () {
       if (this.editedIndex > -1) {
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+        Object.assign(this.cursos[this.editedIndex], this.editedItem)
       } else {
-        editarParticipante()
+        editarcurso()
       }
       this.close()
     },
   },
   created(){
-    this.getParticipantes()
+    this.getcursos()
     this.getRazones()
-    //this.mostrarGenero(valor)
+    //this.mostrarresolucion_sence(valor)
   }
 }
 </script>
