@@ -175,8 +175,11 @@
                     required
                 ></v-text-field>
                 </v-col>
+                <input type="checkbox" id="checkbox" v-model="particular">
+                  <label for="checkbox"> particular </label>
                 <v-col>
                 <v-autocomplete
+                      v-if="particular==false"
                       v-model="razon_social"
                       :items="razonesV"
                       dense
@@ -261,7 +264,7 @@ export default {
     mostrarMalla:['Si','No'],
     instancias:[],
     instancia:[],
-    enviar:[],
+    enviar:'',
     num_hes:'',
     razon_social:'',
     razones: [],
@@ -271,6 +274,7 @@ export default {
     sences:[],
     especificar:'',
     num_orden:'',
+    particular:false,
     factura:[],
     empresa:{
       razon_social: 'test',
@@ -317,14 +321,20 @@ export default {
       this.page=this.page-1
     },
     avanzarPage2:function(){
-      this.page=2
+        this.page=2
     },
     asignar: function(){
       if(this.instancia.length==0){
         alert("Debe seleccionar una instancia.")
       }
       else{
-        this.page=3
+        try{
+          this.getRazonesValidas()
+          this.page=3
+        }
+        catch(error){
+          console.log("error")
+        }
       }
     },
     onlyRut:function(){
@@ -333,6 +343,22 @@ export default {
         participantes.push({rut:this.participantesFactura[i].rut})
       }
       return (participantes)
+    },
+    comprobarFecha:function(fecha){
+      if (fecha.split('-').length == 3){
+        return true
+      }
+      else{
+        return false
+      }
+    },
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
     },
     generarFactura: async function(){
       if (this.participantesFactura.length==0){
@@ -365,7 +391,7 @@ export default {
           this.mostrarMalla=['Si','No']
           this.instancias=[]
           this.instancia=[]
-          this.enviar=[]
+          this.enviar=''
           this.num_hes=''
           this.razon_social=''
           this.razones= []
@@ -385,15 +411,27 @@ export default {
       }
     },
     continuarPage4: async function(){
-      let response= await axios.get('http://localhost:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
-      this.participantes=response.data
-      console.log(this.razon_social.razon_social)
-      if(this.participantes.length==0){
-        alert("No existen participantes en esta instancia que tengan esta razon social.")
-        this.razon_social=''
+      if(this.enviar!=''){
+        if(this.particular==false){
+          let response= await axios.get('http://localhost:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
+          this.participantes=response.data
+          console.log(this.razon_social.razon_social)
+          if(this.participantes.length==0){
+            alert("No existen participantes en esta instancia que tengan esta razon social.")
+            this.razon_social=''
+          }
+          else{
+            this.page=4
+          }
+        }
+        else{
+          this.razon_social=''
+          
+        }
+
       }
       else{
-        this.page=4
+        alert("Debe seleccionar a donde se quiere enviar.")
       }
     },
     async getRazones(){

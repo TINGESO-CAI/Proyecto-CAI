@@ -1,13 +1,9 @@
 <template>
     <v-container class="test">
-    <div class="home">
-        <h1>Ingresar Nueva empresa</h1>
-        <br>
-        <div>
-        <v-form v-model="valid">
-            <v-container >
-            <v-row >
-
+              <v-row>
+              <h3>Ingresar nuevo contacto</h3>
+              </v-row>
+              <v-row>
                 <v-col>
                 <v-text-field
                     v-model="razon_social"
@@ -17,81 +13,42 @@
                     required
                 ></v-text-field>
                 </v-col>
-
                 <v-col>
                 <v-text-field
-                    v-model="giro"
-                    :rules="giroRules"
+                    v-model="correo"
+                    :rules="correoRules"
                     :counter="20"
-                    label="Giro"
+                    label="correo"
                     required
+                    dense
                 ></v-text-field>
-                </v-col>
-                <v-col>
-                <v-text-field
-                    v-model="atencion"
-                    :rules="atencionRules"
-                    :counter="20"
-                    label="Atencion"
-                    required
-                ></v-text-field>
-                </v-col>
-                <v-col>
-                <v-autocomplete
-                      v-model="departamento"
-                      :items="departamentos"
-                      item-text="departamento"
-                      label="departamento"
-                      persistent-hint
-                      return-object
-                      single-line
-                ></v-autocomplete>
                 </v-col>
               </v-row>
               <v-row>
-                
                 <v-col>
                 <v-text-field
-                    v-model="rut"
-                    :rules="rutRules"
-                    :counter="16"
-                    label="Rut"
+                    v-model="fono"
+                    :rules="fonoRules"
+                    :counter="15"
+                    label="fono"
                     required
+                    dense
                 ></v-text-field>
                 </v-col>
                 <v-col>
                 <v-text-field
-                    v-model="direccion"
-                    :rules="direccionRules"
+                    v-model="descripcion"
+                    :rules="descripcionRules"
                     :counter="20"
-                    label="direccion"
+                    label="descripcion"
                     required
+                    dense
                 ></v-text-field>
                 </v-col>
-                <v-col>
-                <v-autocomplete
-                      v-model="comuna"
-                      :items="comunas"
-                      item-text="comuna"
-                      label="comuna"
-                      persistent-hint
-                      return-object
-                      single-line
-                ></v-autocomplete>
-                </v-col>
-                <v-col>
-                <v-btn  color="blue lighten-1" class="mr-4" @click="createEmpresa">Crear empresa</v-btn>
-                </v-col>
-              </v-row>
                 
-                <!--contacto agregar-->
-              
-            </v-container>
-        </v-form>
-        
-        
-        </div>
-    </div>
+            </v-row>
+            <v-btn  color="blue lighten-1" class="mr-3" @click="createContacto">Agregar contacto</v-btn>
+            
     </v-container>
 </template>
 <script>
@@ -212,7 +169,6 @@ export default {
 
       console.log(this.razon_social != '')
       let newContacto={ 
-        id_contacto: this.razon_social+'1',
         correo: this.transformarVacio(this.correo),
         fono: this.transformarVacio(this.fono),
         descripcion: this.transformarVacio(this.descripcion),

@@ -146,16 +146,16 @@ export default {
         try{
           let response = await axios.post('http://localhost:5000/participante_instancia/agregar',{rut:this.matriculados[i].rut, id_instancia:this.curso[0].id_instancia});
           console.log('response', response.data);
-          alert('Participante/s inscrito/s con exito.')
-          this.matriculados=[]
-          this.curso=[]
-          this.page=1
         }
         catch (error){
           console.log(error)
           alert('Ocurrio un error.')
         }
       }
+      alert('Participante/s inscrito/s con exito.')
+      this.matriculados=[]
+      this.curso=[]
+      this.page=1
     },
     handleClick: function(value){
       console.log(value)
