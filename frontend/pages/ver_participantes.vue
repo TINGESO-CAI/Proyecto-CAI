@@ -7,6 +7,7 @@
               :items="participantes"
               :search="search"
               dense
+
             >
               <template v-slot:[`item.genero`]="{ item }">
                 <span>{{ mostrarGenero(item.genero) }}</span>
@@ -127,9 +128,7 @@
                   </v-col>    
                 </v-row>
                 <v-row>
-                  
-          
-                  
+      
                   <v-col
                     cols="12"
                     sm="6"
@@ -170,13 +169,14 @@
                     </v-select>
 
                   </v-col>
-                  
+                <v-row>
                   <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   ><v-autocomplete
                       v-model="editedItem.razon_social"
+                      title="razon social"
                       :items="razones"
                       dense
                       item-text="razon_social"
@@ -185,8 +185,64 @@
                       return-object
                       single-line
                 ></v-autocomplete>
-  
                   </v-col>
+                <v-col cols="12"
+                    sm="6"
+                    md="4" >
+                <v-autocomplete
+                  v-model="editedItem.tipo_inscripcion"
+                  :items="inscripciones"
+                  item-text="tipo_inscripcion"
+                  label="tipo_inscripcion"
+                  persistent-hint
+                  return-object
+                  single-line   
+                ></v-autocomplete>
+                </v-col>
+
+                <v-col cols="12"
+                    sm="6"
+                    md="4" >
+
+                <v-text-field
+                    v-model="editedItem.ocupacion"
+                    label="ocupacion"
+                    
+                ></v-text-field>
+                </v-col>
+                </v-row>
+  
+   
+                </v-row>
+
+                <v-row>
+                <v-col cols="12"
+                    sm="6"
+                    md="4">
+                <v-autocomplete
+                  v-model="editedItem.nacionalidad"
+                  :items="paises"
+                  item-text="nacionalidad"
+                  label="nacionalidad"
+                  persistent-hint
+                  return-object
+                  single-line   
+                ></v-autocomplete>
+                </v-col>
+                <v-col cols="12"
+                    sm="6"
+                    md="4">
+                <v-select
+                  v-model="nivel_educacional"
+                  :items="nivelesEdu"
+                  item-text="nivel_educacional"
+                  label="nivel_educacional"
+                  persistent-hint
+                  return-object
+                  single-line
+                ></v-select>
+                </v-col>
+
                 </v-row>
               </v-container>
             </v-card-text>
@@ -253,7 +309,11 @@ export default {
     busqueda: null,
     search: '',
     generos:['femenino','masculino'],
+    nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otra"],
+    paises: [ "Chile","Desconocido","Afganistán","Albania","Alemania","Andorra","Angola","Antigua y Barbuda","Arabia Saudita","Argelia","Argentina","Armenia","Australia","Austria","Azerbaiyán","Bahamas","Bangladés","Barbados","Baréin","Bélgica","Belice","Benín","Bielorrusia","Birmania","Bolivia","Bosnia y Herzegovina","Botsuana","Brasil","Brunéi","Bulgaria","Burkina Faso","Burundi","Bután","Cabo Verde","Camboya","Camerún","Canadá","Catar","Chad","China","Chipre","Ciudad del Vaticano","Colombia","Comoras","Corea del Norte","Corea del Sur","Costa de Marfil","Costa Rica","Croacia","Cuba","Dinamarca","Dominica","Ecuador","Egipto","El Salvador","Emiratos Árabes Unidos","Eritrea","Eslovaquia","Eslovenia","España","Estados Unidos","Estonia","Etiopía","Filipinas","Finlandia","Fiyi","Francia","Gabón","Gambia","Georgia","Ghana","Granada","Grecia","Guatemala","Guyana","Guinea","Guinea ecuatorial","Guinea-Bisáu","Haití","Honduras","Hungría","India","Indonesia","Irak","Irán","Irlanda","Islandia","Islas Marshall","Islas Salomón","Israel","Italia","Jamaica","Japón","Jordania","Kazajistán","Kenia","Kirguistán","Kiribati","Kuwait","Laos","Lesoto","Letonia","Líbano","Liberia","Libia","Liechtenstein","Lituania","Luxemburgo","Madagascar","Malasia","Malaui","Maldivas","Malí","Malta","Marruecos","Mauricio","Mauritania","México","Micronesia","Moldavia","Mónaco","Mongolia","Montenegro","Mozambique","Namibia","Nauru","Nepal","Nicaragua","Níger","Nigeria","Noruega","Nueva Zelanda","Omán","Países Bajos","Pakistán","Palaos","Palestina","Panamá","Papúa Nueva Guinea","Paraguay","Perú","Polonia","Portugal","Reino Unido","República Centroafricana","República Checa","República de Macedonia","República del Congo","República Democrática del Congo","República Dominicana","República Sudafricana","Ruanda","Rumanía","Rusia","Samoa","San Cristóbal y Nieves","San Marino","San Vicente y las Granadinas","Santa Lucía","Santo Tomé y Príncipe","Senegal","Serbia","Seychelles","Sierra Leona","Singapur","Siria","Somalia","Sri Lanka","Suazilandia","Sudán","Sudán del Sur","Suecia","Suiza","Surinam","Tailandia","Tanzania","Tayikistán","Timor Oriental","Togo","Tonga","Trinidad y Tobago","Túnez","Turkmenistán","Turquía","Tuvalu","Ucrania","Uganda","Uruguay","Uzbekistán","Vanuatu","Venezuela","Vietnam","Yemen","Yibuti","Zambia","Zimbabue"],
+    inscripciones:["presencial","online"],
     headers: [
+      { text: 'Editar/Borrar', value: 'actions', sortable: false },
       {
         text: 'Rut',
         align: 'start',
@@ -266,9 +326,17 @@ export default {
       { text: 'correo corporativo', value: 'correo_corporativo'},
       { text: 'fono corporativo', value: 'fono_corporativo'},
       { text: 'razon_social', value: 'razon_social'},
+      { text: 'nacionalidad', value: 'nacionalidad'},
+      { text: 'tipo_inscripcion', value: 'tipo_inscripcion'},
+      { text: 'correo_personal', value: 'correo_personal'},
+      { text: 'fono_personal', value: 'fono_personal'},
+      { text: 'ocupacion', value: 'ocupacion'},
+      { text: 'nivel_educacional', value: 'nivel_educacional'},
+      { text: 'fecha_nacimiento', value: 'fecha_nacimiento'},
       { text: 'genero', value: 'genero'},
+      
 
-      { text: 'Editar/Borrar', value: 'actions', sortable: false },
+      
   
     ],
 
