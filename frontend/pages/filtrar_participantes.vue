@@ -46,15 +46,16 @@
                 <v-select
                     v-model="genero"
                     :items="geneross"
-                    item-text="generos"
+                    item-text="genero"
                     label="genero"
                     persistent-hint
                     return-object
                     single-line   
+                    
                 >
-                <template v-slot:[`item`]="{ item }">
-                <span>{{ mostrarGenero(item) }}</span>
-              </template></v-select>
+                  <template v-slot:[`item`]="{ item }">
+                    <span>{{ mostrarGenero(item) }}</span>
+                  </template></v-select>
                 </v-col>
 
                 <v-col>
@@ -65,7 +66,7 @@
                   label="nivel_educacional"
                   persistent-hint
                   return-object
-                  single-line   
+                  single-line
                 ></v-select>
                 </v-col>
               </v-row>
@@ -74,7 +75,7 @@
                 <v-text-field
                     v-model="fecha_nacimiento"
                     :counter="20"
-                    label="fecha_nacimiento"
+                    label="fecha_nacimiento"    
                 ></v-text-field>
                 </v-col>
 
@@ -108,23 +109,25 @@
                     v-model="ocupacion"
                     :counter="20"
                     label="ocupacion"
+                    
                 ></v-text-field>
                 </v-col>
 
                 <v-col>
                 <v-text-field
-                    v-model="correo"
-                    :rules="correoRules"
-                    :counter="20"
-                    label="correo"
+                    v-model="correo_personal"
+                    :counter="30"
+                    label="correo_personal"
+                    
                 ></v-text-field>
                 </v-col>
 
                 <v-col>
                 <v-text-field
-                    v-model="fono"
+                    v-model="fono_personal"
                     :counter="15"
-                    label="fono"
+                    label="fono_personal"
+                    
                 ></v-text-field>
                 </v-col>
                 <v-col>
@@ -140,7 +143,24 @@
                 ></v-autocomplete>
                 </v-col>
             </v-row>
-            </v-container>
+
+            <v-row>
+              <v-col>
+              <v-text-field
+                      v-model="correo_corporativo"
+                      :counter="20"
+                      label="correo_corporativo"
+                ></v-text-field>
+                </v-col>
+                <v-col>
+                <v-text-field
+                    v-model="fono_corporativo"
+                    :counter="15"
+                    label="fono_corporativo"
+                ></v-text-field>
+                </v-col>
+            </v-row>
+            </v-container> 
         </v-form>
         
         <v-btn  color="blue lighten-1" class="mr-4" @click="filtro">Filtrar</v-btn>
@@ -216,8 +236,10 @@ export default {
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo: '',
-      fono: '',
+      correo_corporativo: '',
+      correo_personal: '',
+      fono_personal: '',
+      fono_corporativo: '',
       razon_social: '',
       
     }
@@ -275,11 +297,17 @@ export default {
        if (this.ocupacion != '' ){
          ruta= ruta + 'ocupacion='+this.ocupacion +'&'
        }
-       if (this.correo != '' ){
-         ruta= ruta + 'correo='+this.correo +'&'
+       if (this.correo_personal != '' ){
+         ruta= ruta + 'correo_personal='+this.correo_personal +'&'
        }
-       if (this.fono != '' ){
-         ruta= ruta + 'fono='+this.fono +'&'
+       if (this.correo_corporativo != '' ){
+         ruta= ruta + 'correo_corporativo='+this.correo_corporativo +'&'
+       }
+       if (this.fono_personal != '' ){
+         ruta= ruta + 'fono_personal='+this.fono_personal +'&'
+       }
+       if (this.fono_corporativo != '' ){
+         ruta= ruta + 'fono_corporativo='+this.fono_corporativo +'&'
        }
        if (this.razon_social != '' ){
          ruta= ruta + 'razon_social='+this.razon_social.razon_social

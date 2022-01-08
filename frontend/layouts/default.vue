@@ -332,7 +332,7 @@ export default {
 			['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
 			['Ver participantes','mdi-account-multiple','/ver_participantes'],
 			['Subir archivo', 'mdi-file-plus','/subir_archivo'],
-			['Filtrar participantes','mdi-account-multiple','/filtrar_participantes' ]
+			['Filtrar participantes','mdi-account-filter-outline','/filtrar_participantes' ]
 			],
 			relatores: [
 			['Nuevo relator', 'mdi-account-multiple-plus','/nuevo_relator'],
