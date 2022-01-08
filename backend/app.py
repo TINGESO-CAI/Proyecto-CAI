@@ -97,8 +97,8 @@ def registrar_cuenta():
 # Funcion que se encarga de cargar una cuenta
 @login_manager.user_loader
 def load_user(user_id):
-    # since the user_id is just the primary key of our user table, use it in the query for the user
-    return mo.Cuenta.query.get(int(user_id))
+	# since the user_id is just the primary key of our user table, use it in the query for the user
+	return mo.Cuenta.query.get(int(user_id))
 
 # Funcion respecto al login
 @app.route('/entrar', methods=['POST'])
@@ -128,8 +128,8 @@ def entrar_cuenta():
 @login_required
 def salir_cuenta():
 	# comando para salirse
-    logout_user()
-    return jsonify("deslogeaste jiji")
+	logout_user()
+	return jsonify("deslogeaste jiji")
 
 # Funcion usada para las pruebas de login
 @app.route('/prueba')
@@ -151,7 +151,6 @@ def obtener_permisos():
 		}
 	
 	return jsonify(permiso)
-
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -863,10 +862,9 @@ def eliminar_relator():
 @app.route("/contacto/agregar",methods=["POST"])
 def crear_contacto():
 
-	#id_contacto=request.json['id_contacto']
 	correo=request.json['correo']
 	fono=request.json['fono']
-	descripcion=request.json['descripcion'] #PROBLEMAS CON LA DESCRIPCION, SALE NULL
+	descripcion=request.json['descripcion']
 	razon_social=request.json['razon_social']
 	
 	nuevo_contacto=mo.Contacto(correo,fono,descripcion,razon_social)
@@ -884,23 +882,24 @@ def crear_contacto():
 def filtro_contacto():
 	
 	id_contacto= request.args.get('id_contacto')
-	razon_social = request.args.get('razon_social')
 	correo = request.args.get('correo')
 	fono = request.args.get('fono')
 	descripcion = request.args.get('descripcion')
+	razon_social = request.args.get('razon_social')
 	
 	contacto = mo.Contacto.query.filter()
 
 	if id_contacto != None:
 		contacto = contacto.filter(mo.Contacto.id_contacto==id_contacto)
-	if razon_social != None:
-		contacto = contacto.filter(mo.Contacto.razon_social==razon_social)
 	if correo!= None:
 		contacto = contacto.filter(mo.Contacto.correo==correo)
 	if fono != None:
 		contacto = contacto.filter(mo.Contacto.fono==fono)
 	if descripcion != None:
 		contacto = contacto.filter(mo.Contacto.descripcion==descripcion)
+	if razon_social != None:
+		contacto = contacto.filter(mo.Contacto.razon_social==razon_social)
+
 	contacto=contacto.order_by(mo.Contacto.id_contacto.desc())
 	contacto_filtrados = contacto_schemas.dump(contacto)
 	
@@ -1075,33 +1074,34 @@ def filtro_factura():
 	observacion = request.args.get('observacion')
 	num_cai = request.args.get('num_cai')
 	
-	factura = mo.Factura.query.filter()
+	facturas = mo.Factura.query.filter()
 
 	if id_factura != None:
-		factura = factura.filter(mo.Factura.id_factura==id_factura)
+		facturas = facturas.filter(mo.Factura.id_factura==id_factura)
 	if sence != None:
-		factura = factura.filter(mo.Factura.sence==sence)
+		facturas = facturas.filter(mo.Factura.sence==sence)
 	if estado!= None:
-		factura = factura.filter(mo.Factura.estado==estado)
+		facturas = facturas.filter(mo.Factura.estado==estado)
 	if num_hes != None:
-		factura = factura.filter(mo.Factura.num_hes==num_hes)
+		facturas = facturas.filter(mo.Factura.num_hes==num_hes)
 	if fecha_emision != None:
-		factura = factura.filter(mo.Factura.fecha_emision==fecha_emision)
+		facturas = facturas.filter(mo.Factura.fecha_emision==fecha_emision)
 	if fecha_vencimiento != None:
-		factura = factura.filter(mo.Factura.fecha_vencimiento==fecha_vencimiento)
+		facturas = facturas.filter(mo.Factura.fecha_vencimiento==fecha_vencimiento)
 	if enviar_factura != None:
-		factura = factura.filter(mo.Factura.enviar_factura==enviar_factura)
+		facturas = facturas.filter(mo.Factura.enviar_factura==enviar_factura)
 	if especificar != None:
-		factura = factura.filter(mo.Factura.especificar==especificar)
+		facturas = facturas.filter(mo.Factura.especificar==especificar)
 	if num_orden != None:
-		factura = factura.filter(mo.Factura.num_orden==num_orden)
+		facturas = facturas.filter(mo.Factura.num_orden==num_orden)
 	if observacion != None:
-		factura = factura.filter(mo.Factura.observacion==observacion)
+		facturas = facturas.filter(mo.Factura.observacion==observacion)
 	if num_cai != None:
-		factura = factura.filter(mo.Factura.num_cai==num_cai)
-	factura=factura.order_by(mo.Factura.id_factura.desc())
+		facturas = facturas.filter(mo.Factura.num_cai==num_cai)
+
+	facturas=facturas.order_by(mo.Factura.id_factura.desc())
 	
-	facturas_filtradas = factura_schemas.dump(factura)
+	facturas_filtradas = factura_schemas.dump(facturas)
 	
 	return jsonify(facturas_filtradas)
 
@@ -1176,18 +1176,41 @@ def crear_PI():
 
 @app.route("/participante_instancia/obtener",methods=["GET"])
 def obtener_participante_instancia():
+
 	id_instancia = request.args.get('id_instancia')
 	razon_social = request.args.get('razon_social')
 
 	instancia = mo.Instancia.query.get(id_instancia)
 	if razon_social is None:
-		participantes= instancia.alumnos
+		participantes= instancia.alumnos # REVISAR
 	else:
 		participantes = instancia.alumnos.filter(mo.Participante.razon_social==razon_social)
 
 	participantes_filtrados = participante_schemas.dump(participantes)
 
 	return jsonify(participantes_filtrados)
+
+@app.route("/participante_instancia/obtener_instancias/<rut>",methods=["GET"])
+def obtener_instancias_participante(rut):
+
+	participante = mo.Participante.query.get(rut)
+
+	instancias = participante.instancias
+
+	lista_instancias = []
+	for i in instancias:
+		curso = mo.Curso.query.get(i.sence)
+		instancia = mo.Instancia.query.get(i.id_instancia)
+		permiso={
+			"id_instancia": i.id_instancia,
+			"nombre": curso.nombre,
+			"modalidad": curso.modalidad,
+			"fecha_inicio": instancia.fecha_inicio.strftime('%Y-%m-%d'),
+			"fecha_termino": instancia.fecha_termino.strftime('%Y-%m-%d')
+			}
+		lista_instancias.append(permiso)
+	
+	return jsonify(lista_instancias) 
 
 @app.route("/participante_factura/agregar",methods=["POST"])
 def crear_PF():
@@ -1216,30 +1239,6 @@ def obtener_participante_factura(id_factura):
 	participantes_filtrados = participante_schemas.dump(factura.facturas_alumnos)
 
 	return jsonify(participantes_filtrados)
-"""
-No se si esto ira o que
-
-@app.route("/participante_orden/agregar",methods=["POST"])
-def crear_PF()
-	
-	request_rut=request.json['rut']
-	request_id_factura=request.json['id_orden']
-
-	participante = mo.Participante.query.get(request_rut)
-	factura = mo.Factura.query.get(request_id_factura)
-	
-	if not(participante in orden.ordenes_alumnos):
-		orden.ordenes_alumnos.append(participante)
-	else:
-		return jsonify({"respuesta":"El participante ya esta asociado a esta orden "})
-
-	try:
-		db.session.commit()
-	except sqlalchemy.orm.exc.FlushError:
-		return jsonify({"respuesta":"El participante o la orden no existe"})
-
-	return jsonify({"respuesta":"Participante ha sido asociado a una orden con exito"})
-"""
 
 if __name__ == '__main__':
 	app.run(debug=True)
