@@ -23,7 +23,7 @@
                     :rules="nombreRules"
                     :counter="20"
                     label="Nombre"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
 
@@ -33,7 +33,7 @@
                     :rules="apellido_paternoRules"
                     :counter="20"
                     label="Apellido paterno"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
               </v-row>
@@ -44,7 +44,7 @@
                     :rules="apellido_maternoRules"
                     :counter="20"
                     label="Apellido materno"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
 
@@ -80,12 +80,12 @@
                     :rules="fecha_nacimientoRules"
                     :counter="20"
                     label="fecha_nacimiento"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
 
                 <v-col>
-                <v-select
+                <v-autocomplete
                   v-model="nacionalidad"
                   :items="paises"
                   item-text="nacionalidad"
@@ -93,11 +93,11 @@
                   persistent-hint
                   return-object
                   single-line   
-                ></v-select>
+                ></v-autocomplete>
                 </v-col>
 
                 <v-col>
-                <v-select
+                <v-autocomplete
                   v-model="tipo_inscripcion"
                   :items="inscripciones"
                   item-text="tipo_inscripcion"
@@ -105,7 +105,7 @@
                   persistent-hint
                   return-object
                   single-line   
-                ></v-select>
+                ></v-autocomplete>
                 </v-col>
               </v-row>
               <v-row>
@@ -115,7 +115,7 @@
                     :rules="ocupacionRules"
                     :counter="20"
                     label="ocupacion"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
 
@@ -125,7 +125,7 @@
                     :rules="correo_personalRules"
                     :counter="30"
                     label="correo_personal"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
 
@@ -135,7 +135,7 @@
                     :rules="fono_personalRules"
                     :counter="15"
                     label="fono_personal"
-                    required
+                    
                 ></v-text-field>
                 </v-col>
                 <v-col>
@@ -190,8 +190,8 @@ export default {
     return{
       generos : ["masculino","femenino"],
       nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otra"],
-      paises: [ "Chilena","Extranjera"],
-      inscripciones: [ "presencial","online"],
+      paises: [ "Chile","Desconocido","Afganistán","Albania","Alemania","Andorra","Angola","Antigua y Barbuda","Arabia Saudita","Argelia","Argentina","Armenia","Australia","Austria","Azerbaiyán","Bahamas","Bangladés","Barbados","Baréin","Bélgica","Belice","Benín","Bielorrusia","Birmania","Bolivia","Bosnia y Herzegovina","Botsuana","Brasil","Brunéi","Bulgaria","Burkina Faso","Burundi","Bután","Cabo Verde","Camboya","Camerún","Canadá","Catar","Chad","China","Chipre","Ciudad del Vaticano","Colombia","Comoras","Corea del Norte","Corea del Sur","Costa de Marfil","Costa Rica","Croacia","Cuba","Dinamarca","Dominica","Ecuador","Egipto","El Salvador","Emiratos Árabes Unidos","Eritrea","Eslovaquia","Eslovenia","España","Estados Unidos","Estonia","Etiopía","Filipinas","Finlandia","Fiyi","Francia","Gabón","Gambia","Georgia","Ghana","Granada","Grecia","Guatemala","Guyana","Guinea","Guinea ecuatorial","Guinea-Bisáu","Haití","Honduras","Hungría","India","Indonesia","Irak","Irán","Irlanda","Islandia","Islas Marshall","Islas Salomón","Israel","Italia","Jamaica","Japón","Jordania","Kazajistán","Kenia","Kirguistán","Kiribati","Kuwait","Laos","Lesoto","Letonia","Líbano","Liberia","Libia","Liechtenstein","Lituania","Luxemburgo","Madagascar","Malasia","Malaui","Maldivas","Malí","Malta","Marruecos","Mauricio","Mauritania","México","Micronesia","Moldavia","Mónaco","Mongolia","Montenegro","Mozambique","Namibia","Nauru","Nepal","Nicaragua","Níger","Nigeria","Noruega","Nueva Zelanda","Omán","Países Bajos","Pakistán","Palaos","Palestina","Panamá","Papúa Nueva Guinea","Paraguay","Perú","Polonia","Portugal","Reino Unido","República Centroafricana","República Checa","República de Macedonia","República del Congo","República Democrática del Congo","República Dominicana","República Sudafricana","Ruanda","Rumanía","Rusia","Samoa","San Cristóbal y Nieves","San Marino","San Vicente y las Granadinas","Santa Lucía","Santo Tomé y Príncipe","Senegal","Serbia","Seychelles","Sierra Leona","Singapur","Siria","Somalia","Sri Lanka","Suazilandia","Sudán","Sudán del Sur","Suecia","Suiza","Surinam","Tailandia","Tanzania","Tayikistán","Timor Oriental","Togo","Tonga","Trinidad y Tobago","Túnez","Turkmenistán","Turquía","Tuvalu","Ucrania","Uganda","Uruguay","Uzbekistán","Vanuatu","Venezuela","Vietnam","Yemen","Yibuti","Zambia","Zimbabue"],
+      inscripciones:["presencial","online"],
       razones: ["ninguna"],
       //FORMULARIO
       valid: false,

@@ -293,18 +293,7 @@ export default {
     nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
     paises: [ "Chilena","Otra"],
     razones: ["ninguna"],
-    empresas:[
-      {     
-        razon_social: '',
-        giro: '',
-        atencion: '',
-        departamento: '',
-        rut: '',
-        direccion: '',
-        comuna: '',
-        descripcion: '',
-      }
-    ],
+    empresas:[],
     contacto:{     
         id_contacto: 'test',
         razon_social: 'test',
@@ -324,7 +313,7 @@ export default {
     rut: '',
     direccion: '',
     comuna: '',
-
+    
     id_contacto: '',
     razon_social: '',
     correo: '',

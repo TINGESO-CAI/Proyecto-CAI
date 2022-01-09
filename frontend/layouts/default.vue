@@ -38,7 +38,7 @@
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
-						<v-list-item-title>Participantes</v-list-item-title>
+						<v-list-item-title>PARTICIPANTES</v-list-item-title>
 					</v-list-item-content>
 				</template>
 
@@ -64,7 +64,7 @@
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
-						<v-list-item-title>Relatores</v-list-item-title>
+						<v-list-item-title>RELATORES</v-list-item-title>
 					</v-list-item-content>
 				</template>
 
@@ -91,7 +91,7 @@
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
-						<v-list-item-title>Cursos</v-list-item-title>
+						<v-list-item-title>CURSOS</v-list-item-title>
 					</v-list-item-content>
 				</template>
 
@@ -118,7 +118,7 @@
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
-						<v-list-item-title>Empresas</v-list-item-title>
+						<v-list-item-title>EMPRESAS</v-list-item-title>
 					</v-list-item-content>
 				</template>
 
@@ -145,7 +145,7 @@
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
-						<v-list-item-title>Finanzas</v-list-item-title>
+						<v-list-item-title>FINANZAS</v-list-item-title>
 					</v-list-item-content>
 				</template>
 
@@ -171,7 +171,7 @@
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
-						<v-list-item-title>Administracion</v-list-item-title>
+						<v-list-item-title>ADMINISTRACION</v-list-item-title>
 					</v-list-item-content>
 				</template>
 

@@ -226,7 +226,7 @@ export default {
           let response = await axios.post('http://localhost:5000/contacto/agregar',newContacto);
           console.log('response', response.data);
           let id = response.data.id;
-          this.message = `${this.id_contacto} fue creado con éxito con id: ${id}`;
+          this.message = `El contacto de ${this.razon_social} fue creado con éxito con id: ${id}`;
           //limpiar
           this.correo=''
           this.fono=''
