@@ -6,12 +6,22 @@
               :headers="headers"
               :items="empresas"
               dense
+              :search="search"
             >
              <template v-slot:top>
       <v-toolbar
         flat
       >
         <v-toolbar-title> VISOR EMPRESAS</v-toolbar-title>
+        <v-spacer></v-spacer>
+          <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Busqueda"
+                single-line
+                hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
         <v-divider
           class="mx-4"
           inset
@@ -363,6 +373,7 @@ export default {
     busqueda: null,
     confirmarEliminarContacto:false,
     editar:false,
+    search:'',
     search2:'',
     page:1,
     contador:0,

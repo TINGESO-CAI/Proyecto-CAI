@@ -11,7 +11,7 @@
                 <v-text-field
                     v-model="sence"
                     :rules="senceRules"
-                    :counter="16"
+                    :counter="20"
                     label="codigo sence"
                     required
                 ></v-text-field>
@@ -20,10 +20,8 @@
                 <v-col>
                 <v-text-field
                     v-model="nombre"
-                    :rules="nombreRules"
                     :counter="20"
                     label="Nombre"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
@@ -56,28 +54,22 @@
                 <v-col>
                 <v-text-field
                     v-model="horas_curso"
-                    :rules="horas_cursoRules"
                     :counter="20"
                     label="horas_curso"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
                 <v-text-field
                     v-model="valor_efectivo_participante"
-                    :rules="valor_efectivo_participanteRules"
                     :counter="20"
                     label="Valor efec. participante"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
                 <v-text-field
                     v-model="valor_imputable_participante"
-                    :rules="valor_imputable_participanteRules"
                     :counter="20"
                     label="Valor imput. participante"
-                    required
                 ></v-text-field>
                 </v-col>
 
@@ -98,18 +90,14 @@
                 <v-text-field
                     v-model="f_vigencia"
                     :rules="f_vigenciaRules"
-                    :counter="20"
                     label="f_vigencia (YYYY-MM-DD)"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
                 <v-text-field
                     v-model="resolucion_sence"
                     :rules="resolucion_senceRules"
-                    :counter="20"
                     label="resolucion_sence"
-                    required
                 ></v-text-field>
                 </v-col>
 
@@ -117,9 +105,7 @@
                 <v-text-field
                     v-model="resolucion_usach"
                     :rules="resolucion_usachRules"
-                    :counter="15"
                     label="resolucion_usach"
-                    required
                 ></v-text-field>
                 </v-col>
               </v-row>

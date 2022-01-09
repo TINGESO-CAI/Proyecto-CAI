@@ -69,6 +69,7 @@
                     <v-text-field
                       v-model="editedItem.sence"
                       label="sence"
+                      readonly
                     ></v-text-field>
                   </v-col>
                 <!--hasta aqui-->
@@ -87,20 +88,28 @@
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
+                    <v-autocomplete
                       v-model="editedItem.modalidad"
-                      label="apellido paterno"
-                    ></v-text-field>
+                      :items="modalidades"
+                      label="modalidad"
+                      persistent-hint
+                      return-object
+                      single-line 
+                    ></v-autocomplete>
                   </v-col>
                   <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
+                    <v-autocomplete
                       v-model="editedItem.categoria"
-                      label="apellido materno"
-                    ></v-text-field>
+                      label="categoria"
+                      :items="categorias"
+                     persistent-hint
+                      return-object
+                      single-line 
+                    ></v-autocomplete>
                   </v-col>
                   <v-col
                     cols="12"
@@ -112,72 +121,72 @@
                       label="horas_curso"
                     ></v-text-field>
                   </v-col>
-                  <v-col
-                    cols="12"
+                <v-col cols="12"
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
-                      v-model="editedItem.correo_personal"
-                      label="correo_personal"
-                    ></v-text-field>
-                  </v-col>    
-                </v-row>
-                <v-row>
-                  
-          
-                  
-                  <v-col
-                    cols="12"
+                <v-text-field
+                    v-model="editedItem.valor_efectivo_participante"
+                    :counter="20"
+                    label="Valor efec. participante"
+                ></v-text-field>
+                </v-col>
+                <v-col cols="12"
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
-                      v-model="editedItem.fono_personal"
-                      label="fono_personal"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.valor_efectivo_participante"
-                      label="valor_efectivo_participante"
-                    ></v-text-field>
-                  </v-col>
-                   <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                  
-                    <v-text-field
-                      v-model="editedItem.resolucion_sence"
-                      label="resolucion_sence"
-                    >
-                    ></v-text-field>
+                <v-text-field
+                    v-model="editedItem.valor_imputable_participante"
+                    :counter="20"
+                    label="Valor imput. participante"
+                ></v-text-field>
+                </v-col>
 
-                  </v-col>
-                  
-                  <v-col
-                    cols="12"
+                <v-col cols="12"
                     sm="6"
                     md="4"
-                  ><v-autocomplete
-                      v-model="editedItem.valor_imputable_participante"
-                      :items="razones"
-                      dense
-                      item-text="valor_imputable_participante"
-                      label="valor_imputable_participante"
-                      persistent-hint
-                      return-object
-                      single-line
-                ></v-autocomplete>
-  
-                  </v-col>
-                </v-row>
+                  >
+                <v-select
+                    v-model="editedItem.estado"
+                    :items="estados"
+                    item-text="estado"
+                    label="estado"
+                    persistent-hint
+                    return-object
+                    single-line   
+                ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                <v-text-field
+                    v-model="editedItem.f_vigencia"
+                    label="f_vigencia (YYYY-MM-DD)"
+                ></v-text-field>
+                </v-col>
+                <v-col cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                <v-text-field
+                    v-model="editedItem.resolucion_sence"
+                    label="resolucion_sence"
+                ></v-text-field>
+                </v-col>
+
+                <v-col cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                <v-text-field
+                    v-model="editedItem.resolucion_usach"
+                    label="resolucion_usach"
+                ></v-text-field>
+                </v-col>
+              </v-row>
               </v-container>
             </v-card-text>
 
@@ -193,7 +202,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="editarcurso"
+                @click="editarCurso"
               >
                 Guardar
               </v-btn>
@@ -241,8 +250,13 @@ export default {
 
   data:()=>( {
     busqueda: null,
+    estados : ["activo","inactivo"],
+    modalidades: [ "presencial","e-learning","a distancia"],
+    categorias: [ "sincrono","asincrono","presencial"],
+    razones: ["ninguna"],
     search: '',
     headers: [
+      { text: 'Editar/Borrar', value: 'actions', sortable: false },
       {
         text: 'sence',
         align: 'start',
@@ -255,9 +269,12 @@ export default {
       { text: 'horas curso', value: 'horas_curso'},
       { text: 'valor efec', value: 'valor_efectivo_participante'},
       { text: 'valor imput', value: 'valor_imputable_participante'},
+      { text: 'estado', value: 'estado'},
+      { text: 'f_vigencia', value: 'f_vigencia'},
       { text: 'res_sence', value: 'resolucion_sence'},
+       { text: 'res_usach', value: 'resolucion_usach'},
 
-      { text: 'Editar/Borrar', value: 'actions', sortable: false },
+      
   
     ],
 
@@ -274,34 +291,26 @@ export default {
       nombre: '',
       modalidad: '',
       categoria: '',
-      resolucion_sence: '',
-      nivel_educacional: '',
-      fecha_nacimiento: '',
-      nacionalidad: '',
-      tipo_inscripcion: '',
-      ocupacion: '',
       horas_curso: '',
-      correo_personal: '',
-      fono_personal: '',
       valor_efectivo_participante: '',
-      valor_imputable_participante: ''
+      valor_imputable_participante: '',
+      estado: '',
+      f_vigencia: '',     
+      resolucion_sence: '',
+      resolucion_usach: '',
     },
     defaultItem: {
       sence: '',
       nombre: '',
       modalidad: '',
       categoria: '',
-      resolucion_sence: '',
-      nivel_educacional: '',
-      fecha_nacimiento: '',
-      nacionalidad: '',
-      tipo_inscripcion: '',
-      ocupacion: '',
       horas_curso: '',
-      correo_personal: '',
-      fono_personal: '',
       valor_efectivo_participante: '',
-      valor_imputable_participante: ''
+      valor_imputable_participante: '',
+      estado: '',
+      f_vigencia: '',     
+      resolucion_sence: '',
+      resolucion_usach: '',
     }, 
   }),
   //funciones para editar
@@ -319,10 +328,7 @@ export default {
     },
   },
   methods:{
-    forEach: async function(){
-
-    },
-    getcursos: async function(){
+    getCursos: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/curso/obtener?');
@@ -344,26 +350,23 @@ export default {
         return valor
       }
     },
-    editarcurso: async function(){
-      let newcurso ={
+    editarCurso: async function(){
+      let newCurso ={
         sence: this.editedItem.sence,
         nombre: this.transformarVacio(this.editedItem.nombre),
         modalidad: this.transformarVacio(this.editedItem.modalidad),
         categoria: this.transformarVacio(this.editedItem.categoria),
-        resolucion_sence: this.transformarVacio(this.resolucion_sence),
-        nivel_educacional: this.transformarVacio(this.editedItem.nivel_educacional),
-        fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
-        nacionalidad: this.transformarVacio(this.editedItem.nacionalidad),
-        tipo_inscripcion: this.transformarVacio(this.editedItem.tipo_inscripcion),
-        ocupacion: this.transformarVacio(this.editedItem.ocupacion),
         horas_curso: this.transformarVacio(this.editedItem.horas_curso),
-        correo_personal: this.transformarVacio(this.editedItem.correo_personal),
-        fono_personal: this.transformarVacio(this.editedItem.fono_personal),
         valor_efectivo_participante: this.transformarVacio(this.editedItem.valor_efectivo_participante),
-        valor_imputable_participante: this.transformarVacio(this.editedItem.valor_imputable_participante)
+        valor_imputable_participante: this.transformarVacio(this.editedItem.valor_imputable_participante),
+        estado: this.transformarVacio(this.editedItem.estado),
+        f_vigencia: this.transformarVacio(this.editedItem.f_vigencia),
+        resolucion_sence: this.transformarVacio(this.editedItem.resolucion_sence),
+        resolucion_usach: this.transformarVacio(this.editedItem.resolucion_usach),
       }
       try {
-        let response = await axios.put('http://localhost:5000/curso/editar?sence='+newcurso.sence,newcurso);
+        //FALTA LA QUERY!!!!!
+        let response = await axios.put('http://localhost:5000/curso/editar?sence='+newCurso.sence,newCurso);
         console.log(response);
         this.close();
 
@@ -375,17 +378,6 @@ export default {
         console.log('error', error);
       }
     },
-    async getRazones(){
-      try {
-        let response = await axios.get('http://localhost:5000/empresa/obtener/valor_imputable_participante');
-        this.razones = response.data;
-        console.log(response);
-      }
-      catch (error) {
-        console.log('error', error); 
-      }
-    },
-    
     editItem (item) {
         this.editedIndex = this.cursos.indexOf(item)
         this.editedItem = Object.assign({}, item)
@@ -433,8 +425,7 @@ export default {
     },
   },
   created(){
-    this.getcursos()
-    this.getRazones()
+    this.getCursos()
     //this.mostrarresolucion_sence(valor)
   }
 }
