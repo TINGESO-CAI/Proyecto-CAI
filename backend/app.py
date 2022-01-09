@@ -23,28 +23,18 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
-#from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_jwt_extended import JWTManager,jwt_required, create_access_token, get_jwt_identity
 
 # Configuracion de la app
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
-#app.config['SECRET_KEY'] = 'loginmaldito' # secretkey para el login
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = True # Para mostrar las query SQL
-app.config['JWT_SECRET_KEY'] = 'Super_Secret_JWT_KEY'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 db.init_app(app)
 
 ma = Marshmallow(app) # Para el uso de sqlalchemy
 migrate= Migrate(app,db) # Para el uso de los migrate
-
-# LOGIN
-jwt = JWTManager(app)
-#login_manager = LoginManager()
-#login_manager.init_app(app)
 
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
@@ -74,94 +64,6 @@ cuenta_schemas= mo.CuentaSchema(many=True)
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
-
-# Funcion encargada de registar una cuenta
-@app.route('/registrar', methods=['POST'])
-def registrar_cuenta():
-
-	# Request de los json
-	correo = request.json['correo']
-	contrasena = request.json['contrasena']
-	nombre = request.json['nombre']
-	apellido = request.json['apellido']
-	rut = request.json['rut']
-
-	# Se crea la instancia cuenta con los datos capturados
-	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut)
-
-	# Se agrega y se sube a la db
-	db.session.add(nueva_cuenta)
-	db.session.commit()
-
-	# Se realiza un "dump" de los schemas para moder "jsonifear"
-	resultado = cuenta_schema.dump(nueva_cuenta)
-
-	return jsonify(resultado)
-
-# Funcion que se encarga de cargar una cuenta
-#@login_manager.user_loader
-#def load_user(user_id):
-	# since the user_id is just the primary key of our user table, use it in the query for the user
-	#return mo.Cuenta.query.get(int(user_id))
-
-# Funcion respecto al login
-@app.route('/entrar', methods=['POST'])
-def entrar_cuenta():
-
-	# Request de los json
-	correo = request.json['correo']
-	contrasena = request.json['contrasena']
-
-	# Se instancia la clase Cuenta con el metodo de autenticar definido
-	usuario = mo.Cuenta.autenticar(correo,contrasena)
-
-	# En caso de que el usario no este en la db
-	if not usuario:
-		return jsonify({ 'message': 'Invalid credentials', 'authenticated': False }), 401
-
-	try:
-		# Se carga el usuario y se logea
-		#load_user(usuario.id)
-		#login_user(usuario)
-		access_token = create_access_token(identity=correo)
-		#return jsonify("El usuario de id "+str(usuario.id)+" se ha logeado")
-		return jsonify({'success': True, 'token': access_token}), 200
-	except Exception as e:
-		return jsonify(str(e))
-
-@app.route('/protected', methods=['GET'])
-@jwt_required()
-def protected():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
-
-# Funcion para el logout
-@app.route('/salir')
-#@login_required
-def salir_cuenta():
-	# comando para salirse
-	#logout_user()
-	return jsonify("deslogeaste jiji")
-
-# Funcion usada para las pruebas de login
-@app.route('/prueba')
-#@login_required
-def prueba():
-	return jsonify("FUNCIONA JIJI")
-
-@app.route('/cuenta/permisos',methods=["GET"])
-@jwt_required()
-def obtener_permisos():
-
-	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
-	permiso={
-		"nombre": cuenta.nombre + " " + cuenta.apellido,
-		"rut": cuenta.rut,
-		"correo": cuenta.correo,
-		"nivel_acceso": cuenta.nivel_acceso
-		}
-	
-	return jsonify(permiso)
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -772,6 +674,49 @@ def filtro_empresas():
 	
 	return jsonify(empresas_filtrados)
 
+# Funcion que se encarga de editar o actualizar una empresa
+@app.route("/empresa/editar",methods=["PUT"])
+def editar_empresa():
+
+	# Request de los json
+	# ej: /empresa/editar?razon_social=xxxx
+	razon_social_aux=request.args.get('razon_social')
+	# Captura la empresa
+	empresa = mo.Empresa.query.get(razon_social_aux) 
+	
+	# Nuevos datos
+	giro = request.json['giro']
+	atencion = request.json['atencion']
+	departamento = request.json['departamento']
+	rut = request.json['rut']
+	direccion = request.json['direccion']
+	comuna = request.json['comuna']
+
+	# Actualizacion
+	if giro != empresa.giro:
+		empresa.giro = giro
+	if atencion != empresa.atencion:
+		empresa.atencion = atencion
+	if departamento != empresa.departamento:
+		empresa.departamento = departamento
+	if rut != empresa.rut:
+		empresa.rut = rut
+	if direccion != empresa.direccion:
+		empresa.direccion = direccion
+	if comuna != empresa.comuna:
+		empresa.comuna = comuna
+	
+	try:
+		# Se agrega a la db
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	# Se crea el dump
+	resultado = empresa_schema.dump(empresa)
+
+	return jsonify(resultado)
+
 # Funcion que trae todas las razones sociales de las empresas
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
@@ -1191,7 +1136,8 @@ def crear_factura():
 	sence=request.json['sence']
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
-	fono_empresa=request.json['fono_empresa'] # Agregar en front
+	# fono_empresa=request.json['fono_empresa'] # Agregar en front
+	fono_empresa = 123123123
 	
 	# ----------- INFO GENERAL ---------------------------
 	
