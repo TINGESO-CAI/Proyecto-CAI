@@ -1013,6 +1013,38 @@ def eliminar_contacto():
 		return jsonify({"respuesta":msg}) 
 	except:
 		return jsonify({"respuesta":"El contacto a eliminar no existe"})
+@app.route("/contacto/editar",methods=["PUT"])
+def editar_instancia():
+
+	# Request de los json
+	# ej: /contacto/editar?id_contacto=xxxx
+	id_contacto_aux=request.args.get('id_contacto')
+	# Captura de contacto
+	contacto = mo.Contacto.query.get(id_contacto_aux) 
+	
+	# Nuevos datos
+	correo = request.json['correo']
+	fono = request.json['fono']
+	descripcion = request.json['descripcion']
+
+	# Actualizacion
+	if correo != contacto.correo:
+		contacto.correo = correo
+	if fono != contacto.fono:
+		contacto.fono = fono
+	if descripcion != contacto.descripcion:
+		contacto.descripcion =descripcion
+	
+	try:
+		# Se agrega a la db
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	# Se crea el dump
+	resultado = contacto_schema.dump(contacto)
+
+	return jsonify(resultado)
 
 # Funcion que obtiene todas las empresas con sus contacos pertinentes
 @app.route("/contacto/obtener_empresa",methods=["GET"])
