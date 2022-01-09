@@ -156,7 +156,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="save"
+                @click="editarEmpresa"
               >
                 Guardar
               </v-btn>
@@ -409,6 +409,8 @@ export default {
     descripcion: '',
 
     headers: [
+
+      { text: 'Contacto/Editar/Borrar', value: 'actions', sortable: false },
       { text: 'razon_social', value: 'razon_social', align: 'start',
         filterable: true},
       { text: 'giro', value: 'giro'},
@@ -417,15 +419,15 @@ export default {
       { text: 'rut', value: 'rut'},
       { text: 'direccion', value: 'direccion'},
       { text: 'comuna', value: 'comuna'},
-      { text: 'Contacto/Editar/Borrar', value: 'actions', sortable: false },
     ],
     headers2: [
+
+      { text: 'Editar/Borrar', value: 'action', sortable: false},
       { text: 'Id contacto', value: 'id_contacto', align: 'start',
         filterable: true},
       { text: 'Correo', value: 'correo'},
       { text: 'Fono', value: 'fono'},
       { text: 'Descripción', value: 'descripcion'},
-      { text: 'Editar', value: 'action', sortable: false},
     ],
     //datos para editar
     dialog: false,
@@ -495,9 +497,10 @@ export default {
         console.log(error)
       }
     },
-    editarContacto: async function(item){
+    editarEmpresa: async function(item){
+      console.log(item)
       let newEmpresa ={
-        razon_social: this.razon_social,
+        razon_social: this.editedItem.razon_social,
         giro: this.transformarVacio(this.editedItem.giro),
         atencion: this.transformarVacio(this.editedItem.atencion),
         departamento: this.transformarVacio(this.editedItem.departamento),
@@ -506,10 +509,11 @@ export default {
         comuna: this.transformarVacio(this.editedItem.comuna)
       }
       try{ 
-        let response = await axios.put('http://localhost:5000/contacto/editar?'+newEmpresa.rut,newEmpresa);
+        let response = await axios.put('http://localhost:5000/empresa/editar?razon_social='+newEmpresa.razon_social,newEmpresa);
         console.log(response);
         this.close();
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+        Object.assign(this.empresas[this.editedIndex], this.editedItem)
+        this.editar=false
       }
       catch(error){
         console.log(error)
@@ -535,7 +539,7 @@ export default {
     getContactos: async function(item){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/contacto/obtener?'+item.razon_social);
+        let response = await axios.get('http://localhost:5000/contacto/obtener?razon_social='+item.razon_social);
         this.contactos = response.data;
         console.log(response);
         return true
@@ -573,11 +577,23 @@ export default {
         this.editedIndex = -1
       })
     },
-    save () {
-      if (this.editedIndex > -1) {
-        Object.assign(this.empresas[this.editedIndex], this.editedItem)
-      } else {
-        this.empresas.push(this.editedItem)
+    editarContacto: async function () {
+      let newContacto ={
+        correo: this.transformarVacio(this.contactoEditar.correo),
+        fono: this.transformarVacio(this.contactoEditar.fono),
+        descripcion: this.transformarVacio(this.contactoEditar.descripcion),
+        razon_social: this.transformarVacio(this.razon_social)
+      }
+      try{ 
+        let response = await axios.put('http://localhost:5000/contacto/editar?id_contacto='+this.contactoEditar.id_contacto,newContacto);
+        console.log(response);
+        this.close();
+        Object.assign(this.contactos[this.editedIndex], this.editedItem)
+
+      }
+      catch(error){
+        console.log(error)
+        alert("ocurrio un error")
       }
       this.close()
     },

@@ -350,6 +350,7 @@ export default {
 			],
 			empresas:[
 			['Nueva empresa', 'mdi-account-multiple-plus','/nueva_empresa'],
+			['Nuevo Contacto', 'mdi-cellphone-basic', '/nuevo_contacto'],
 			['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
 			],
 			finanzas:[

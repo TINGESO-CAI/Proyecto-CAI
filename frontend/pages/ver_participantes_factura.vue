@@ -95,17 +95,50 @@
                       v-model="editedItem.apellido_paterno"
                       label="apellido paterno"
                     ></v-text-field>
-                  </v-col>  
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.apellido_materno"
+                      label="apellido materno"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.correo_corporativo"
+                      label="correo_corporativo"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.correo_personal"
+                      label="correo_personal"
+                    ></v-text-field>
+                  </v-col>    
                 </v-row>
                 <v-row>
+                  
+          
+                  
                   <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.correo"
-                      label="correo"
+                      v-model="editedItem.fono_personal"
+                      label="fono_personal"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -114,10 +147,31 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.fono"
-                      label="fono"
+                      v-model="editedItem.fono_corporativo"
+                      label="fono_corporativo"
                     ></v-text-field>
                   </v-col>
+                   <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                  
+                    <v-select
+                      v-model="editedItem.genero"
+                      :items="generos"
+                      dense
+                      item-text="genero"
+                      label="genero"
+                      persistent-hint
+                      return-object
+                      single-line   
+                      
+                    >
+                    </v-select>
+
+                  </v-col>
+                  
                   <v-col
                     cols="12"
                     sm="6"
@@ -269,8 +323,10 @@ export default {
       nacionalidad: '',
       tipo_inscripcion: '',
       ocupacion: '',
-      correo: '',
-      fono: '',
+      correo_corporativo: '',
+      correo_personal:'',
+      fono_corporativo: '',
+      fono_personal:'',
       razon_social: '',
     }, 
   }),
@@ -346,7 +402,7 @@ export default {
     mostrarGenero(valor){
       if (valor == '1' ) return 'femenino'
       else if (valor == '2' ) return 'masculino'
-      else return 'desconocido'
+      else return null
     },
     editItem (item) {
         this.editedIndex = this.participantes.indexOf(item)
@@ -376,13 +432,52 @@ export default {
         this.editedIndex = -1
       })
     },
-    save () {
-      if (this.editedIndex > -1) {
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
-      } else {
-        this.participantes.push(this.editedItem)
+
+    cambiarGenero(valor){
+      console.log(valor)
+      if (valor ==  'femenino') return '1'
+      else if (valor == 'masculino' ) return '2'
+      else return null
+    },
+
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
       }
-      this.close()
+      else{
+        return valor
+      }
+    },
+    save: async function() {
+      let newParticipante ={
+        rut: this.editedItem.rut,
+        nombre: this.transformarVacio(this.editedItem.nombre),
+        apellido_paterno: this.transformarVacio(this.editedItem.apellido_paterno),
+        apellido_materno: this.transformarVacio(this.editedItem.apellido_materno),
+        genero: this.transformarVacio(this.cambiarGenero(this.editedItem.genero)),
+        nivel_educacional: this.transformarVacio(this.editedItem.nivel_educacional),
+        fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
+        nacionalidad: this.transformarVacio(this.editedItem.nacionalidad),
+        tipo_inscripcion: this.transformarVacio(this.editedItem.tipo_inscripcion),
+        ocupacion: this.transformarVacio(this.editedItem.ocupacion),
+        correo_corporativo: this.transformarVacio(this.editedItem.correo_corporativo),
+        correo_personal: this.transformarVacio(this.editedItem.correo_personal),
+        fono_personal: this.transformarVacio(this.editedItem.fono_personal),
+        fono_corporativo: this.transformarVacio(this.editedItem.fono_corporativo),
+        razon_social: this.transformarVacio(this.editedItem.razon_social)
+      }
+      try {
+        let response = await axios.put('http://localhost:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
+        console.log(response);
+        this.close();
+
+        console.log(this.cambiarGenero(this.editedItem.genero),this.editedItem.genero)
+        this.editedItem.genero=this.cambiarGenero(this.editedItem.genero)
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+      }
+      catch (error) {
+        console.log('error', error);
+      }
     },
   },
   created(){
