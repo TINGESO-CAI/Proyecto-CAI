@@ -485,7 +485,62 @@ def obtener_sences_existente():
 	# se realiza el dump
 	cursos = curso_schemas.dump(cursos_con_inst)
 	return jsonify(cursos)
+# Funcion que se encarga de editar o actualizar una instancia
+@app.route("/curso/editar",methods=["PUT"])
+def editar_curso():
 
+	# Request de los json
+	# ej: /instacia/editar?id_instancia=xxxx
+	sence_aux=request.args.get('sence')
+	# Captura de instancia
+	curso = mo.Curso.query.get(sence_aux) 
+	
+	# Nuevos datos
+	sence = request.json['sence']
+	nombre = request.json['nombre']
+	modalidad = request.json['modalidad']
+	categoria = request.json['categoria']
+	horas_curso=request.json['horas_curso']
+	valor_efectivo_participante=request.json['valor_efectivo_participante']
+	valor_imputable_participante=request.json['valor_imputable_participante']
+	estado = request.json['estado']
+	f_vigencia = request.json['f_vigencia']
+	resolucion_sence=request.json['resolucion_sence']
+	resolucion_usach=request.json['resolucion_usach']
+	# Actualizacion
+	if sence != curso.sence:
+		curso.sence = sence
+	if nombre != curso.nombre:
+		curso.nombre = nombre
+	if modalidad != curso.modalidad:
+		curso.modalidad = modalidad
+	if categoria != curso.categoria:
+		curso.categoria = categoria
+	if horas_curso != curso.horas_curso:
+		curso.horas_curso = horas_curso
+	if valor_efectivo_participante != curso.valor_efectivo_participante:
+		curso.valor_efectivo_participante = valor_efectivo_participante
+	if valor_imputable_participante != curso.valor_imputable_participante:
+		curso.valor_imputable_participante = valor_imputable_participante
+	if estado != curso.estado:
+		curso.estado = estado
+	if f_vigencia != curso.f_vigencia:
+		curso.f_vigencia = f_vigencia
+	if resolucion_sence != curso.resolucion_sence:
+		curso.resolucion_sence = resolucion_sence
+	if resolucion_usach != curso.resolucion_usach:
+		curso.resolucion_usach = resolucion_usach
+	
+	try:
+		# Se agrega a la db
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	# Se crea el dump
+	resultado = curso_schema.dump(curso)
+
+	return jsonify(resultado)
 # Funcion que se usa para eliminar
 @app.route("/curso/eliminar",methods=["DELETE"])
 def eliminar_curso():
@@ -1014,7 +1069,7 @@ def eliminar_contacto():
 	except:
 		return jsonify({"respuesta":"El contacto a eliminar no existe"})
 @app.route("/contacto/editar",methods=["PUT"])
-def editar_instancia():
+def editar_contacto():
 
 	# Request de los json
 	# ej: /contacto/editar?id_contacto=xxxx
