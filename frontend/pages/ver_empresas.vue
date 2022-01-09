@@ -48,11 +48,88 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.id_empresa"
-                      label="id_empresa"
+                      v-model="editedItem.razon_social"
+                      label="razon_social"
+                      readonly
                     ></v-text-field>
                   </v-col>
                 <!--hasta aqui-->
+                <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.giro"
+                      label="giro"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.atencion"
+                      label="atencion"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <!--replicar desde aqui-->
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.rut"
+                      label="rut"
+                    ></v-text-field>
+                  </v-col>
+                <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-autocomplete
+                      v-model="editedItem.departamento"
+                      :items="departamentos"
+                      item-text="departamento"
+                      label="departamento"
+                      persistent-hint
+                      return-object
+                      single-line
+                ></v-autocomplete>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.direccion"
+                      label="direccion"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+
+                <v-row>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                  <v-autocomplete
+                      v-model="editedItem.comuna"
+                      :items="comunas"
+                      item-text="comuna"
+                      label="comuna"
+                      persistent-hint
+                      return-object
+                      single-line
+                ></v-autocomplete>
+                </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -344,30 +421,22 @@ export default {
     dialogDelete: false,
     editedIndex: -1,
     editedItem: {
-      id_empresa: 'test',
-      sence: 'test',
-      estado: 'test',
-      num_hes: 'test',
-      fecha_emision: 'test',
-      fecha_vencimiento: 'test',
-      enviar_empresa: 'test',
-      especificar: 'test',
-      num_orden: 'test',
-      observacion: 'test',
-      num_cai:'test'
+      razon_social: '',
+      giro: '',
+      atencion: '',
+      departamento: '',
+      rut: '',
+      direccion: '',
+      comuna: '',
     },
     defaultItem: {
-      id_empresa: 'test',
-      sence: 'test',
-      estado: 'test',
-      num_hes: 'test',
-      fecha_emision: 'test',
-      fecha_vencimiento: 'test',
-      enviar_empresa: 'test',
-      especificar: 'test',
-      num_orden: 'test',
-      observacion: 'test',
-      num_cai:'test'
+      razon_social: '',
+      giro: '',
+      atencion: '',
+      departamento: '',
+      rut: '',
+      direccion: '',
+      comuna: '',
     }, 
   }),
   //funciones para editar
@@ -416,8 +485,20 @@ export default {
       }
     },
     editarContacto: async function(item){
+      let newEmpresa ={
+        razon_social: this.razon_social,
+        giro: this.transformarVacio(this.editedItem.giro),
+        atencion: this.transformarVacio(this.editedItem.atencion),
+        departamento: this.transformarVacio(this.editedItem.departamento),
+        rut: this.transformarVacio(this.editedItem.rut),
+        direccion: this.transformarVacio(this.editedItem.direccion),
+        comuna: this.transformarVacio(this.editedItem.comuna)
+      }
       try{ 
-        //let response = await axios.put('http://localhost:5000/contacto/obtener?');
+        let response = await axios.put('http://localhost:5000/contacto/editar?'+newEmpresa.rut,newEmpresa);
+        console.log(response);
+        this.close();
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
       }
       catch(error){
         console.log(error)
