@@ -278,6 +278,15 @@ def eliminar_participante():
 		return jsonify({"respuesta":msg}) 
 	except:
 		return jsonify({"respuesta":"El usuario a eliminar no existe"})
+
+@app.route("/participante/obtener/independientes",methods=["GET"])
+def obtener_independientes():
+
+        participantes = db.session.query(mo.Participante).filter(mo.Participante.empresa==None)
+
+        resultado= participante_schemas.dump(participantes)
+
+        return jsonify(resultado)
  
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------CURSO------------------------------------------------------
@@ -728,50 +737,6 @@ def obtener_por_razon_social():
 	
 	return jsonify(empresa)
 
-# Funcion que se encarga de editar o actualizar una instancia
-@app.route("/empresa/editar",methods=["PUT"])
-def editar_empresa():
-
-	# Request de los json
-	# ej: /instacia/editar?razon_social=xxxx
-	razon_social_aux=request.args.get('razon_social')
-	# Captura de empresa
-	empresa = mo.empresa.query.get(razon_social_aux) 
-	
-	# Nuevos datos
-	giro = request.json['giro']	
-	atencion = request.json['atencion']
-	departamento = request.json['departamento']
-	rut = request.json['rut']
-	direccion = request.json['direccion']
-	direccion = request.json['direccion']
-	comuna = request.json['comuna']
-	
-
-	# Actualizacion
-	if giro != empresa.giro:
-		empresa.giro = giro
-	if atencion != empresa.atencion:
-		empresa.atencion = atencion
-	if departamento != empresa.departamento:
-		empresa.departamento = departamento
-	if rut != empresa.rut:
-		empresa.rut = rut
-	if direccion != empresa.direccion:
-		empresa.direccion = direccion	
-	if comuna != empresa.comuna:
-		empresa.comuna = comuna
-	
-	try:
-		# Se agrega a la db
-		db.session.commit() 
-	except:
-		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
-	
-	# Se crea el dump
-	resultado = empresa_schema.dump(empresa)
-
-	return jsonify(resultado)
 # Funcion que elimina una empresa
 @app.route("/empresa/eliminar",methods=["DELETE"])
 def eliminar_empresa():
