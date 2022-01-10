@@ -14,10 +14,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy.orm import query
 import sqlalchemy.orm.exc
-import json
 from docxtpl import DocxTemplate
 from datetime import datetime
-
 from sqlalchemy.sql import text
 from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
@@ -1194,7 +1192,7 @@ def crear_factura():
 		return jsonify({"respuesta":"La solicitud de factura ya ha sido ingresada o hay un problema con ella"})
 	
 	# PARA EL FORMULARIO DEL WORD
-	tpl=DocxTemplate("backend/db/data/FORMULARIO_No_4_solicitud_de_factura.docx")
+	tpl=DocxTemplate("db/data/FORMULARIO_No_4_solicitud_de_factura.docx")
 	# Se define el estado
 	if estado == 0:
 		estado="cerrado"
@@ -1233,7 +1231,7 @@ def crear_factura():
 		"observacion":observacion
 	}
 	tpl.render(parametros)
-	tpl.save("backend/db/facturas_generadas/%s.docx"%num_factura)
+	tpl.save("db/facturas_generadas/%s.docx"%num_factura)
 
 	for rut in lista_rut:
 		participante = mo.Participante.query.get(rut)

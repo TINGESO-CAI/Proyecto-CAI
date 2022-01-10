@@ -1,0 +1,57 @@
+version: '3.7'
+
+services:
+  back:
+    build:
+      context: ./backend
+      dockerfile: dockerFlask
+    volumes:
+      - './backend:/usr/src/backend'
+    ports:
+      - 5002:5000
+    environment:
+      - FLASK_CONFIG=development
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@tutorial-db:5432/dev_db
+      - DATABASE_TEST_URL=postgres://postgres:postgres@tutorial-db:5432/test_db
+      - SECRET_KEY=ZQbn05PDeA7v11
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./backend/db/database
+      dockerfile: dockerPostgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: dockerNginx
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - back
+      - front
+
+  front:
+    build:
+      context: ./frontend
+      dockerfile: dockerNuxt
+    volumes:
+      - './frontend:/usr/src/frontend'
+      - '/usr/src/frontend/node_modules'
+    ports:
+      - 8081:8081
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_SERVICE_URL=http://localhost:8081
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - back
