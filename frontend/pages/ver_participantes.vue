@@ -242,7 +242,16 @@
                   single-line
                 ></v-select>
                 </v-col>
+                <v-col cols="12"
+                    sm="6"
+                    md="4" >
 
+                <v-text-field
+                    v-model="editedItem.fecha_nacimiento"
+                    label="fecha_nacimiento <YYYY-MM-DD>"
+                    
+                ></v-text-field>
+                </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -327,13 +336,15 @@ export default {
       { text: 'fono corporativo', value: 'fono_corporativo'},
       { text: 'razon_social', value: 'razon_social'},
       { text: 'nacionalidad', value: 'nacionalidad'},
-      { text: 'tipo_inscripcion', value: 'tipo_inscripcion'},
+      { text: 'fecha_nacimiento', value: 'fecha_nacimiento'},
+      
       { text: 'correo_personal', value: 'correo_personal'},
       { text: 'fono_personal', value: 'fono_personal'},
       { text: 'ocupacion', value: 'ocupacion'},
       { text: 'nivel_educacional', value: 'nivel_educacional'},
-      { text: 'fecha_nacimiento', value: 'fecha_nacimiento'},
       { text: 'genero', value: 'genero'},
+      { text: 'tipo_inscripcion', value: 'tipo_inscripcion'},
+      
       
 
       

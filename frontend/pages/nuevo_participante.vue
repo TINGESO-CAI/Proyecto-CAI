@@ -20,7 +20,6 @@
                 <v-col>
                 <v-text-field
                     v-model="nombre"
-                    :rules="nombreRules"
                     :counter="20"
                     label="Nombre"
                     
@@ -30,7 +29,6 @@
                 <v-col>
                 <v-text-field
                     v-model="apellido_paterno"
-                    :rules="apellido_paternoRules"
                     :counter="20"
                     label="Apellido paterno"
                     
@@ -41,7 +39,6 @@
                 <v-col>
                 <v-text-field
                     v-model="apellido_materno"
-                    :rules="apellido_maternoRules"
                     :counter="20"
                     label="Apellido materno"
                     
@@ -77,9 +74,8 @@
                 <v-col>
                 <v-text-field
                     v-model="fecha_nacimiento"
-                    :rules="fecha_nacimientoRules"
                     :counter="20"
-                    label="fecha_nacimiento"
+                    label="fecha_nacimiento <YYYY-MM-DD>"
                     
                 ></v-text-field>
                 </v-col>
