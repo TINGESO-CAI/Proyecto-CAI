@@ -90,6 +90,7 @@ import axios from 'axios';
 export default {
   data:()=>( {
     busqueda: null,
+    estados:["abierto","cerrado"],
     headers1: [
       {
         text: 'Rut',
@@ -118,6 +119,7 @@ export default {
       { text: 'Malla', value: 'malla' },
       { text: 'Fecha inicio', value: 'fecha_inicio'},
       { text: 'Fecha termino', value: 'fecha_termino'},
+      { text: 'estado', value: 'estado'},
   
     ],
 		selectAll: false,

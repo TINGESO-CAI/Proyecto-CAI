@@ -142,20 +142,6 @@
                 ></v-text-field>
                 </v-col>
 
-                <v-col cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                <v-select
-                    v-model="editedItem.estado"
-                    :items="estados"
-                    item-text="estado"
-                    label="estado"
-                    persistent-hint
-                    return-object
-                    single-line   
-                ></v-select>
-                </v-col>
               </v-row>
               <v-row>
                 <v-col cols="12"
@@ -250,7 +236,6 @@ export default {
 
   data:()=>( {
     busqueda: null,
-    estados : ["activo","inactivo"],
     modalidades: [ "presencial","e-learning","a distancia"],
     categorias: [ "sincrono","asincrono","presencial"],
     razones: ["ninguna"],
@@ -269,7 +254,6 @@ export default {
       { text: 'horas curso', value: 'horas_curso'},
       { text: 'valor efec', value: 'valor_efectivo_participante'},
       { text: 'valor imput', value: 'valor_imputable_participante'},
-      { text: 'estado', value: 'estado'},
       { text: 'f_vigencia', value: 'f_vigencia'},
       { text: 'res_sence', value: 'resolucion_sence'},
        { text: 'res_usach', value: 'resolucion_usach'},
@@ -294,7 +278,6 @@ export default {
       horas_curso: '',
       valor_efectivo_participante: '',
       valor_imputable_participante: '',
-      estado: '',
       f_vigencia: '',     
       resolucion_sence: '',
       resolucion_usach: '',
@@ -307,7 +290,6 @@ export default {
       horas_curso: '',
       valor_efectivo_participante: '',
       valor_imputable_participante: '',
-      estado: '',
       f_vigencia: '',     
       resolucion_sence: '',
       resolucion_usach: '',
@@ -359,7 +341,6 @@ export default {
         horas_curso: this.transformarVacio(this.editedItem.horas_curso),
         valor_efectivo_participante: this.transformarVacio(this.editedItem.valor_efectivo_participante),
         valor_imputable_participante: this.transformarVacio(this.editedItem.valor_imputable_participante),
-        estado: this.transformarVacio(this.editedItem.estado),
         f_vigencia: this.transformarVacio(this.editedItem.f_vigencia),
         resolucion_sence: this.transformarVacio(this.editedItem.resolucion_sence),
         resolucion_usach: this.transformarVacio(this.editedItem.resolucion_usach),

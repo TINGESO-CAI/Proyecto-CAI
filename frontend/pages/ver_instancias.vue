@@ -97,7 +97,21 @@
                       label="Fecha termino"
                     ></v-text-field>
                   </v-col>
-                  
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-autocomplete
+                      v-model="editedItem.estado"
+                      :items="estados"
+                      label="estado"
+                      item-text="estado"
+                      persistent-hint
+                      return-object
+                      single-line   
+                    ></v-autocomplete>
+                  </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -161,8 +175,10 @@ import axios from 'axios';
 export default {
 
   data:()=>( {
+    estados:["abierto","cerrado"],
     busqueda: null,
     headers: [
+      { text: 'Editar/Borrar', value: 'actions', sortable: false },
       {
         text: 'Id instancia',
         align: 'start',
@@ -174,42 +190,37 @@ export default {
       { text: 'Malla', value: 'malla' },
       { text: 'Fecha inicio', value: 'fecha_inicio'},
       { text: 'Fecha termino', value: 'fecha_termino'},
-
-      { text: 'Editar/Borrar', value: 'actions', sortable: false },
-  
+      { text: 'estado', value: 'estado'},
     ],
 
     instancias:[],
-
-    rut: null,
-    nombre: null,
-    apellido_paterno: null,
-    apellido_materno: null,
-    genero: null,
-    nivel_educacional: null,
-    fecha_nacimiento: null,
-    nacionalidad: null,
-    tipo_inscripcion: null,
-    ocupacion: null,
-    correo: null,
-    fono: null,
-    razon_social: null,
-
     //datos para editar
     dialog: false,
     dialogDelete: false,
     editedIndex: -1,
     editedItem: {
-      id_instancia:''
+      id_instancia:'',
+      sence:'',
+      direccion:'',
+      malla:'',
+      fecha_inicio:'',
+      fecha_termino:'',
+      estado:'',
     },
     defaultItem: {
-      id_instancia:''
+      id_instancia:'',
+      sence:'',
+      direccion:'',
+      malla:'',
+      fecha_inicio:'',
+      fecha_termino:'',
+      estado:'',
     }, 
   }),
   //funciones para editar
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'Nueva participante' : 'Editar participante'
+      return this.editedIndex === -1 ? 'Nueva instancia' : 'Editar instancia'
     },
   },
   watch: {
@@ -288,14 +299,15 @@ export default {
             malla:this.editedItem.malla,
             direccion: this.editedItem.direccion,
             fecha_termino:this.editedItem.fecha_termino,
-            fecha_inicio:this.editedItem.fecha_inicio
+            fecha_inicio:this.editedItem.fecha_inicio,
+            estado:this.editedItem.estado
           })
         }
         catch(error){
           console.log(error)
         }
       } else {
-        this.participantes.push(this.editedItem)
+        this.instancias.push(this.editedItem)
       }
       this.close()
     },

@@ -11,7 +11,6 @@
                 <v-col>
                 <v-text-field
                     v-model="razon_social"
-                    :rules="razon_socialRules"
                     :counter="20"
                     label="razon_social"
                     required
@@ -21,31 +20,24 @@
                 <v-col>
                 <v-text-field
                     v-model="giro"
-                    :rules="giroRules"
                     :counter="20"
                     label="Giro"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
                 <v-text-field
                     v-model="atencion"
-                    :rules="atencionRules"
                     :counter="20"
                     label="Atencion"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
-                <v-autocomplete
+                <v-text-field
                       v-model="departamento"
-                      :items="departamentos"
+
                       item-text="departamento"
                       label="departamento"
-                      persistent-hint
-                      return-object
-                      single-line
-                ></v-autocomplete>
+                ></v-text-field>
                 </v-col>
               </v-row>
               <v-row>
@@ -53,10 +45,8 @@
                 <v-col>
                 <v-text-field
                     v-model="rut"
-                    :rules="rutRules"
                     :counter="16"
                     label="Rut"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
@@ -65,7 +55,6 @@
                     :rules="direccionRules"
                     :counter="20"
                     label="direccion"
-                    required
                 ></v-text-field>
                 </v-col>
                 <v-col>
@@ -105,7 +94,6 @@ export default {
   data:function(){
     return{
       contador:0,
-      departamentos : ["ingenieria","ciencias","humanidades"],
       nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
       paises: [ "Chilena","Otra"],
       razones: ["ninguna"],

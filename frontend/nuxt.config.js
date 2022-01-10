@@ -5,6 +5,7 @@ export default {
   ssr: false,
 
   server: {
+    //host: 'devtesting.ddns.net',
     port: 8081 // default: 3000
   },
 

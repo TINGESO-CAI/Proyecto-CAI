@@ -102,15 +102,11 @@
                     sm="6"
                     md="4"
                   >
-                    <v-autocomplete
+                    <v-text-field
                       v-model="editedItem.departamento"
-                      :items="departamentos"
                       item-text="departamento"
                       label="departamento"
-                      persistent-hint
-                      return-object
-                      single-line
-                ></v-autocomplete>
+                ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
@@ -401,7 +397,6 @@ export default {
     rut: '',
     direccion: '',
     comuna: '',
-    
     id_contacto: '',
     razon_social: '',
     correo: '',

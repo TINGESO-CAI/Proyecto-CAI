@@ -62,12 +62,6 @@
                 </v-col>
                 </v-row>
                 <v-row>
-                <v-col>
-                    <p class="font-weight-bold">Estado:</p>
-                </v-col>               
-                <v-col>
-                        {{curso[0].estado}}
-                </v-col>
                 
                 </v-row>
         </v-container>
@@ -111,6 +105,19 @@
                     label="Fecha de termino (YYYY-MM-DD)"
                     required
                 ></v-text-field>
+                </v-col>
+                <v-col>
+                <v-select
+                  v-model="estado"
+                  :items="estados"
+                  item-text="estado"
+                  label="estado"
+                  persistent-hint
+                  return-object
+                  single-line
+                ></v-select>
+                </v-col>
+                <v-col>
                 <v-btn  color="blue lighten-1" class="mr-4" @click="crearInstancia">Crear Instancia</v-btn>
                 </v-col>             
             </v-form>
@@ -139,6 +146,8 @@ export default {
     malla:'Malla',
     fecha_inicio:'',
     fecha_termino:'',
+    estado:'',
+    estados:["abierto","cerrado"],
     mostrarMalla:['Si','No']
   }),
   methods:{
@@ -184,6 +193,7 @@ export default {
           this.direccion=''
           this.fecha_inicio=''
           this.fecha_termino=''
+          this.estado=''
           this.curso=[]
         }
         catch(error){

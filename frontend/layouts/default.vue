@@ -221,13 +221,12 @@
 			<v-toolbar-title v-text="title" />
 			<v-spacer />
 			<v-switch
-			
+			fluid
 			color="secondary"
-				height="0"
 				v-model="$vuetify.theme.dark"
 				prepend-icon='mdi-brightness-4'
 			></v-switch>
-
+			<v-spacer />
 			<v-btn
 				icon
 				@click.stop="rightDrawer = !rightDrawer"

@@ -75,7 +75,6 @@
                   ,valor_imputable_participante: archivo[j][6].toString()
                   ,resolucion_sence:archivo[j][7].toString()
                   ,resolucion_usach: archivo[j][8].toString()
-                  ,estado: archivo[j][9]
                   ,f_vigencia: this.todate(archivo[j][10])}
                   let response=await axios.post('http://localhost:5000/curso/agregar',NewCurso)
                   }

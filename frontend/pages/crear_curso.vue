@@ -73,17 +73,6 @@
                 ></v-text-field>
                 </v-col>
 
-                <v-col>
-                <v-select
-                    v-model="estado"
-                    :items="estados"
-                    item-text="estado"
-                    label="estado"
-                    persistent-hint
-                    return-object
-                    single-line   
-                ></v-select>
-                </v-col>
               </v-row>
               <v-row>
                 <v-col>
@@ -127,7 +116,6 @@ export default {
   name: 'Home',
   data:function(){
     return{
-      estados : ["activo","inactivo"],
       nivelesEdu : ["básica incompleta","básica completa","media incompleta","media completa","técnico profesional","superior completa","desconocido","otro"],
       paises: [ "Chilena","Extranjera"],
       modalidades: [ "presencial","e-learning","a distancia"],
@@ -144,7 +132,6 @@ export default {
       horas_curso: '',
       valor_efectivo_participante: '',
       valor_imputable_participante: '',
-      estado: '',
       f_vigencia: '',     
       resolucion_sence: '',
       resolucion_usach: '',
@@ -219,7 +206,6 @@ export default {
         valor_imputable_participante: this.transformarVacio(this.valor_imputable_participante),
         resolucion_sence: this.transformarVacio(this.resolucion_sence),
         resolucion_usach: this.transformarVacio(this.resolucion_usach),
-        estado: this.transformarVacio(this.estado),
         f_vigencia: this.transformarVacio(this.f_vigencia)
       }
       if(this.sence!=''){
@@ -239,7 +225,6 @@ export default {
             this.horas_curso= ''
             this.valor_efectivo_participante= ''
             this.valor_imputable_participante= ''
-            this.estado= ''
             this.f_vigencia= ''
             this.resolucion_sence= ''
             this.resolucion_usach= ''
