@@ -162,6 +162,13 @@
                 </v-col>
                 <v-col>
                 <v-text-field
+                    v-model="numeroRegistro"
+                    label="Numero registro"
+                    required
+                ></v-text-field>
+                </v-col>
+                <v-col>
+                <v-text-field
                     v-model="num_hes"
                     label="Numero hes"
                     required
@@ -209,7 +216,7 @@
                     label="observación"
                     required
                 ></v-text-field>
-                </v-col> 
+                </v-col>
                 <v-row>
                 <v-col>
                 <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
@@ -257,6 +264,8 @@ import axios from 'axios';
 export default {
   data:()=>( {
     page:1,
+    estado:'',
+    numeroRegistro:'',
     curso:[],
     sence:'',
     otic:'',
@@ -360,6 +369,30 @@ export default {
         return valor
       }
     },
+    transformarVacio: function(valor){
+      if(valor==''){
+        return null
+      }
+      else{
+        return valor
+      }
+    },
+    comprobarFecha:function(fecha){
+      if (fecha.split('-').length == 3){
+        return true
+      }
+      else{
+        return false
+      }
+    },
+    transformarEstado(){
+      if (this.estado==''){
+        return null
+      }
+      else{
+        return parseInt(this.estado)
+      }
+    },
     generarFactura: async function(){
       if (this.participantesFactura.length==0){
         alert("Debe seleccionar almenos un participante.")
@@ -368,18 +401,18 @@ export default {
         try{
           let response= await axios.post('http://localhost:5000/factura/agregar',
           {
-            num_registro: '1'
-            ,estado: 0
-            ,num_hes: this.num_hes
+            num_registro: this.transformarVacio(this.numeroRegistro)
+            ,estado: null //this.transformarEstado()
+            ,num_hes: this.transformarVacio(this.num_hes)
             ,fecha_emision: '10/12/2021'
             ,fecha_vencimiento: '21/12/2021'
-            ,sence: this.curso[0].sence
-            ,id_instancia: this.instancia[0].id_instancia
-            ,razon_social: this.razon_social.razon_social
+            ,sence: this.transformarVacio(this.curso[0].sence)
+            ,id_instancia: this.transformarVacio(this.instancia[0].id_instancia)
+            ,razon_social: this.transformarVacio(this.razon_social)
             ,enviar_factura: parseInt(this.enviar)
-            ,especificar: this.especificar
-            ,num_orden:this.num_orden
-            ,obs:this.observacion
+            ,especificar: this.transformarVacio(this.especificar)
+            ,num_orden:this.transformarVacio(this.num_orden)
+            ,obs:this.transformarVacio(this.observacion)
             ,participantes:this.onlyRut()
           })
           window.location.href='http://localhost:5000/factura/descargar/'+response.data.id_factura.toString()
@@ -407,6 +440,7 @@ export default {
         catch(error){
           console.log(error)
           alert("ocurrio un error")
+          console.log(this.razon_social)
         }
       }
     },
@@ -426,7 +460,15 @@ export default {
         }
         else{
           this.razon_social=''
-          
+          let response= await axios.get('http://localhost:5000/participante/obtener/independientes')
+          this.participantes=response.data          
+          if(this.participantes.length==0){
+            alert("No existen participantes independientes.")
+            this.razon_social=''
+          }
+          else{
+            this.page=4
+          }
         }
 
       }

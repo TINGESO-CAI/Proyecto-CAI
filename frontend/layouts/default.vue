@@ -353,9 +353,9 @@ export default {
 			['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
 			],
 			finanzas:[
-			['Generar Factura','mdi-file-plus','/factura'],
-			['Ver facturas','mdi-format-list-bulleted-type','/ver_facturas'],
-			['Filtrar facturas','mdi-book-open-page-variant','/filtrar_facturas'],
+			['Generar S. Factura','mdi-file-plus','/factura'],
+			['Ver S. facturas','mdi-format-list-bulleted-type','/ver_facturas'],
+			['Filtrar S. facturas','mdi-book-open-page-variant','/filtrar_facturas'],
 			['Ver participantes','mdi-account-multiple','/ver_participantes_factura'],
 			
 			],

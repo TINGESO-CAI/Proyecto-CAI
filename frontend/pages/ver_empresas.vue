@@ -228,7 +228,7 @@
                 class="test2"
 
               >
-        <v-toolbar-title> Ver contactos de {{razon_social}} (Para editar haga click en la fila del contacto)</v-toolbar-title>
+        <v-toolbar-title> Ver contactos de {{razon_social}} </v-toolbar-title>
             <v-spacer></v-spacer>
           <v-text-field
                 v-model="search2"
@@ -573,6 +573,7 @@ export default {
       })
     },
     editarContacto: async function () {
+      console.log((this.contactoEditar))
       let newContacto ={
         correo: this.transformarVacio(this.contactoEditar.correo),
         fono: this.transformarVacio(this.contactoEditar.fono),
@@ -582,15 +583,13 @@ export default {
       try{ 
         let response = await axios.put('http://localhost:5000/contacto/editar?id_contacto='+this.contactoEditar.id_contacto,newContacto);
         console.log(response);
-        this.close();
-        Object.assign(this.contactos[this.editedIndex], this.editedItem)
 
       }
       catch(error){
         console.log(error)
         alert("ocurrio un error")
       }
-      this.close()
+      this.editar=false
     },
     volver(){
       this.page=1

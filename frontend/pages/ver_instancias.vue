@@ -1,5 +1,6 @@
 <template>
     <v-container class="test" >
+      <div v-if="page==1">
         <v-card>
             <v-data-table
               :headers="headers"
@@ -158,6 +159,12 @@
       </v-icon>
       <v-icon
         small
+        @click="detalles(item)"
+      >
+        mdi-shape-square-plus
+      </v-icon>
+      <v-icon
+        small
         @click="deleteItem(item)"
       >
         mdi-delete
@@ -165,6 +172,159 @@
     </template>
             </v-data-table>
           </v-card>
+          </div>
+          <div v-else-if="page==2">
+          <v-card>
+          <v-data-table
+              :headers="headers2"
+              :items="relatores"
+              :search="search2"
+              dense
+            >
+              <template v-slot:[`item.genero`]="{ item }">
+                <span>{{ mostrarGenero(item.genero) }}</span>
+              </template>
+              <template v-slot:[`item.action`]="{item }">
+                    <v-icon
+                      small
+                      class="mr-2"
+                      @click="permitirEditar(item)"
+                    >
+                      mdi-pencil
+                    </v-icon>
+                    <v-icon
+                      small
+                      @click="verBorrarContacto(item)"
+                    >
+                      mdi-delete
+                    </v-icon> 
+              </template>
+
+              <template v-slot:top>
+                <v-toolbar
+                flat
+                class="test2"
+
+              >
+        <v-toolbar-title> Ver relatores de la instancia {{instancia.id_instancia}} </v-toolbar-title>
+            <v-spacer></v-spacer>
+          <v-text-field
+                v-model="search2"
+                append-icon="mdi-magnify"
+                label="Busqueda"
+                single-line
+                hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+                </v-toolbar>
+              </template>
+          </v-data-table>
+          </v-card>       
+          <br>
+          <v-card>
+          <v-data-table
+              :headers="headers3"
+              :items="participantes"
+              :search="search3"
+              dense
+            >
+
+              <template v-slot:[`item.genero`]="{ item }">
+                <span>{{ mostrarGenero(item.genero) }}</span>
+              </template>
+
+              <template v-slot:[`item.emitidaS`]="{item }">
+                    <v-icon
+                      v-if="item.emitirS"
+                      class="mr-2"
+                      color="green darken-2"
+                      @click="confirmacion(1)"
+                    >
+                      mdi-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.emitirS==false"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(1)"
+                    >
+                      mdi-circle
+                    </v-icon>
+              </template>
+              <template v-slot:[`item.emitidasF`]="{item }">
+                    <v-icon
+                      v-if="item.emitirF"
+                      class="mr-2"
+                      color="green darken-2"
+                      @click="confirmacion(2)"
+                    >
+                      mdi-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.emitirF==false"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(2)"
+                    >
+                      mdi-circle
+                    </v-icon>
+              </template>
+              <template v-slot:[`item.facturasP`]="{item }">
+                    <v-icon
+                      v-if="item.facturaPagada"
+                      class="mr-2"
+                      color="green darken-2"
+                      @click="confirmacion(3)"
+                    >
+                      mdi-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.facturaPagada==false"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(3)"
+                    >
+                      mdi-circle
+                    </v-icon>
+              </template>
+
+              <template v-slot:top>
+                <v-toolbar
+                flat
+                class="test2"
+
+              >
+        <v-toolbar-title> Ver participantes de la instancia {{instancia.id_instancia}} </v-toolbar-title>
+            <v-spacer></v-spacer>
+          <v-text-field
+                v-model="search3"
+                append-icon="mdi-magnify"
+                label="Busqueda"
+                single-line
+                hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+                </v-toolbar>
+              </template>
+          </v-data-table>
+          </v-card>   
+          
+            <v-btn  color="blue lighten-1" class="mr-3" @click="volver">Ver instancias</v-btn>        
+        </div>
+        <v-dialog v-model="cambiarEstado" max-width="500px">
+          <v-card>
+            <v-card-title class="text-h5">¿Quiere cambiar el estado de esto?</v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="cerrar">Cancelar</v-btn>
+              <v-btn color="blue darken-1" text @click="confirmarCambiarEstado">OK</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -177,8 +337,13 @@ export default {
   data:()=>( {
     estados:["abierto","cerrado"],
     busqueda: null,
+    search2:'',
+    search3:'',
+    page:1,
+    instanciaEditar:{},
+    cambiarEstado:false,
     headers: [
-      { text: 'Editar/Borrar', value: 'actions', sortable: false },
+      { text: 'Editar/Detalles/Borrar', value: 'actions', sortable: false },
       {
         text: 'Id instancia',
         align: 'start',
@@ -189,11 +354,71 @@ export default {
       { text: 'Dirección', value: 'direccion'},
       { text: 'Malla', value: 'malla' },
       { text: 'Fecha inicio', value: 'fecha_inicio'},
-      { text: 'Fecha termino', value: 'fecha_termino'},
+      { text: 'Fecha termino', value: 'fecha_termino'},  
       { text: 'estado', value: 'estado'},
+    ],
+    headers2: [
+      {
+        text: 'Rut',
+        align: 'start',
+        filterable: true,
+        value: 'rut',
+      },
+      { text: 'Nombre', value: 'nombre' },
+      { text: 'Apellido_paterno', value: 'apellido_paterno'},
+      { text: 'Apellido_materno', value: 'apellido_materno' },
+      { text: 'Titulo', value: 'titulo'},
+      { text: 'Numero cuenta', value: 'numero_cuenta'},
+      { text: 'Banco', value: 'banco'},
+      { text: 'Tipo cuenta', value: 'tipo_cuenta'},
+      { text: 'numero_cuenta', value: 'numero_cuenta'},
+      { text: 'correo corporativo', value: 'correo_corporativo'},
+      { text: 'fono corporativo', value: 'fono_corporativo'},
+      { text: 'correo_personal', value: 'correo_personal'},
+      { text: 'fono_personal', value: 'fono_personal'},
+      { text: 'fecha_nacimiento', value: 'fecha_nacimiento'},
+      { text: 'genero', value: 'genero'},
+      { text: 'CV', value: 'cv'},
+    ],
+    headers3: [
+      { text: 'Solicitud emitida', value: 'emitidaS', sortable: false, align: 'center' },
+      { text: 'Factura emitida', value: 'emitidasF', sortable: false, align: 'center' },
+      { text: 'Factura pagada', value: 'facturasP', sortable: false, align: 'center' },
+      { text: 'Rut', value: 'rut' },
+      { text: 'nombre', value: 'nombre' },
+      { text: 'apellido_paterno', value: 'apellido_paterno'},
+      { text: 'apellido_materno', value: 'apellido_materno' },
+      { text: 'correo corporativo', value: 'correo_corporativo'},
+      { text: 'fono corporativo', value: 'fono_corporativo'},
+      { text: 'razon_social', value: 'razon_social'},
+      { text: 'nacionalidad', value: 'nacionalidad'},
+      { text: 'tipo_inscripcion', value: 'tipo_inscripcion'},
+      { text: 'correo_personal', value: 'correo_personal'},
+      { text: 'fono_personal', value: 'fono_personal'},
+      { text: 'ocupacion', value: 'ocupacion'},
+      { text: 'nivel_educacional', value: 'nivel_educacional'},
+      { text: 'fecha_nacimiento', value: 'fecha_nacimiento'},
+      { text: 'genero', value: 'genero'},
     ],
 
     instancias:[],
+
+    rut: null,
+    nombre: null,
+    apellido_paterno: null,
+    apellido_materno: null,
+    genero: null,
+    nivel_educacional: null,
+    fecha_nacimiento: null,
+    nacionalidad: null,
+    tipo_inscripcion: null,
+    ocupacion: null,
+    correo: null,
+    fono: null,
+    razon_social: null,
+    instancia:{},
+    participantes:[{genero:1,emitirS:false, emitirF:false, facturaPagada:true}],
+    relatores:[{genero:1}],
     //datos para editar
     dialog: false,
     dialogDelete: false,
@@ -235,6 +460,11 @@ export default {
     forEach: async function(){
 
     },
+    mostrarGenero(valor){
+      if (valor == '1' ) return 'femenino'
+      else if (valor == '2' ) return 'masculino'
+      else return null
+    },
     getInstancias: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
@@ -247,6 +477,9 @@ export default {
       catch (error) {
         console.log('error', error); 
       }
+    },
+    volver(){
+      this.page=1
     },
     mostrarMalla(valor){
       if (valor == true ) return 'SI'
@@ -288,6 +521,54 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
       })
+    },
+    detalles: async function(item){
+      console.log(item)
+      this.instancia=item
+      this.page=2
+    },
+    cerrar(){
+      this.cambiarEstado=false
+    },
+    confirmacion(item){
+      this.token=item
+      this.cambiarEstado=true
+    },
+    confirmarCambiarEstado(){
+      if(this.token==1){
+        this.cambiarEmisionSolicitud()
+      }
+      else if(this.token==2){
+        this.cambiarEmisionFactura()
+      }
+      else{
+        this.cambiarFacturaPagada()
+      }
+      this.cerrar()
+    },
+    cambiarEmisionSolicitud(){
+      if(this.participantes[0].emitirS){
+        this.participantes[0].emitirS=false
+      }
+      else{
+        this.participantes[0].emitirS=true
+      }
+    },
+    cambiarEmisionFactura(){
+     if(this.participantes[0].emitirF){
+        this.participantes[0].emitirF=false
+      }
+      else{
+        this.participantes[0].emitirF=true
+      }
+    },
+    cambiarFacturaPagada(){
+     if(this.participantes[0].facturaPagada){
+        this.participantes[0].facturaPagada=false
+      }
+      else{
+        this.participantes[0].facturaPagada=true
+      }
     },
     save: async function() {
       if (this.editedIndex > -1) {
