@@ -23,7 +23,6 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
-
 # Configuracion de la app
 db= mo.objeto_db()
 app= Flask(__name__)
@@ -64,6 +63,8 @@ cuenta_schemas= mo.CuentaSchema(many=True)
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+
+
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -626,21 +627,41 @@ def obtener_todo(id_instancia):
 	alumnos = instancia.alumnos
 
 	resultado = []
-	for i in alumnos:
-		for f in i.facturas:
-			if  f.id_instancia == int(id_instancia):
-				if not (i in resultado):
-					resultado.append(i)
-			
+	participantes_facturados=[]
 	alumnos_no_fact = []
 	for i in alumnos:
-		if i not in resultado:
+		factura = {} #[[f,[a,a,a]	, 	[f2,[a2,a2,a2,a2]] , [f,[i]] ]
+		flag2=0
+		for f in i.facturas:
+			
+			if f.id_instancia == int(id_instancia):
+				j=0
+				flag=0
+				while j < len(participantes_facturados):
+					if participantes_facturados[j][0]==f:
+						posicion=j
+						flag=1
+						j=len(participantes_facturados)
+					j+=1
+				if flag==1:
+					participantes_facturados[posicion][1].append(i)
+				else:
+					participantes_facturados.append([f,[i]])
+				flag2=1
+		if flag2==0:
 			alumnos_no_fact.append(i)
-
+	
+	list_dict=[]
+	for i in participantes_facturados:
+		list_dict.append({"factura":factura_schema.dump(i[0]),"alumnos":participante_schemas.dump(i[1])})
+	print(participantes_facturados)	
+	
 	resultado={'relatores':relator_schemas.dump(profesores),
 	'participantes_nofacturados': participante_schemas.dump(alumnos_no_fact),
-	'participantes_facturados': participante_schemas.dump(resultado)}
+	'participantes_facturados': list_dict}
 	return jsonify(resultado)
+	
+	
 
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
