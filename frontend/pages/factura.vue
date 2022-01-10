@@ -275,7 +275,7 @@ export default {
     instancia:[],
     enviar:'',
     num_hes:'',
-    razon_social:'',
+    razon_social:{razon_social:''},
     razones: [],
     razonesV: [],
     participantes:[],
@@ -408,7 +408,7 @@ export default {
             ,fecha_vencimiento: '21/12/2021'
             ,sence: this.transformarVacio(this.curso[0].sence)
             ,id_instancia: this.transformarVacio(this.instancia[0].id_instancia)
-            ,razon_social: this.transformarVacio(this.razon_social)
+            ,razon_social: this.transformarVacio(this.razon_social.razon_social)
             ,enviar_factura: parseInt(this.enviar)
             ,especificar: this.transformarVacio(this.especificar)
             ,num_orden:this.transformarVacio(this.num_orden)
@@ -416,7 +416,9 @@ export default {
             ,participantes:this.onlyRut()
           })
           window.location.href='http://localhost:5000/factura/descargar/'+response.data.id_factura.toString()
+          this.$router.push('factura') 
           this.page=1
+          this.getSences()
           this.curso=[]
           this.sence=''
           this.otic=''
@@ -445,6 +447,7 @@ export default {
       }
     },
     continuarPage4: async function(){
+      console.log(this.razon_social.razon_social)
       if(this.enviar!=''){
         if(this.particular==false){
           let response= await axios.get('http://localhost:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
@@ -452,19 +455,19 @@ export default {
           console.log(this.razon_social.razon_social)
           if(this.participantes.length==0){
             alert("No existen participantes en esta instancia que tengan esta razon social.")
-            this.razon_social=''
+            this.razon_social.razon_social=''
           }
           else{
             this.page=4
           }
         }
         else{
-          this.razon_social=''
+          this.razon_social.razon_social=''
           let response= await axios.get('http://localhost:5000/participante/obtener/independientes')
           this.participantes=response.data          
           if(this.participantes.length==0){
             alert("No existen participantes independientes.")
-            this.razon_social=''
+            this.razon_social.razon_social=''
           }
           else{
             this.page=4
