@@ -30,7 +30,7 @@ app= Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
-app.config['SQLALCHEMY_ECHO'] = True # Para mostrar las query SQL
+app.config['SQLALCHEMY_ECHO'] = False # Para mostrar las query SQL
 db.init_app(app)
 
 ma = Marshmallow(app) # Para el uso de sqlalchemy
@@ -282,11 +282,11 @@ def eliminar_participante():
 @app.route("/participante/obtener/independientes",methods=["GET"])
 def obtener_independientes():
 
-        participantes = db.session.query(mo.Participante).filter(mo.Participante.empresa==None)
+		participantes = db.session.query(mo.Participante).filter(mo.Participante.empresa==None)
 
-        resultado= participante_schemas.dump(participantes)
+		resultado= participante_schemas.dump(participantes)
 
-        return jsonify(resultado)
+		return jsonify(resultado)
  
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------CURSO------------------------------------------------------
@@ -618,21 +618,29 @@ def obtener_ids():
 	return jsonify(instancias)
 
 # Funcion que obtiene
-@app.route("/instancia/obtener_todo",methods=["GET"])
+@app.route("/instancia/obtener_todo/<id_instancia>",methods=["GET"])
 def obtener_todo(id_instancia):
-    instancia = mo.Instancia.query.get(id_instancia)
-    profesores = instancia.profesores
-    alumnos = instancia.alumnos
+	
+	instancia = mo.Instancia.query.get(id_instancia)
+	profesores = instancia.profesores
+	alumnos = instancia.alumnos
 
-    resultado = []
-    for i in alumnos:
-        factura = i.facturas
-        for f in factura:
-            if  f.id_instancia == i.id_instancia:
-                if not i in resultado:
-                    resultado.append(i)
-    resultado={'relatores':relator_schemas.dump(profesores), 'participantes':participante_schema.dump(resultado)}
-    return jsonify(resultado)
+	resultado = []
+	for i in alumnos:
+		for f in i.facturas:
+			if  f.id_instancia == int(id_instancia):
+				if not (i in resultado):
+					resultado.append(i)
+			
+	alumnos_no_fact = []
+	for i in alumnos:
+		if i not in resultado:
+			alumnos_no_fact.append(i)
+
+	resultado={'relatores':relator_schemas.dump(profesores),
+	'participantes_nofacturados': participante_schemas.dump(alumnos_no_fact),
+	'participantes_facturados': participante_schemas.dump(resultado)}
+	return jsonify(resultado)
 
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
