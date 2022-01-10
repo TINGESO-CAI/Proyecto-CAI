@@ -87,12 +87,11 @@ class Curso(db.Model):
 	valor_imputable_participante = db.Column(db.Integer, nullable = True)
 	resolucion_sence = db.Column(db.Text, nullable = True)
 	resolucion_usach = db.Column(db.Text, nullable = True)
-	estado = db.Column(db.Text, nullable = True)
 	f_vigencia = db.Column(db.Date, nullable = True)
 	
 	instancias = db.relationship('Instancia', backref=db.backref("curso"))
 	
-	def __init__(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia):
+	def __init__(self,sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,f_vigencia):
 		self.sence = sence
 		self.nombre=nombre
 		self.modalidad=modalidad
@@ -102,19 +101,18 @@ class Curso(db.Model):
 		self.valor_imputable_participante=valor_imputable_participante
 		self.resolucion_sence=resolucion_sence
 		self.resolucion_usach=resolucion_usach
-		self.estado=estado
 		self.f_vigencia=f_vigencia
 
 class CursoSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('sence','nombre',
 		'modalidad','categoria','horas_curso','valor_efectivo_participante','valor_imputable_participante',
-		'resolucion_sence','resolucion_usach','estado','f_vigencia')
+		'resolucion_sence','resolucion_usach','f_vigencia')
 
 class Empresa(db.Model):
 	__tablename__ = 'empresa'
 
-	razon_social = db.Column(db.Text, primary_key=True, nullable = True)
+	razon_social = db.Column(db.Text, primary_key=True, nullable = False)
 	giro = db.Column(db.Text, nullable = True)
 	atencion = db.Column(db.Text, nullable = True)
 	departamento = db.Column(db.Text, nullable = True)
@@ -147,6 +145,11 @@ class Factura(db.Model):
 	sence = db.Column(db.Text, nullable = True)
 	num_cai = db.Column(db.Text, nullable = True)
 	estado = db.Column(db.Integer, nullable = True)
+	
+	id_instancia=db.Column(db.Integer, nullable = True)
+	mandada=db.Column(db.Boolean,nullable=False)
+	pagada=db.Column(db.Boolean,nullable=False)
+
 	num_hes = db.Column(db.Text, nullable = True)
 	fecha_emision = db.Column(db.Date, nullable = True)
 	fecha_vencimiento = db.Column(db.Date, nullable = True)
@@ -155,7 +158,7 @@ class Factura(db.Model):
 	num_orden = db.Column(db.Text, nullable = True)
 	observacion = db.Column(db.Text, nullable = True)
 
-	def __init__(self,id_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion):
+	def __init__(self,id_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion,id_instancia):
 		self.id_factura = id_factura
 		self.sence = sence
 		self.num_cai =num_cai
@@ -167,10 +170,14 @@ class Factura(db.Model):
 		self.especificar = especificar
 		self.num_orden = num_orden
 		self.observacion = observacion
+		self.id_instancia = id_instancia
+		self.mandada = False
+		self.pagada = False
 
 class FacturaSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_factura','sence','num_cai','estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento','enviar_factura','especificar','num_orden','observacion')
+		fields = ('id_factura','sence','num_cai','estado','tipo_pago','num_hes', 'fecha_emision','fecha_vencimiento','enviar_factura',
+		'especificar','num_orden','observacion','id_instancia','mandada','pagada')
 
 
 class Instancia(db.Model):
@@ -182,18 +189,20 @@ class Instancia(db.Model):
 	malla = db.Column(db.Boolean, nullable = True)
 	fecha_inicio = db.Column(db.Date, nullable = True)
 	fecha_termino = db.Column(db.Date, nullable = True)
+	estado = db.Column(db.Text, nullable = True) # Abierto cerrado
 
-	def __init__(self,sence,direccion,malla,fecha_inicio,fecha_termino):
+	def __init__(self,sence,direccion,malla,fecha_inicio,fecha_termino,estado):
 		self.sence = sence
 		self.direccion = direccion
 		self.malla = malla 
 		self.fecha_inicio = fecha_inicio
 		self.fecha_termino = fecha_termino
+		self.estado = estado 
 
 class InstanciaSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('id_instancia','sence','direccion',
-		'malla','fecha_inicio','fecha_termino')		
+		'malla','fecha_inicio','fecha_termino','estado')		
 		
 class Participante(db.Model):
 	__tablename__ = 'participante'
@@ -237,7 +246,6 @@ class Participante(db.Model):
 		self.correo_personal=correo_personal
 		self.razon_social=razon_social
 	
-
 class ParticipanteSchema(SQLAlchemyAutoSchema):
 	class Meta:
 		fields = ('rut','nombre',

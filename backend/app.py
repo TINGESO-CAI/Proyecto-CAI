@@ -306,11 +306,10 @@ def crear_curso():
 	valor_imputable_participante = request.json['valor_imputable_participante']
 	resolucion_sence = request.json['resolucion_sence']
 	resolucion_usach = request.json['resolucion_usach']
-	estado = request.json['estado']
 	f_vigencia = request.json['f_vigencia']
 
 	# Se instancia el nuevo cuso
-	nuevo_curso=mo.Curso(sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,estado,f_vigencia)
+	nuevo_curso=mo.Curso(sence,nombre,modalidad,categoria,horas_curso,valor_efectivo_participante,valor_imputable_participante,resolucion_sence,resolucion_usach,f_vigencia)
 
 	# Se agrega el nuevo curso ingresado
 	db.session.add(nuevo_curso)
@@ -337,7 +336,6 @@ def obtener_curso():
 	valor_imputable_participante = request.args.get('valor_imputable_participante')
 	resolucion_sence = request.args.get('resolucion_sence')
 	resolucion_usach = request.args.get('resolucion_usach')
-	estado = request.args.get('estado')
 	f_vigencia = request.args.get('f_vigencia')
 
 	# Se insancian todos los cursos para posteriormente ser filtrados
@@ -362,8 +360,6 @@ def obtener_curso():
 		cursos = cursos.filter(mo.Curso.resolucion_sence==resolucion_sence)
 	if resolucion_usach!= None:
 		cursos = cursos.filter(mo.Curso.resolucion_usach==resolucion_usach)
-	if estado!= None:
-		cursos = cursos.filter(mo.Curso.estado==estado)
 	if f_vigencia!= None:
 		cursos = cursos.filter(mo.Curso.f_vigencia==f_vigencia)
 
@@ -414,10 +410,10 @@ def editar_curso():
 	horas_curso=request.json['horas_curso']
 	valor_efectivo_participante=request.json['valor_efectivo_participante']
 	valor_imputable_participante=request.json['valor_imputable_participante']
-	estado = request.json['estado']
 	f_vigencia = request.json['f_vigencia']
 	resolucion_sence=request.json['resolucion_sence']
 	resolucion_usach=request.json['resolucion_usach']
+
 	# Actualizacion
 	if sence != curso.sence:
 		curso.sence = sence
@@ -433,8 +429,6 @@ def editar_curso():
 		curso.valor_efectivo_participante = valor_efectivo_participante
 	if valor_imputable_participante != curso.valor_imputable_participante:
 		curso.valor_imputable_participante = valor_imputable_participante
-	if estado != curso.estado:
-		curso.estado = estado
 	if f_vigencia != curso.f_vigencia:
 		curso.f_vigencia = f_vigencia
 	if resolucion_sence != curso.resolucion_sence:
@@ -452,6 +446,7 @@ def editar_curso():
 	resultado = curso_schema.dump(curso)
 
 	return jsonify(resultado)
+
 # Funcion que se usa para eliminar
 @app.route("/curso/eliminar",methods=["DELETE"])
 def eliminar_curso():
@@ -483,9 +478,10 @@ def crear_instancia_curso():
 	malla = request.json['malla']
 	fecha_inicio = request.json['fecha_inicio']
 	fecha_termino = request.json['fecha_termino']
+	estado = request.json['estado']
 	
 	# Crea la instancia de instancia XD
-	nuevo_instancia_curso=mo.Instancia(sence=sence,direccion=direccion,malla=malla,fecha_inicio=fecha_inicio,fecha_termino=fecha_termino)
+	nuevo_instancia_curso=mo.Instancia(sence,direccion,malla,fecha_inicio,fecha_termino,estado)
 
 	# se agrega la instancia
 	db.session.add(nuevo_instancia_curso)
@@ -509,6 +505,7 @@ def obtener_instancia_curso():
 	malla = request.args.get('malla')
 	fecha_inicio = request.args.get('fecha_inicio')
 	fecha_termino = request.args.get('fecha_termino')
+	estado = request.args.get('estado')
 
 	# Se traen todas las instancias
 	instancias = mo.Instancia.query.filter()
@@ -526,6 +523,8 @@ def obtener_instancia_curso():
 		instancias = instancias.filter(mo.Instancia.fecha_inicio==fecha_inicio)
 	if fecha_termino != None:
 		instancias = instancias.filter(mo.Instancia.fecha_termino==fecha_termino)
+	if estado != None:
+		instancias = instancias.filter(mo.Instancia.estado==estado)
 	
 	# Se crea el dump
 	instancias_cursos_filtrado = instancia_schemas.dump(instancias)
@@ -548,6 +547,7 @@ def editar_instancia():
 	malla = request.json['malla']
 	fecha_inicio = request.json['fecha_inicio']
 	fecha_termino = request.json['fecha_termino']
+	estado = request.json['estado']
 
 	# Actualizacion
 	if sence != instancia.sence:
@@ -560,6 +560,8 @@ def editar_instancia():
 		instancia.fecha_inicio = fecha_inicio
 	if fecha_termino != instancia.fecha_termino:
 		instancia.fecha_termino = fecha_termino
+	if estado != instancia.estado:
+		instancia.estado = estado
 	
 	try:
 		# Se agrega a la db
@@ -614,7 +616,24 @@ def obtener_ids():
 	instancias = instancia_schemas.dump(ids_instancias)
 	
 	return jsonify(instancias)
-		
+
+# Funcion que obtiene
+@app.route("/instancia/obtener_todo",methods=["GET"])
+def obtener_todo(id_instancia):
+    instancia = mo.Instancia.query.get(id_instancia)
+    profesores = instancia.profesores
+    alumnos = instancia.alumnos
+
+    resultado = []
+    for i in alumnos:
+        factura = i.facturas
+        for f in factura:
+            if  f.id_instancia == i.id_instancia:
+                if not i in resultado:
+                    resultado.append(i)
+    resultado={'relatores':relator_schemas.dump(profesores), 'participantes':participante_schema.dump(resultado)}
+    return jsonify(resultado)
+
 # -----------------------------------------------------------------------------------------------------
 # ----------------------------------------EMPRESA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------	
@@ -1093,8 +1112,8 @@ def crear_factura():
 		num_factura=num_factura.id_factura+1
 	
 	# Request de los json
-	num_cai=request.json['num_registro'] 
-	estado=request.json['estado']
+	num_cai=request.json['num_registro'] # Es ingresable
+	estado=request.json['estado']        # Estado?? en relacion al curso.
 	num_hes=request.json['num_hes'] 
 	fecha_emision=datetime.today().strftime('%Y-%m-%d') 
 	fecha_vencimiento=request.json['fecha_vencimiento'] 
@@ -1102,7 +1121,7 @@ def crear_factura():
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
 	# fono_empresa=request.json['fono_empresa'] # Agregar en front
-	fono_empresa = 123123123
+	fono_empresa = 123123123             # Agregar el contacto por front
 	
 	# ----------- INFO GENERAL ---------------------------
 	
@@ -1136,7 +1155,7 @@ def crear_factura():
 	# ----------- INFO DE LA EMPRESA ------------------------
 	if razon_social is None:
 		participante=mo.Participante.query.get(lista_rut[0])
-		razon_social=participante.nombre+" "+participante.apellido_paterno+" "+ participante.apellido_materno
+		razon_social=participante.nombre+" "+participante.apellido_paterno+" "+ participante.apellido_materno # Revisar caso donde solo se tiene el rut
 		giro_empresa= ""
 		atencion_empresa= ""
 		departamento_empresa = ""
@@ -1157,7 +1176,7 @@ def crear_factura():
 	valor_total=valor_curso*len(lista_rut)
 	
 	# Se instancia la factura
-	nueva_factura=mo.Factura(num_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion)
+	nueva_factura=mo.Factura(num_factura,sence,num_cai,estado,num_hes,fecha_emision,fecha_vencimiento,enviar_factura,especificar,num_orden,observacion,id_instancia)
 	# Se agrega la factura
 	db.session.add(nueva_factura)
 	try:
@@ -1278,7 +1297,7 @@ def filtro_factura():
 def eliminar_factura():
 	
 	id_factura=request.args.get('id_factura')
-	factura = mo.Factura.query.get(id_factura) # Capturo al participante
+	factura = mo.Factura.query.get(id_factura) # Capturo la factura
 	
 	try:
 		db.session.delete(factura)
