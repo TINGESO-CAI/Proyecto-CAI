@@ -235,59 +235,57 @@
 
               <template v-slot:[`item.emitidaS`]="{item }">
                     <v-icon
-                      v-if="item.emitirS"
+                      v-if="item.creada"
                       class="mr-2"
                       color="green darken-2"
-                      @click="confirmacion(1)"
                     >
-                      mdi-circle
+                      mdi-check-circle
                     </v-icon>
                     <v-icon
-                      v-if="item.emitirS==false"
+                      v-if="item.creada==false"
                       center
                       class="mr-2"
                       color="red darken-2"
-                      @click="confirmacion(1)"
                     >
-                      mdi-circle
+                      mdi-close-circle
                     </v-icon>
               </template>
               <template v-slot:[`item.emitidasF`]="{item }">
                     <v-icon
-                      v-if="item.emitirF"
+                      v-if="item.mandada"
                       class="mr-2"
                       color="green darken-2"
-                      @click="confirmacion(2)"
+                      @click="confirmacion(item,1)"
                     >
-                      mdi-circle
+                      mdi-check-circle
                     </v-icon>
                     <v-icon
-                      v-if="item.emitirF==false"
+                      v-if="item.mandada==false"
                       center
                       class="mr-2"
                       color="red darken-2"
-                      @click="confirmacion(2)"
+                      @click="confirmacion(item,1)"
                     >
-                      mdi-circle
+                      mdi-close-circle
                     </v-icon>
               </template>
               <template v-slot:[`item.facturasP`]="{item }">
                     <v-icon
-                      v-if="item.facturaPagada"
+                      v-if="item.pagada"
                       class="mr-2"
                       color="green darken-2"
-                      @click="confirmacion(3)"
+                      @click="confirmacion(item,2)"
                     >
-                      mdi-circle
+                      mdi-check-circle
                     </v-icon>
                     <v-icon
-                      v-if="item.facturaPagada==false"
+                      v-if="item.pagada==false"
                       center
                       class="mr-2"
                       color="red darken-2"
-                      @click="confirmacion(3)"
+                      @click="confirmacion(item,2)"
                     >
-                      mdi-circle
+                      mdi-close-circle
                     </v-icon>
               </template>
 
@@ -384,6 +382,9 @@ export default {
       { text: 'Solicitud emitida', value: 'emitidaS', sortable: false, align: 'center' },
       { text: 'Factura emitida', value: 'emitidasF', sortable: false, align: 'center' },
       { text: 'Factura pagada', value: 'facturasP', sortable: false, align: 'center' },
+      { text: 'Factura', value: 'id_factura' },
+      { text: 'Fecha emision S. factura', value: 'fecha_emision' },
+      { text: 'Fecha vencimiento S. factura', value: 'fecha_vencimiento' },
       { text: 'Rut', value: 'rut' },
       { text: 'nombre', value: 'nombre' },
       { text: 'apellido_paterno', value: 'apellido_paterno'},
@@ -418,6 +419,7 @@ export default {
     razon_social: null,
     instancia:{},
     participantes:[{genero:1,emitirS:false, emitirF:false, facturaPagada:true}],
+    participante:{},
     relatores:[{genero:1}],
     //datos para editar
     dialog: false,
@@ -523,22 +525,34 @@ export default {
       })
     },
     detalles: async function(item){
-      console.log(item)
-      this.instancia=item
-      this.page=2
+      
+      try{
+        console.log(item)
+        this.instancia=item
+        this.page=2
+        let response=await axios.get('http://localhost:5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
+        console.log(response.data)
+        this.participantes=response.data.participante
+        this.relatores=response.data.relatores
+      }
+      catch(error){
+        console.log(error)
+        alert("ocurrio un error")
+      }
     },
     cerrar(){
       this.cambiarEstado=false
     },
-    confirmacion(item){
-      this.token=item
-      this.cambiarEstado=true
+    confirmacion(item,token){
+      if(item.id_factura!=null){
+        this.token=token
+        console.log(item)
+        this.cambiarEstado=true
+        this.participante=item
+      }
     },
     confirmarCambiarEstado(){
       if(this.token==1){
-        this.cambiarEmisionSolicitud()
-      }
-      else if(this.token==2){
         this.cambiarEmisionFactura()
       }
       else{
@@ -546,28 +560,44 @@ export default {
       }
       this.cerrar()
     },
-    cambiarEmisionSolicitud(){
-      if(this.participantes[0].emitirS){
-        this.participantes[0].emitirS=false
+    cambiarEmisionFactura: async function(){
+     if(this.participante.mandada){
+        this.participante.mandada=false
       }
       else{
-        this.participantes[0].emitirS=true
+        this.participante.mandada=true
+      }
+      try{
+        let response=await axios.put('http://localhost:5000/factura/editar?id_factura='+this.participante.id_factura.toString(),{mandada:this.participante.mandada,pagada:this.participante.pagada})
+        console.log(response.data)
+        let response2=await axios.get('http://localhost:5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
+        console.log(response.data)
+        this.participantes=response2.data.participante
+
+      }
+      catch(error){
+        console.log(error)
+        alert("ocurrio un error")
       }
     },
-    cambiarEmisionFactura(){
-     if(this.participantes[0].emitirF){
-        this.participantes[0].emitirF=false
+    cambiarFacturaPagada: async function(){
+     if(this.participante.pagada){
+        this.participante.pagada=false
       }
       else{
-        this.participantes[0].emitirF=true
+        this.participante.pagada=true
       }
-    },
-    cambiarFacturaPagada(){
-     if(this.participantes[0].facturaPagada){
-        this.participantes[0].facturaPagada=false
+      try{
+        let response=await axios.put('http://localhost:5000/factura/editar?id_factura='+this.participante.id_factura.toString(),{mandada:this.participante.mandada,pagada:this.participante.pagada})
+        console.log(response.data)
+        let response2=await axios.get('http://localhost:5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
+        console.log(response.data)
+        this.participantes=response2.data.participante
+
       }
-      else{
-        this.participantes[0].facturaPagada=true
+      catch(error){
+        console.log(error)
+        alert("ocurrio un error")
       }
     },
     save: async function() {

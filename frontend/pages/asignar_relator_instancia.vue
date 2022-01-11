@@ -127,7 +127,7 @@ export default {
           console.log(this.relatoresCurso[i].rut,this.curso[0].id_instancia)
           let response = await axios.post('http://localhost:5000/relator_instancia/agregar',{rut:this.relatoresCurso[i].rut, id_instancia:this.curso[0].id_instancia});
           console.log('response', response.data);
-          alert('Relatore/s asignado/s con exito.')
+          alert('Relator/es asignado/s con exito.')
           this.relatoresCurso=[]
           this.curso=[]
           this.page=1
