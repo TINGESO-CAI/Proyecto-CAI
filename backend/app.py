@@ -22,6 +22,7 @@ from datetime import datetime, date
 from sqlalchemy.sql import text
 from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
+from werkzeug.wrappers import response
 import db.modelos as mo
 
 # LOGIN
@@ -115,35 +116,24 @@ def entrar_cuenta():
 
 	try:
 		access_token = create_access_token(identity=correo)
-		return jsonify({'token': access_token.decode('UTF-8')})
+		# nombre,rut y correo , token
+		return jsonify({'nombre': usuario.nombre,
+			'rut': usuario.rut,
+			'correo': usuario.correo,
+			'token': access_token.decode('UTF-8')})
 	except Exception as e:
 		return jsonify(str(e))
 
-def token_required(f):
-	@wraps(f)
-	def decorator(*args, **kwargs):
-		token = None
-
-		if 'x-access-tokens' in request.headers:
-			token = request.headers['x-access-tokens']
-
-		if not token:
-			return jsonify({'message': 'a valid token is missing'})
-
-		try:
-			data = jwt.decode(token, app.config['JWT_SECRET_KEY'])
-			current_user = mo.Cuenta.query.filter_by(nombre=data['nombre']).first()
-		except:
-			return jsonify({'message': 'token is invalid'})
-
-		return f(current_user, *args, **kwargs)
-	
-	return decorator
-
 @app.route('/cuenta/permisos',methods=["GET"])
-@token_required
 def obtener_permisos():
 
+	token = request.json['token']
+
+	data = jwt.decode(token, app.config['JWT_SECRET_KEY'])
+
+	return jsonify(data)
+
+	'''
 	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
 	permiso={
 		"nombre": cuenta.nombre + " " + cuenta.apellido,
@@ -153,6 +143,7 @@ def obtener_permisos():
 		}
 	
 	return jsonify(permiso)
+	'''
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -1215,6 +1206,8 @@ def obtener_contactos_razon_social(razon_social):
 	for i in empresa.contactos:
 		if i.fono != None:
 			contactos.append({"fono":i.fono})
+		if i != None:
+			contactos.append({"fono":i.fono})
 	return jsonify(contactos)
 
 # Funcion que entrega las descripciones de una razon y fono asociada
@@ -1223,8 +1216,9 @@ def obtener_contactos_razon_social(razon_social):
 @app.route("/contacto/obtener_descripcion",methods=["GET"])
 def obtener_descripcion():
 
-	razon_social = request.json['razon_social']
-	fono = request.json['fono']
+	# /contacto/obtener_descripcion?razon_social=XXXX&fono=XXXX
+	razon_social = request.args.get('razon_social')
+	fono = request.args.get('fono')
 	
 	contacto = mo.Contacto.query.all()
 	desc = []
