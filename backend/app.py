@@ -1215,6 +1215,24 @@ def obtener_contactos_razon_social(razon_social):
 	for i in empresa.contactos:
 		contactos.append({"fono":i.fono,"descripcion":i.descripcion})
 	return jsonify(contactos)
+
+# Funcion que entrega las descripciones de una razon y fono asociada
+# REVISAR ESTA QUERY***
+# HACER QUERY DECIFRADO TOKEN***
+@app.route("/contacto/obtener_descripcion",methods=["GET"])
+def obtener_descripcion():
+
+	razon_social = request.json['razon_social']
+	fono = request.json['fono']
+	
+	contacto = mo.Contacto.query.all()
+	desc = []
+	for i in contacto:
+		if (i.razon_social==razon_social and i.fono==fono):
+			desc.append({"descripcion":i.descripcion})
+	
+	return jsonify(desc)
+
 # -----------------------------------------------------------------------------------------------------
 # ---------------------------------------FACTURA-------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
