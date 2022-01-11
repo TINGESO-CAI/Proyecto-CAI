@@ -6,6 +6,7 @@ from operator import mod
 import re
 from sys import meta_path
 from typing import Sequence, Text
+from marshmallow.fields import Boolean, Date
 import requests
 from flask import Flask, jsonify, request,send_file
 from flask_sqlalchemy import SQLAlchemy
@@ -16,7 +17,7 @@ from sqlalchemy.orm import query
 import sqlalchemy.orm.exc
 import json
 from docxtpl import DocxTemplate
-from datetime import datetime
+from datetime import datetime, date
 
 from sqlalchemy.sql import text
 from sqlalchemy.sql.expression import null
@@ -628,37 +629,37 @@ def obtener_todo(id_instancia):
 
 	resultado = []
 	participantes_facturados=[]
+	
+	for i in alumnos:
+		for f in i.facturas:
+			if f.id_instancia == int(id_instancia):
+				if not (i in participantes_facturados):
+					participantes_facturados.append(i)
+					completo=participante_schema.dump(i)
+					completo["id_factura"]=f.id_factura
+					completo["creada"]=True
+					completo["mandada"]=f.mandada
+					completo["pagada"]=f.pagada
+					completo["fecha_emision"]=(f.fecha_emision).strftime('%Y-%m-%d') 
+					completo["fecha_vencimiento"]=(f.fecha_emision).strftime('%Y-%m-%d') 
+					resultado.append(completo)
+	
 	alumnos_no_fact = []
 	for i in alumnos:
-		factura = {} #[[f,[a,a,a]	, 	[f2,[a2,a2,a2,a2]] , [f,[i]] ]
-		flag2=0
-		for f in i.facturas:
-			
-			if f.id_instancia == int(id_instancia):
-				j=0
-				flag=0
-				while j < len(participantes_facturados):
-					if participantes_facturados[j][0]==f:
-						posicion=j
-						flag=1
-						j=len(participantes_facturados)
-					j+=1
-				if flag==1:
-					participantes_facturados[posicion][1].append(i)
-				else:
-					participantes_facturados.append([f,[i]])
-				flag2=1
-		if flag2==0:
+		if i not in participantes_facturados:
 			alumnos_no_fact.append(i)
-	
-	list_dict=[]
-	for i in participantes_facturados:
-		list_dict.append({"factura":factura_schema.dump(i[0]),"alumnos":participante_schemas.dump(i[1])})
-	print(participantes_facturados)	
-	
+			completo=participante_schema.dump(i)
+			completo["id_factura"]= None
+			completo["creada"]= False
+			completo["mandada"]=False 
+			completo["pagada"]= False
+			completo["fecha_emision"]=None
+			completo["fecha_vencimiento"]=None
+			resultado.append(completo)
+
+
 	resultado={'relatores':relator_schemas.dump(profesores),
-	'participantes_nofacturados': participante_schemas.dump(alumnos_no_fact),
-	'participantes_facturados': list_dict}
+	'participante':resultado}
 	return jsonify(resultado)
 	
 	
