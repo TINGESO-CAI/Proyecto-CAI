@@ -7,3 +7,5 @@ sqlalchemy
 docxtpl
 datetime
 flask_login
+requests
+marshmallow_sqlalchemy

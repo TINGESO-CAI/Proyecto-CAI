@@ -17,5 +17,5 @@ COPY . /usr/src/backend
 
 # run server
 CMD flask db upgrade
-CMD python3 app.py run -h 0.0.0.0
+CMD python3 app.py 
 
