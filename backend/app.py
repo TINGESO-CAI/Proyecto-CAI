@@ -1213,7 +1213,8 @@ def obtener_contactos_razon_social(razon_social):
 	empresa = mo.Empresa.query.get(razon_social)
 	contactos=[]
 	for i in empresa.contactos:
-		contactos.append({"fono":i.fono,"descripcion":i.descripcion})
+		if i.fono != None:
+			contactos.append({"fono":i.fono})
 	return jsonify(contactos)
 
 # Funcion que entrega las descripciones de una razon y fono asociada
