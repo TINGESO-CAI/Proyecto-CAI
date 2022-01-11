@@ -24,6 +24,10 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.operators import custom_op
 import db.modelos as mo
 
+# LOGIN
+from flask_jwt_extended import JWTManager,jwt_required, create_access_token, get_jwt_identity
+from functools import wraps
+
 # Configuracion de la app
 db= mo.objeto_db()
 app= Flask(__name__)
@@ -31,10 +35,16 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = False # Para mostrar las query SQL
+#LOGIN
+app.config['JWT_SECRET_KEY'] = 'Super_Secret_JWT_KEY'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 db.init_app(app)
 
 ma = Marshmallow(app) # Para el uso de sqlalchemy
 migrate= Migrate(app,db) # Para el uso de los migrate
+
+# LOGIN
+jwt = JWTManager(app)
 
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
@@ -65,7 +75,84 @@ cuenta_schemas= mo.CuentaSchema(many=True)
 # -----------------------------------------CUENTA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 
+# Funcion encargada de registar una cuenta
+@app.route('/registrar', methods=['POST'])
+def registrar_cuenta():
 
+	# Request de los json
+	correo = request.json['correo']
+	contrasena = request.json['contrasena']
+	nombre = request.json['nombre']
+	apellido = request.json['apellido']
+	rut = request.json['rut']
+
+	# Se crea la instancia cuenta con los datos capturados
+	nueva_cuenta = mo.Cuenta(correo,contrasena,nombre,apellido,rut)
+
+	# Se agrega y se sube a la db
+	db.session.add(nueva_cuenta)
+	db.session.commit()
+
+	# Se realiza un "dump" de los schemas para moder "jsonifear"
+	resultado = cuenta_schema.dump(nueva_cuenta)
+
+	return jsonify(resultado)
+
+# Funcion respecto al login
+@app.route('/entrar', methods=['POST'])
+def entrar_cuenta():
+
+	# Request de los json
+	correo = request.json['correo']
+	contrasena = request.json['contrasena']
+
+	# Se instancia la clase Cuenta con el metodo de autenticar definido
+	usuario = mo.Cuenta.autenticar(correo,contrasena)
+
+	# En caso de que el usario no este en la db
+	if not usuario:
+		return jsonify({ 'message': 'Invalid credentials', 'authenticated': False }), 401
+
+	try:
+		access_token = create_access_token(identity=correo)
+		return jsonify({'token': access_token.decode('UTF-8')})
+	except Exception as e:
+		return jsonify(str(e))
+
+def token_required(f):
+	@wraps(f)
+	def decorator(*args, **kwargs):
+		token = None
+
+		if 'x-access-tokens' in request.headers:
+			token = request.headers['x-access-tokens']
+
+		if not token:
+			return jsonify({'message': 'a valid token is missing'})
+
+		try:
+			data = jwt.decode(token, app.config['JWT_SECRET_KEY'])
+			current_user = mo.Cuenta.query.filter_by(nombre=data['nombre']).first()
+		except:
+			return jsonify({'message': 'token is invalid'})
+
+		return f(current_user, *args, **kwargs)
+	
+	return decorator
+
+@app.route('/cuenta/permisos',methods=["GET"])
+@token_required
+def obtener_permisos():
+
+	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
+	permiso={
+		"nombre": cuenta.nombre + " " + cuenta.apellido,
+		"rut": cuenta.rut,
+		"correo": cuenta.correo,
+		"nivel_acceso": cuenta.nivel_acceso
+		}
+	
+	return jsonify(permiso)
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -1071,6 +1158,8 @@ def eliminar_contacto():
 		return jsonify({"respuesta":msg}) 
 	except:
 		return jsonify({"respuesta":"El contacto a eliminar no existe"})
+
+# Funcion que se encarga de editar un contacto
 @app.route("/contacto/editar",methods=["PUT"])
 def editar_contacto():
 
@@ -1289,6 +1378,9 @@ def filtro_factura():
 	num_orden = request.args.get('num_orden')
 	observacion = request.args.get('observacion')
 	num_cai = request.args.get('num_cai')
+	id_instancia = request.args.get('id_instancia')
+	mandada = request.args.get('mandada')
+	pagada = request.args.get('pagada')
 	
 	# Se llaman a todas las facturas
 	facturas = mo.Factura.query.filter()
@@ -1316,12 +1408,50 @@ def filtro_factura():
 		facturas = facturas.filter(mo.Factura.observacion==observacion)
 	if num_cai != None:
 		facturas = facturas.filter(mo.Factura.num_cai==num_cai)
+	if id_instancia != None:
+		facturas = facturas.filter(mo.Factura.id_instancia==id_instancia)
+	if mandada != None:
+		facturas = facturas.filter(mo.Factura.mandada==mandada)
+	if pagada != None:
+		facturas = facturas.filter(mo.Factura.pagada==pagada)
 
 	facturas=facturas.order_by(mo.Factura.id_factura.desc())
 	
 	facturas_filtradas = factura_schemas.dump(facturas)
 	
 	return jsonify(facturas_filtradas)
+
+# Funcion que se encarga de editar un contacto
+@app.route("/factura/editar",methods=["PUT"])
+def editar_factura():
+
+	# Request de los json
+	# ej: /factura/editar?id_factura=xxxx
+	id_factura_aux=request.args.get('id_factura')
+	# Captura de contacto
+	factura = mo.Factura.query.get(id_factura_aux) 
+	
+	# Nuevos datos
+	mandada = request.json['mandada']
+	pagada = request.json['pagada']
+	
+	# Actualizacion
+	if mandada != factura.mandada:
+		factura.mandada = mandada
+	if pagada != factura.pagada:
+		factura.pagada = pagada
+
+	try:
+		# Se agrega a la db
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	
+	# Se crea el dump
+	resultado = factura_schema.dump(factura)
+
+	return jsonify(resultado)
+
 
 @app.route("/factura/eliminar",methods=["DELETE"])
 def eliminar_factura():
