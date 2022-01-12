@@ -55,10 +55,11 @@
                 //var converted_date = date.toISOString().split('T')[0];
               }
               return converted_date
-            },
-            postParticipante: async function(archivo,j){
-              
-              
+            },            
+            cambiarGenero(valor){
+              if (valor == 'femenino' ) return '1'
+              else if (valor == 'masculino' ) return '2'
+              else return ''
             },
             ingresar: async function(i){
               let errores=[]
@@ -81,7 +82,7 @@
                   ,fono_corporativo: archivo[j][11]
                   ,correo_personal: archivo[j][12]
                   ,correo_corporativo: archivo[j][13]
-                  ,genero: archivo[j][14]}//)
+                  ,genero: this.cambiarGenero(archivo[j][14])}//)
                   console.log(NewRelator)
                   let response=await axios.post('http://localhost:5000/relator/agregar',NewRelator)
                   }

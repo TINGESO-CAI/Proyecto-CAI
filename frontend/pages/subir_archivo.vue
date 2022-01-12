@@ -56,9 +56,10 @@
               }
               return converted_date
             },
-            postParticipante: async function(archivo,j){
-              
-              
+            cambiarGenero(valor){
+              if (valor == 'f' ) return '1'
+              else if (valor == 'm' ) return '2'
+              else return null
             },
             ingresar: async function(i){
               let errores=[]
@@ -70,7 +71,7 @@
                   ,nombre:archivo[j][1]
                   ,apellido_paterno:archivo[j][2]
                   ,apellido_materno:archivo[j][3]
-                  ,genero:archivo[j][4].toString()
+                  ,genero:this.cambiarGenero(archivo[j][4].toString())
                   ,nivel_educacional:archivo[j][6]
                   ,fecha_nacimiento: this.todate(archivo[j][5])
                   ,nacionalidad:archivo[j][7]
