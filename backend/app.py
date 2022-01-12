@@ -92,8 +92,10 @@ def registrar_cuenta():
 
 	# Se agrega y se sube a la db
 	db.session.add(nueva_cuenta)
-	db.session.commit()
-
+	try:
+		db.session.commit()
+	except:
+		return jsonify("Error")
 	# Se realiza un "dump" de los schemas para moder "jsonifear"
 	resultado = cuenta_schema.dump(nueva_cuenta)
 
