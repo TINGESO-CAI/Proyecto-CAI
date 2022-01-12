@@ -1,7 +1,7 @@
 <template>
     <v-container class="test" >
       <div v-if="participantes.length==0">
-        <h1 class="text-center">Ingrese Id de la solicitud de factura</h1>
+        <h1 class="text-center">Ingrese Id de la solicitud de S. factura</h1>
         <v-autocomplete
                       v-model="factura"
                       :items="facturas"
