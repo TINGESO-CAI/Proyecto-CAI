@@ -1244,7 +1244,6 @@ def crear_factura():
 	
 	# Request de los json
 	num_cai=request.json['num_registro'] # Es ingresable
-	estado=request.json['estado']        # Estado?? en relacion al curso.
 	num_hes=request.json['num_hes'] 
 	fecha_emision=datetime.today().strftime('%Y-%m-%d') 
 	fecha_vencimiento=request.json['fecha_vencimiento'] 
@@ -1273,6 +1272,7 @@ def crear_factura():
 	fecha_termino_instancia = instancia_factura.fecha_termino
 	num_registro_sence = instancia_factura.id_instancia
 	valor_curso = curso_factura.valor_efectivo_participante
+	estado = instancia_factura.estado
 	
 	# --------- INFO DE PARTICIPANTES ----------------------
 	lista_participantes = request.get_json()
@@ -1327,12 +1327,7 @@ def crear_factura():
 	
 	# PARA EL FORMULARIO DEL WORD
 	tpl=DocxTemplate("backend/db/data/FORMULARIO_No_4_solicitud_de_factura.docx")
-	# Se define el estado
-	if estado == 0:
-		estado="cerrado"
-	else:
-		estado="abierto" 
-	
+
 	# para los casos particulares
 	if num_cai == None:
 		num_cai = ''
