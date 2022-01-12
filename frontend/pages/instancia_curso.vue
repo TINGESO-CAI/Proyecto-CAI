@@ -258,7 +258,7 @@ export default {
       this.getSences();
     }
     else{
-      window.history.back()
+      window.location.href='/'
     }
   },
 }

@@ -247,7 +247,7 @@ export default {
       this.getCursos()
     }
     else{
-      window.history.back()
+      window.location.href='/'
     }
   },
 }

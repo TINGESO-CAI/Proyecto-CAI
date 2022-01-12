@@ -303,9 +303,33 @@ export default {
       }
       this.close()
     },
+
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    },
   },
   created(){
-    this.getFacturas()
+    if(this.permisos()){
+      this.getFacturas()
+    }
+    else{
+      window.location.href='/'
+    }
   }
 }
 </script>

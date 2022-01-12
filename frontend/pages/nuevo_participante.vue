@@ -389,7 +389,7 @@ export default {
       this.getRazones();
     }
     else{
-      window.history.back()
+      window.location.href='/'
     }
     
   },

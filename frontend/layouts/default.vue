@@ -137,11 +137,11 @@
 				</v-list-item>
 				
 			</v-list-group>
-
 			<v-list-group
 						router
 						exact
 						sub-group
+						v-if="permisos()"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -168,6 +168,7 @@
 						router
 						exact
 						sub-group
+						v-if="permisos()"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -286,7 +287,6 @@
               <span>Nombre: {{usuario.nombre}}</span>
               <span>Rut: {{usuario.rut}}</span>
               <span>Correo: {{usuario.correo}}</span>
-              <span>Nivel acceso: {{usuario.nivel_acceso}}</span>
 
         </v-card-text>
 				<v-card-actions>
@@ -324,7 +324,6 @@ export default {
 				nombre:'',
 				rut:'',
 				correo:'',
-				nivel_acceso:'',
 			},
 			//lista para submenu
 			participantes: [
@@ -360,8 +359,10 @@ export default {
 			
 			],
 			administracion:[
+			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],
+			/*
 			['Asignar permisos', 'mdi-account-multiple-plus','/permisos'],
-			['Editar datos','mdi-account-multiple','/editar datos']
+			['Editar datos','mdi-account-multiple','/editar datos']*/
 			],
 			items: [
 				{
@@ -407,10 +408,14 @@ export default {
 		}
 	},
 	methods:{
+		/*
 		successMessage:function(){
 			alert("Ingreso exitoso(REVISAR)")
 		},
+		*/
 		async ingresar(){
+			//localStorage.setItem("user",JSON.stringify({mail:"jose@gmail.com", password:"password", permiso:3}))
+			//this.login=1
 			this.message = '';
 			let credenciales={
 				correo: this.correo,
@@ -421,14 +426,18 @@ export default {
 				//limpiar
 				this.correo = '';
 				this.contrasena = '';
-				this.successMessage();
-				console.log('response', response.data);
+				console.log('response: ', response.data);
+				localStorage.setItem("user",JSON.stringify({token:response.data.token,nombre:response.data.nombre,correo:response.data.correo,rut:response.data.rut}))
+				this.usuario.nombre=response.data.nombre
+				this.usuario.rut=response.data.rut
+				this.usuario.correo=response.data.correo
 				this.login=1;
-				this.traerDatos();
+				this.cambiarMenuPermisos()
+				//this.traerDatos();
 			}
 			catch (error){
 				console.log('error', error); 
-				this.message = 'Ocurrió un error'
+				alert('Credenciales no validas')
 			}
 		},
 		async traerDatos(){
@@ -445,6 +454,17 @@ export default {
 			}
 		},
 		async salir(){
+			localStorage.removeItem("user")
+			this.login=0
+			this.usuario = {
+				nombre:'',
+				rut:'',
+				correo:'',
+			},
+			this.contrasena = '';
+			this.cambiarMenuSinPermisos()
+			window.location.href='/'
+			/*
 			this.message = '';
 			try {
 				let response = await axios.post('http://localhost:5000/salir');
@@ -459,9 +479,98 @@ export default {
 				console.log('error', error); 
 				this.message = 'Ocurrió un error'
 			}
+			*/
+		},
+		permisos(){
+			let data=localStorage.getItem("user")
+			console.log(data)
+			if(data!=null){
+				return true
+				/*data=JSON.parse(data)
+				if(data.permiso==3){
+				return true
+				}
+				else{
+				return false
+				}
+				*/
+			}
+			else{
+				return false
+			}
+    	},
+		cambiarMenuPermisos(){
+			this.participantes= [
+			['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
+			['Ver participantes','mdi-account-multiple','/ver_participantes'],
+			['Subir archivo', 'mdi-file-plus','/subir_archivo'],
+			['Filtrar participantes','mdi-account-filter-outline','/filtrar_participantes' ]
+			]
+			this.relatores= [
+			['Nuevo relator', 'mdi-account-multiple-plus','/nuevo_relator'],
+			['Ver relatores','mdi-format-list-bulleted-type','/ver_relatores'],
+			['Subir archivo', 'mdi-file-plus','/subir_archivo_relator']
+			]
+			this.cursos=[
+			['Crear curso', 'mdi-account-multiple-plus','/crear_curso'],
+			['Ver cursos','mdi-format-list-bulleted-type','/ver_cursos'],
+			['Subir archivo', 'mdi-file-plus','/subir_archivo_curso'],
+			['Ver Instancias','mdi-format-list-bulleted-type','/ver_instancias'],
+			['Asignar Instancia','mdi-loupe','/Instancia_curso'],
+			['Asignar relatores','mdi-account-multiple','/asignar_relator_instancia'],
+			['Asignar participantes','mdi-account-multiple','/matricular_participantes']
+			]
+			this.empresas=[
+			['Nueva empresa', 'mdi-account-multiple-plus','/nueva_empresa'],
+			['Nuevo Contacto', 'mdi-cellphone-basic', '/nuevo_contacto'],
+			['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
+			]
+			this.finanzas=[
+			['Generar S. Factura','mdi-file-plus','/factura'],
+			['Ver S. facturas','mdi-format-list-bulleted-type','/ver_facturas'],
+			['Filtrar S. facturas','mdi-book-open-page-variant','/filtrar_facturas'],
+			['Ver participantes','mdi-account-multiple','/ver_participantes_factura'],
+			
+			]
+			this.administracion=[
+			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],]
+		},
+		cambiarMenuSinPermisos(){
+			this.participantes= [
+			['Ver participantes','mdi-account-multiple','/ver_participantes'],
+			['Filtrar participantes','mdi-account-filter-outline','/filtrar_participantes' ]
+			]
+			this.relatores= [
+			['Ver relatores','mdi-format-list-bulleted-type','/ver_relatores'],
+			]
+			this.cursos=[
+			['Ver cursos','mdi-format-list-bulleted-type','/ver_cursos'],
+			['Ver Instancias','mdi-format-list-bulleted-type','/ver_instancias'],
+			]
+			this.empresas=[
+			['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
+			]
+			this.administracion=[
+			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],]
+		},
+		asignarDatos(){
+			let data=localStorage.getItem("user")
+			data=JSON.parse(data)
+			this.usuario.correo=data.correo
+			this.usuario.rut=data.rut
+			this.usuario.nombre=data.nombre
+			console.log("DATOS: ",data)
 		}
 	},
 	created(){
+		if(this.permisos()){		
+			this.asignarDatos()
+			this.login=1
+			this.cambiarMenuPermisos()		
+		}
+		else{
+			this.cambiarMenuSinPermisos()
+		}
 		this.traerDatos();
 	}
 }

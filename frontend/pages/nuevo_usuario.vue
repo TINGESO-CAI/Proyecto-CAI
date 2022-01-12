@@ -150,7 +150,9 @@ export default {
     
   },
   created(){
-
+    if(this.permisos==false){
+      window.location.href='/'
+    }
   }
   }
 

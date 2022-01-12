@@ -221,7 +221,7 @@ export default {
 
   created(){
     if(this.permisos()==false){
-      window.history.back()
+      window.location.href='/'
     }
   },
 

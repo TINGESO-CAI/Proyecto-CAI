@@ -509,8 +509,13 @@ export default {
     },
   },
   created(){
-    this.getFacturas()
-    this.getRazones()
+    if(this.permisos()){
+      this.getFacturas()
+      this.getRazones()
+    }
+    else{
+      window.location.href='/'
+    }
   }
 }
 </script>

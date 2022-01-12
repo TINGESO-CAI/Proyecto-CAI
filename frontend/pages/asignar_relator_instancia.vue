@@ -221,7 +221,7 @@ export default {
       this.getInstancias()
     }
     else{
-      window.history.back()
+      window.location.href='/'
     }
     
   },
