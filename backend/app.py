@@ -45,7 +45,7 @@ ma = Marshmallow(app) # Para el uso de sqlalchemy
 migrate= Migrate(app,db) # Para el uso de los migrate
 
 # LOGIN
-#jwt = JWTManager(app)
+jwt = JWTManager(app)
 
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
@@ -122,7 +122,7 @@ def entrar_cuenta():
 		return jsonify({'nombre': usuario.nombre,
 			'rut': usuario.rut,
 			'correo': usuario.correo,
-			'token': access_token.decode('UTF-8')})
+			'token': access_token})
 	except Exception as e:
 		return jsonify(str(e))
 
