@@ -28,5 +28,9 @@
     "eslint-plugin-vue": "^7.12.1",
     "prettier": "^2.3.2",
     "webpack": "^4.45.0"
-  }
+  },
+  "resolutions": {
+    "@nuxtjs/vuetify/**/sass": "10.1.1",
+    "vuetify": "1.12.3"
+	}
 }

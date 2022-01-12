@@ -26,7 +26,7 @@ import db.modelos as mo
 db= mo.objeto_db()
 app= Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@db:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = False # Para mostrar las query SQL
 db.init_app(app)
