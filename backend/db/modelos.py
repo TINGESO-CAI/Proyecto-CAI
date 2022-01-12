@@ -52,7 +52,7 @@ class Cuenta(UserMixin,db.Model):
 	nombre = db.Column(db.Text, nullable = True)
 	apellido = db.Column(db.Text, nullable = True)
 	rut = db.Column(db.Text, nullable = True)
-	nivel_acceso = db.Column(db.Integer, nullable = False)
+	nivel_acceso = db.Column(db.Integer, nullable = True)
 
 	def __init__(self,correo,contrasena,nombre,apellido,rut):
 		self.correo = correo
@@ -74,7 +74,7 @@ class Cuenta(UserMixin,db.Model):
 
 class CuentaSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_cuenta','correo','contrasena','nombre','apellido',"rol")	
+		fields = ('id_cuenta','correo','contrasena','nombre','apellido',"nivel_acceso")	
 
 class Curso(db.Model):
 	__tablename__ = 'curso'

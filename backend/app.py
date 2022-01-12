@@ -27,7 +27,7 @@ import db.modelos as mo
 
 # LOGIN
 from flask_jwt_extended import JWTManager,jwt_required, create_access_token, get_jwt_identity
-from functools import wraps
+import jwt
 
 # Configuracion de la app
 db= mo.objeto_db()
@@ -45,7 +45,7 @@ ma = Marshmallow(app) # Para el uso de sqlalchemy
 migrate= Migrate(app,db) # Para el uso de los migrate
 
 # LOGIN
-jwt = JWTManager(app)
+#jwt = JWTManager(app)
 
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
@@ -129,9 +129,9 @@ def obtener_permisos():
 
 	token = request.json['token']
 
-	data = jwt.decode(token, app.config['JWT_SECRET_KEY'])
+	payload = jwt.decode(token, verify=False)
 
-	return jsonify(data)
+	return jsonify(payload)
 
 	'''
 	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
@@ -1251,8 +1251,7 @@ def crear_factura():
 	sence=request.json['sence']
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
-	fono_empresa=request.json['fono_empresa'] # Agregar en front
-	#fono_empresa = 123123123             # Agregar el contacto por front
+	fono_empresa=request.json['fono_empresa']
 	
 	# ----------- INFO GENERAL ---------------------------
 	
@@ -1285,14 +1284,24 @@ def crear_factura():
 
 	# ----------- INFO DE LA EMPRESA ------------------------
 	if razon_social is None:
+		
 		participante=mo.Participante.query.get(lista_rut[0])
-		razon_social=participante.nombre+" "+participante.apellido_paterno+" "+ participante.apellido_materno # Revisar caso donde solo se tiene el rut
+		nombre_rs = participante.nombre
+		apellido_paterno_rs = participante.apellido_paterno
+		apellido_materno_rs = participante.apellido_materno
+		if(participante.nombre == None):
+			nombre_rs = ''
+		if(participante.apellido_paterno == None):
+			apellido_paterno_rs = ''
+		if(participante.apellido_materno == None):
+			apellido_materno_rs = ''
+		razon_social = nombre_rs+' '+apellido_paterno_rs+' '+apellido_materno_rs
 		giro_empresa= ""
 		atencion_empresa= ""
 		departamento_empresa = ""
 		rut_empresa=participante.rut
-		direccion_empresa="" # Preguntar a sara
-		comuna_empresa="" # PReguntar a sara
+		direccion_empresa = request.json["direccion_particular"]
+		comuna_empresa = request.json["comuna_particular"]
 		fono_empresa=participante.fono_personal
 	else:
 		empresa_factura = mo.Empresa.query.get(razon_social)
@@ -1325,6 +1334,52 @@ def crear_factura():
 		estado="abierto" 
 	
 	# para los casos particulares
+	if num_cai == None:
+		num_cai = ''
+	if estado == None:
+		estado = ''
+	if fecha_emision == None:
+		fecha_emision = ''
+	if razon_social == None:
+		razon_social = ''
+	if giro_empresa == None:
+		giro_empresa = ''		
+	if atencion_empresa == None:
+		atencion_empresa = ''
+	if departamento_empresa == None:		
+		departamento_empresa = ''
+	if rut_empresa == None:	
+		rut_empresa = ''				
+	if direccion_empresa == None:
+		direccion_empresa = ''		
+	if comuna_empresa == None:
+		comuna_empresa = ''			
+	if fono_empresa == None:
+		fono_empresa = ''					
+	if fecha_vencimiento == None:
+		fecha_vencimiento = ''
+	if nombre_curso == None:
+		nombre_curso = ''
+	if sence_curso == None:
+		sence_curso = ''
+	if horas_curso == None:
+		horas_curso = ''
+	if fecha_inicio_instancia == None:
+		fecha_inicio_instancia = ''
+	if fecha_termino_instancia == None:
+		fecha_termino_instancia = ''
+	if num_registro_sence == None:
+		num_registro_sence = ''
+	if valor_curso == None:
+		valor_curso = ''
+	if valor_total == None:
+		valor_total = ''
+	if num_orden == None:
+		num_orden = ''
+	if especificar == None:
+		especificar = ''
+	if observacion == None:
+		observacion = ''
 
 	parametros={
 		"numero_cai":num_cai,
