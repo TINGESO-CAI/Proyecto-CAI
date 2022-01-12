@@ -489,16 +489,44 @@ export default {
       else return null
     },
     editItem (item) {
+      if(this.permisos()){
         this.editedIndex = this.participantes.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.editedItem.genero=this.mostrarGenero(this.editedItem.genero)
         console.log(this.editedItem.genero)
         this.dialog = true
-      },
+      }
+      else{
+        alert("No cuenta con permisos para editar.")
+      }
+    },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    },
     deleteItem (item) {
-      this.editedIndex = this.participantes.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
+      if(this.permisos()){
+        this.editedIndex = this.participantes.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialogDelete = true
+      }
+      else{
+        alert("No cuenta con permisos para editar.")
+      }
     },
     deleteItemConfirm () {
       this.participantes.splice(this.editedIndex, 1)

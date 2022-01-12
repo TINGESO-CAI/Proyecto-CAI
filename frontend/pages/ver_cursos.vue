@@ -359,11 +359,34 @@ export default {
         console.log('error', error);
       }
     },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    },
     editItem (item) {
-        this.editedIndex = this.cursos.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        console.log(this.editedItem.resolucion_sence)
-        this.dialog = true
+        if(this.permisos()){
+          this.editedIndex = this.cursos.indexOf(item)
+          this.editedItem = Object.assign({}, item)
+          console.log(this.editedItem.resolucion_sence)
+          this.dialog = true
+        }
+        else{
+          alert("No cuenta con permisos para editar.")
+        }
       },
     deleteItem (item) {
       this.editedIndex = this.cursos.indexOf(item)

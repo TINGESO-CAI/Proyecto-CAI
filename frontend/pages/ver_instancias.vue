@@ -488,10 +488,33 @@ export default {
       else if (valor == false ) return 'NO'
       else return null
     },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    },
     editItem (item) {
-        this.editedIndex = this.instancias.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
+        if(this.permisos()){
+          this.editedIndex = this.instancias.indexOf(item)
+          this.editedItem = Object.assign({}, item)
+          this.dialog = true
+        }
+        else{
+          alert("No cuenta con permisos para editar.")
+        }
       },
     deleteItem (item) {
       this.editedIndex = this.instancias.indexOf(item)
@@ -544,11 +567,16 @@ export default {
       this.cambiarEstado=false
     },
     confirmacion(item,token){
-      if(item.id_factura!=null){
+      if(this.permisos()){
+        if(item.id_factura!=null){
         this.token=token
         console.log(item)
         this.cambiarEstado=true
         this.participante=item
+        }
+      }
+      else{
+        alert("No cuenta con permisos para edicion.")
       }
     },
     confirmarCambiarEstado(){

@@ -244,6 +244,7 @@
           </v-card>       
           
           <br>
+          <div v-if="permisos()">
           <v-row>
               <h3>Ingresar nuevo contacto</h3>
               </v-row>
@@ -292,9 +293,10 @@
                 </v-col>
                 
             </v-row>
+            </div>
             <v-btn  color="blue lighten-1" class="mr-3" @click="volver">Ver empresas</v-btn>
-            <v-btn  color="blue lighten-1" class="mr-3" @click="createContacto">Agregar contacto</v-btn>
-
+            <v-btn  v-if="permisos()" color="blue lighten-1" class="mr-3" @click="createContacto">Agregar contacto</v-btn>
+            
             <v-dialog v-model="confirmarEliminarContacto" max-width="500px">
               <v-card>
                 <v-card-title class="text-h5">Quieres archivar esto?</v-card-title>
@@ -519,8 +521,13 @@ export default {
       this.editar=false
     },
     permitirEditar: function(item){
-      this.editar=true
-      this.contactoEditar=item
+      if(this.permisos()){
+        this.editar=true
+        this.contactoEditar=item
+      }
+      else{
+        alert("No cuenta con permisos para editar.")
+      }
     },
     paginaContactos:function(item){
       this.editedIndex = this.empresas.indexOf(item)
@@ -545,9 +552,14 @@ export default {
       }
     },
     editItem (item) {
-        this.editedIndex = this.empresas.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
+        if(this.permisos()){
+          this.editedIndex = this.empresas.indexOf(item)
+          this.editedItem = Object.assign({}, item)
+          this.dialog = true
+        }
+        else{
+          alert("No cuenta con permisos para editar.")
+        }
       },
     deleteItem (item) {
       this.editedIndex = this.empresas.indexOf(item)
@@ -590,6 +602,24 @@ export default {
         alert("ocurrio un error")
       }
       this.editar=false
+    },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
     },
     volver(){
       this.page=1
