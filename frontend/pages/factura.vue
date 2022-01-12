@@ -182,13 +182,29 @@
                     required
                 ></v-text-field>
                 </v-col>
-                <input type="checkbox" id="checkbox" v-model="particular">
+
+                <v-col>
+                <v-text-field
+                    v-model=fecha_vencimiento
+                    label="fecha_vencimiento"
+                    required
+                ></v-text-field>
+                </v-col>
+                <v-col>
+                <v-text-field
+                    v-model="observacion"
+                    label="observación"
+                    required
+                ></v-text-field>
+                </v-col>
+                <input type="checkbox" id="checkbox" v-model="particular" @change="cambiarParticular()">
                   <label for="checkbox"> particular </label>
                 <v-col>
                 <v-autocomplete
                       v-if="particular==false"
                       v-model="razon_social"
                       :items="razonesV"
+                      @change="obtenerContacto"
                       dense
                       item-text="razon_social"
                       label="razon_social"
@@ -196,6 +212,27 @@
                       return-object
                       single-line
                 ></v-autocomplete>
+                </v-col>
+                <v-col>
+                <v-autocomplete
+                      v-if="hide==false"
+                      v-model="contacto"
+                      :items="contactos"
+                      dense
+                      item-text="fono"
+                      label="fono"
+                      persistent-hint
+                      return-object
+                      single-line
+                      @change="obtenerDescripcion"
+                ></v-autocomplete>
+                </v-col>
+                <v-col>
+                <v-text-field
+                      v-if="hide==false"
+                      v-model="descripcion"
+                      readonly
+                ></v-text-field>
                 </v-col>
                  <!--
                 <v-col>
@@ -210,13 +247,7 @@
                     <v-col>{{empresa.nombre}}</v-col>
                 </v-col>
                 -->
-                <v-col>
-                <v-text-field
-                    v-model="observacion"
-                    label="observación"
-                    required
-                ></v-text-field>
-                </v-col>
+                
                 <v-row>
                 <v-col>
                 <v-btn  color="blue lighten-1" class="mr-4" @click="volver">Volver</v-btn>
@@ -265,7 +296,12 @@ export default {
   data:()=>( {
     page:1,
     estado:'',
+    hide:true,
+    descripcion:'',
     numeroRegistro:'',
+    fecha_vencimiento:'',
+    contactos:[],
+    contacto:{contacto:''},
     curso:[],
     sence:'',
     otic:'',
@@ -326,11 +362,30 @@ export default {
     ],
   }),
   methods:{
+    obtenerDescripcion: async function(){
+      try{
+        let response= await axios.get('http://localhost:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono)
+        console.log(response.data)
+        this.descripcion=response.data[0].descripcion
+      }
+      catch(error){
+        alert("ocurrio un error")
+        console.log(error)
+      }
+    },
     volver: function(){
       this.page=this.page-1
     },
     avanzarPage2:function(){
         this.page=2
+    },
+    cambiarParticular(){
+      if(this.particular){
+        this.hide=true
+      }
+      else if(this.razon_social.razon_social!=''){
+        this.hide=false
+      }
     },
     asignar: function(){
       if(this.instancia.length==0){
@@ -378,7 +433,7 @@ export default {
       }
     },
     comprobarFecha:function(fecha){
-      if (fecha.split('-').length == 3){
+      if (fecha.split('-').length == 3 || fecha==''){
         return true
       }
       else{
@@ -393,6 +448,31 @@ export default {
         return parseInt(this.estado)
       }
     },
+    obtenerContacto:async function(){
+      try{
+        this.hide=false
+        let response= await axios.get('http://localhost:5000/contacto/obtener/'+this.razon_social.razon_social)
+        console.log(response.data)
+        this.contactos=response.data
+        this.contacto=this.contactos[0]
+        if(this.contacto != null){
+          let response2= await axios.get('http://localhost:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono)
+          console.log(response2.data)
+          this.descripcion=response2.data[0].descripcion
+        }
+        else{
+          this.contacto={contacto:''}
+          this.descripcion=''
+        }
+        
+      }
+      catch(error){
+        alert("ocurrio un error")
+        console.log(error)
+      }
+      
+
+    },
     generarFactura: async function(){
       if (this.participantesFactura.length==0){
         alert("Debe seleccionar almenos un participante.")
@@ -402,10 +482,9 @@ export default {
           let response= await axios.post('http://localhost:5000/factura/agregar',
           {
             num_registro: this.transformarVacio(this.numeroRegistro)
-            ,estado: null //this.transformarEstado()
+            ,estado: this.instancia[0].estado //this.transformarEstado()
             ,num_hes: this.transformarVacio(this.num_hes)
-            ,fecha_emision: '10/12/2021'
-            ,fecha_vencimiento: '21/12/2021'
+            ,fecha_vencimiento: this.transformarVacio(this.fecha_vencimiento)
             ,sence: this.transformarVacio(this.curso[0].sence)
             ,id_instancia: this.transformarVacio(this.instancia[0].id_instancia)
             ,razon_social: this.transformarVacio(this.razon_social.razon_social)
@@ -414,6 +493,7 @@ export default {
             ,num_orden:this.transformarVacio(this.num_orden)
             ,obs:this.transformarVacio(this.observacion)
             ,participantes:this.onlyRut()
+            ,fono_empresa:this.transformarVacio(this.contacto.fono)
           })
           window.location.href='http://localhost:5000/factura/descargar/'+response.data.id_factura.toString()
           this.$router.push('factura') 
@@ -449,6 +529,10 @@ export default {
     continuarPage4: async function(){
       console.log(this.razon_social.razon_social)
       if(this.enviar!=''){
+        if(this.comprobarFecha(this.fecha_vencimiento)==false){
+          alert("Mal formato en fecha")
+          return 0
+        }
         if(this.particular==false){
           let response= await axios.get('http://localhost:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
           this.participantes=response.data
@@ -463,6 +547,7 @@ export default {
         }
         else{
           this.razon_social.razon_social=''
+          this.contacto.fono=''
           let response= await axios.get('http://localhost:5000/participante/obtener/independientes')
           this.participantes=response.data          
           if(this.participantes.length==0){
@@ -507,6 +592,7 @@ export default {
         let response = await axios.get('http://localhost:5000/curso/obtener/sences_con_instancia');
         this.sences = response.data;
         console.log(response);
+        
       }
       catch (error) {
         console.log('error', error); 

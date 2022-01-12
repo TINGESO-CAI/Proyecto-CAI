@@ -239,7 +239,7 @@ export default {
       else return ''
     },
     comprobarFecha:function(fecha){
-      if (fecha.split('-').length == 3){
+      if (fecha.split('-').length == 3 || fecha==''){
         return true
       }
       else{

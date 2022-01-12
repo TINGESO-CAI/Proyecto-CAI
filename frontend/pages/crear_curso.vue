@@ -177,7 +177,7 @@ export default {
       alert("El curso se creo exitosamente.")
     },
     comprobarFecha:function(fecha){
-      if (fecha.split('-').length == 3){
+      if (fecha.split('-').length == 3 || fecha==''){
         return true
       }
       else{

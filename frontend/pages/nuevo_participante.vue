@@ -277,7 +277,7 @@ export default {
       alert("El participante se creo exitosamente.")
     },
     comprobarFecha:function(fecha){
-      if (fecha.split('-').length == 3){
+      if (fecha.split('-').length == 3 || fecha==''){
         return true
       }
       else{
@@ -363,11 +363,35 @@ export default {
       else if (valor == '2' ) return 'masculino'
       else return 'desconocido'
     },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    }
     
   },
 
   created(){
-    this.getRazones();
+    if(this.permisos()){
+      this.getRazones();
+    }
+    else{
+      window.history.back()
+    }
+    
   },
 
 }

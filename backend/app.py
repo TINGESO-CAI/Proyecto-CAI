@@ -1206,8 +1206,6 @@ def obtener_contactos_razon_social(razon_social):
 	for i in empresa.contactos:
 		if i.fono != None:
 			contactos.append({"fono":i.fono})
-		if i != None:
-			contactos.append({"fono":i.fono})
 	return jsonify(contactos)
 
 # Funcion que entrega las descripciones de una razon y fono asociada
@@ -1223,8 +1221,9 @@ def obtener_descripcion():
 	contacto = mo.Contacto.query.all()
 	desc = []
 	for i in contacto:
-		if (i.razon_social==razon_social and i.fono==fono):
-			desc.append({"descripcion":i.descripcion})
+		if i.fono!=None:
+			if (i.razon_social==razon_social and i.fono==fono):
+				desc.append({"descripcion":i.descripcion})
 	
 	return jsonify(desc)
 
@@ -1252,8 +1251,8 @@ def crear_factura():
 	sence=request.json['sence']
 	id_instancia=request.json['id_instancia']
 	razon_social=request.json['razon_social']
-	# fono_empresa=request.json['fono_empresa'] # Agregar en front
-	fono_empresa = 123123123             # Agregar el contacto por front
+	fono_empresa=request.json['fono_empresa'] # Agregar en front
+	#fono_empresa = 123123123             # Agregar el contacto por front
 	
 	# ----------- INFO GENERAL ---------------------------
 	
