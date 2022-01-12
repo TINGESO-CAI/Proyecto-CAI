@@ -195,10 +195,35 @@ export default {
         console.log('error', error); 
       }
     },
+
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    }
   },
   created(){
-    this.getRelatores()
-    this.getInstancias()
+    if(this.permisos()){
+      this.getRelatores()
+      this.getInstancias()
+    }
+    else{
+      window.history.back()
+    }
+    
   },
 }
 </script>

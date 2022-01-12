@@ -231,9 +231,30 @@ export default {
         alert('Debe ingresar una razon social valida')
       }
     },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    }
   },
 
   created(){
+    if(this.permisos()==false){
+      window.history.back()
+    }
   },
 
 }

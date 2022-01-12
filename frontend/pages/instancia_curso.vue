@@ -184,7 +184,7 @@ export default {
           else{
             this.malla=null
           }
-          let response = await axios.post('http://localhost:5000/instancia/agregar',{sence: this.sence , direccion: this.transformarVacio(this.direccion) , malla: this.malla , fecha_inicio:this.transformarVacio(this.fecha_inicio) , fecha_termino:this.transformarVacio(this.fecha_termino)})
+          let response = await axios.post('http://localhost:5000/instancia/agregar',{sence: this.sence , direccion: this.transformarVacio(this.direccion) , malla: this.malla , fecha_inicio:this.transformarVacio(this.fecha_inicio) , fecha_termino:this.transformarVacio(this.fecha_termino),estado: this.estado})
           console.log(this.malla)
           console.log(response.data)
           alert("Instancia creada con exito")
@@ -232,10 +232,34 @@ export default {
         console.log('error', error); 
       }
     },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
+    }
     
   },
   created(){
-    this.getSences();
+    
+    if(this.permisos()){
+      this.getSences();
+    }
+    else{
+      window.history.back()
+    }
   },
 }
 </script>

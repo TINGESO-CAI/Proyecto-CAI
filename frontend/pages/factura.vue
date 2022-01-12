@@ -199,6 +199,22 @@
                 </v-col>
                 <input type="checkbox" id="checkbox" v-model="particular" @change="cambiarParticular()">
                   <label for="checkbox"> particular </label>
+                 <v-col>
+                <v-text-field
+                    v-if="particular"
+                    v-model="direccion_particular"
+                    label="Dirección"
+                    required
+                ></v-text-field>
+                </v-col>
+                 <v-col>
+                <v-text-field
+                    v-if="particular"
+                    v-model="comuna_particular"
+                    label="Comuna"
+                    required
+                ></v-text-field>
+                </v-col>
                 <v-col>
                 <v-autocomplete
                       v-if="particular==false"
@@ -302,6 +318,8 @@ export default {
     fecha_vencimiento:'',
     contactos:[],
     contacto:{contacto:''},
+    direccion_particular:'',
+    comuna_particular:'',
     curso:[],
     sence:'',
     otic:'',
@@ -479,10 +497,10 @@ export default {
       }
       else{
         try{
+          alert(this.direccion_particular)
           let response= await axios.post('http://localhost:5000/factura/agregar',
           {
             num_registro: this.transformarVacio(this.numeroRegistro)
-            ,estado: this.instancia[0].estado //this.transformarEstado()
             ,num_hes: this.transformarVacio(this.num_hes)
             ,fecha_vencimiento: this.transformarVacio(this.fecha_vencimiento)
             ,sence: this.transformarVacio(this.curso[0].sence)
@@ -494,6 +512,8 @@ export default {
             ,obs:this.transformarVacio(this.observacion)
             ,participantes:this.onlyRut()
             ,fono_empresa:this.transformarVacio(this.contacto.fono)
+            ,direccion_particular:this.transformarVacio(this.direccion_particular)
+            ,comuna_particular:this.transformarVacio(this.comuna_particular)
           })
           window.location.href='http://localhost:5000/factura/descargar/'+response.data.id_factura.toString()
           this.$router.push('factura') 
@@ -534,6 +554,8 @@ export default {
           return 0
         }
         if(this.particular==false){
+          this.direccion_particular=''
+          this.comuna_particular=''
           let response= await axios.get('http://localhost:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
           this.participantes=response.data
           console.log(this.razon_social.razon_social)
@@ -637,12 +659,36 @@ export default {
       catch(error){
         console.log('error', error); 
       }
+    },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
     }
   },
   created(){
-    this.getRazones();
-    this.getEmpresa();
-    this.getSences();
+    if(this.permisos()){
+      this.getRazones();
+      this.getEmpresa();
+      this.getSences();
+    }
+    else{
+      window.history.back()
+    }
+    
   },
 }
 </script>

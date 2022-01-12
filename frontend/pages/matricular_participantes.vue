@@ -221,11 +221,34 @@ export default {
       catch(error){
         console.log('error', error); 
       }
+    },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
     }
   },
   created(){
-    this.getParticipantes()
-    this.getCursos()
+    if(this.permisos()){
+      this.getParticipantes()
+      this.getCursos()
+    }
+    else{
+      window.history.back()
+    }
   },
 }
 </script>
