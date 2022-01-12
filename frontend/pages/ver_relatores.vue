@@ -492,9 +492,14 @@ export default {
       }
     },
     deleteItem (item) {
-      this.editedIndex = this.relatores.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
+      if(this.permisos()){
+        this.editedIndex = this.relatores.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialogDelete = true
+      }
+      else{
+        alert("No cuenta con permisos para borrar.")
+      }
     },
     deleteItemConfirm () {
       this.relators.splice(this.editedIndex, 1)

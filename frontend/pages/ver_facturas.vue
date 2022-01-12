@@ -234,13 +234,41 @@ export default {
       }
     },
     descargar (item) {
+      if(this.permisos()){  
         window.location.href='http://localhost:5000/factura/descargar/'+item.id_factura.toString()
-      },
+      }
+      else{
+        alert("No cuenta con permisos para descargar.")
+      }
+    },
     deleteItem (item) {
-      this.editedIndex = this.facturas.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
+      if(this.permisos()){
+        this.editedIndex = this.facturas.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialogDelete = true
+      }
+      else{
+        alert("No cuenta con permisos para borrar.")
+      }
 
+    },
+    permisos(){
+      let data=localStorage.getItem("user")
+      console.log(data)
+        if(data!=null){
+          return true
+            /*data=JSON.parse(data)
+            if(data.permiso==3){
+              return true
+            }
+            else{
+              return false
+            }
+            */
+        }
+        else{
+          return false
+        }
     },
     deleteItemConfirm: async function() {
       try{

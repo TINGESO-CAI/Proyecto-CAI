@@ -476,8 +476,13 @@ export default {
       }
     },
     verBorrarContacto(item){
-      this.contactoEditar=item
-      this.confirmarEliminarContacto=true
+      if(this.permisos()){
+        this.contactoEditar=item
+        this.confirmarEliminarContacto=true
+      }
+      else{
+        alert("No cuenta con permisos para borrar")
+      }
     },
     cancelar(){
       this.confirmarEliminarContacto=false
@@ -562,9 +567,14 @@ export default {
         }
       },
     deleteItem (item) {
-      this.editedIndex = this.empresas.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
+      if(this.permisos()){
+        this.editedIndex = this.empresas.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialogDelete = true
+      }
+      else{
+        alert("No cuenta con permisos para borrar.")
+      }
     },
     deleteItemConfirm () {
       this.empresas.splice(this.editedIndex, 1)

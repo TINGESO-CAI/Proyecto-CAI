@@ -525,7 +525,7 @@ export default {
         this.dialogDelete = true
       }
       else{
-        alert("No cuenta con permisos para editar.")
+        alert("No cuenta con permisos para borrar.")
       }
     },
     deleteItemConfirm () {

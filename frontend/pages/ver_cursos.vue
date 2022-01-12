@@ -389,9 +389,14 @@ export default {
         }
       },
     deleteItem (item) {
-      this.editedIndex = this.cursos.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
+      if(this.permisos()){
+        this.editedIndex = this.cursos.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialogDelete = true
+      }
+      else{
+        alert("No cuenta con permisos para borrar.")
+      }
     },
     deleteItemConfirm () {
       this.cursos.splice(this.editedIndex, 1)
