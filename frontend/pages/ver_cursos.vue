@@ -197,11 +197,11 @@
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="text-h5">Quieres archivar esto?</v-card-title>
+            <v-card-title class="text-h5">¿Quieres eliminar esto?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-btn color="blue darken-1" text @click="eliminarCurso">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
@@ -353,6 +353,17 @@ export default {
 
         console.log(this.editedItem.resolucion_sence,this.editedItem.resolucion_sence)
         this.editedItem.resolucion_sence=this.editedItem.resolucion_sence
+        Object.assign(this.cursos[this.editedIndex], this.editedItem)
+      }
+      catch (error) {
+        console.log('error', error);
+      }
+    },
+    eliminarCurso: async function(){
+      try {
+        let response = await axios.delete('http://localhost:5000/curso/eliminar?sence='+this.editedItem.sence);
+        console.log(response);
+        this.closeDelete();
         Object.assign(this.cursos[this.editedIndex], this.editedItem)
       }
       catch (error) {

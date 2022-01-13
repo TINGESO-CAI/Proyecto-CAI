@@ -6,6 +6,7 @@
               :headers="headers"
               :items="instancias"
               dense
+              :search="search"
             >
             <template v-slot:[`item.malla`]="{ item }">
                 <span>{{ mostrarMalla(item.malla) }}</span>
@@ -20,6 +21,14 @@
             inset
             vertical
           ></v-divider>
+          <v-spacer></v-spacer>
+          <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Busqueda"
+                single-line
+                hide-details
+          ></v-text-field>
           <v-spacer></v-spacer>
           <v-dialog
             v-model="dialog"
@@ -138,7 +147,7 @@
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="text-h5">Quieres archivar esto?</v-card-title>
+            <v-card-title class="text-h5">¿Quieres eliminar esto?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
@@ -335,6 +344,7 @@ export default {
   data:()=>( {
     estados:["abierto","cerrado"],
     busqueda: null,
+    search: '',
     search2:'',
     search3:'',
     page:1,
@@ -671,6 +681,10 @@ export default {
   border-top: 3px solid;
   border-bottom: 3px solid;
   border-color: #4e99fc
+}
+html, body {
+  margin: 0px !important;
+  padding: 0px !important;
 }
 
 </style>

@@ -404,7 +404,7 @@ export default {
 			miniVariant: false,
 			right: true,
 			rightDrawer: false,
-			title: 'Sistema de gestión administrativa para la capacitación CAI'
+			title: 'Sistema de gestión para CAI'
 		}
 	},
 	methods:{

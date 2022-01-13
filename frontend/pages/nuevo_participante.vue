@@ -20,6 +20,7 @@
                 <v-col>
                 <v-text-field
                     v-model="nombre"
+
                     :counter="20"
                     label="Nombre"
                     

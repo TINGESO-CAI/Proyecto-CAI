@@ -1,5 +1,5 @@
 <template>
-<v-container class="test">
+  <v-container class="test">
     <div v-if="page==1">
       <h1>Seleccione Relatores</h1>
       <div>
