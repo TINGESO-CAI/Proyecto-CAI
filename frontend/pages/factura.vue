@@ -500,22 +500,6 @@ export default {
       }
       else{
         try{
-          console.log({
-            num_registro: this.transformarVacio(this.numeroRegistro)
-            ,num_hes: this.transformarVacio(this.num_hes)
-            ,fecha_vencimiento: this.transformarVacio(this.fecha_vencimiento)
-            ,sence: this.transformarVacio(this.curso[0].sence)
-            ,id_instancia: this.transformarVacio(this.instancia[0].id_instancia)
-            ,razon_social: this.transformarVacio(this.razon_social.razon_social)
-            ,enviar_factura: parseInt(this.enviar)
-            ,especificar: this.transformarVacio(this.especificar)
-            ,num_orden:this.transformarVacio(this.num_orden)
-            ,obs:this.transformarVacio(this.observacion)
-            ,participantes:this.onlyRut()
-            ,fono_empresa:this.transformarVacio(this.contacto.fono.replace('+','%2B'))
-            ,direccion_particular:this.transformarVacio(this.direccion_particular)
-            ,comuna_particular:this.transformarVacio(this.comuna_particular)
-          })
           let response= await axios.post('http://localhost:5000/factura/agregar',
           {
             num_registro: this.transformarVacio(this.numeroRegistro)

@@ -274,6 +274,27 @@ export default {
       else if (valor == 'masculino' ) return '2'
       else return ''
     },
+    comprobarTelefono(fono){
+      if (fono==''){
+        return true
+      }
+      if(fono.length!=9){
+        if(fono[0]=='+' && fono.length==12){
+          return true
+        }
+        else{
+          return false
+        }
+      }
+      else{
+        if(fono[0]!='+'){
+          return true
+        }
+        else{
+          return false
+        }
+      }
+    },
     successMessage:function(){
       alert("El participante se creo exitosamente.")
     },
@@ -293,6 +314,21 @@ export default {
       else{
         return valor
       }
+    },
+    validaRut : function (rutCompleto) {
+		if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test( rutCompleto ))
+			return false;
+		var tmp 	= rutCompleto.split('-');
+		var digv	= tmp[1]; 
+		var rut 	= tmp[0];
+		if ( digv == 'K' ) digv = 'k' ;
+		return (this.dv(rut) == digv );
+    },
+    dv : function(T){
+      var M=0,S=1;
+      for(;T;T=Math.floor(T/10))
+        S=(S+T%10*(9-M++%6))%11;
+      return S?S-1:'k';
     },
     async createParticipante(){ //Crear un nuevo PARTICIPANTE
       this.message = '';
@@ -314,7 +350,11 @@ export default {
         correo_personal: this.transformarVacio(this.correo_personal),
         razon_social: this.transformarVacio(this.razon_social)
       }
-      if(this.rut.split('-').length==2){
+      if(this.validaRut(this.rut)){//this.rut.split('-').length==2){
+        if(this.comprobarTelefono(this.fono_personal)==false || this.comprobarTelefono(this.fono_corporativo)==false){
+          alert("Error en formato de telefono.")
+          return 0
+        }
         if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){         
           try {
             //se llama el servicio para crear un nuevo participante
@@ -356,7 +396,7 @@ export default {
         }
       }
       else{
-        alert("Debe ingresar el rut de manera correcta")
+        alert("Debe ingresar un rut valido.")
       }
     },
     mostrarGenero(valor){

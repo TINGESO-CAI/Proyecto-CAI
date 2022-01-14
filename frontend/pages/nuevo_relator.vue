@@ -254,6 +254,42 @@ export default {
         return valor
       }
     },
+    comprobarTelefono(fono){
+      if (fono==''){
+        return true
+      }
+      if(fono.length!=9){
+        if(fono[0]=='+' && fono.length==12){
+          return true
+        }
+        else{
+          return false
+        }
+      }
+      else{
+        if(fono[0]!='+'){
+          return true
+        }
+        else{
+          return false
+        }
+      }
+    },
+    validaRut : function (rutCompleto) {
+		if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test( rutCompleto ))
+			return false;
+		var tmp 	= rutCompleto.split('-');
+		var digv	= tmp[1]; 
+		var rut 	= tmp[0];
+		if ( digv == 'K' ) digv = 'k' ;
+		return (this.dv(rut) == digv );
+    },
+    dv : function(T){
+      var M=0,S=1;
+      for(;T;T=Math.floor(T/10))
+        S=(S+T%10*(9-M++%6))%11;
+      return S?S-1:'k';
+    },
     async createRelator(){ //Crear un nuevo PARTICIPANTE
       this.message = '';
       let newRelator ={
@@ -273,7 +309,11 @@ export default {
         correo_personal:this.transformarVacio(this.correo_personal),
         correo_corporativo:this.transformarVacio(this.correo_corporativo)
       }
-      if(this.rut.split('-').length==2){
+      if(this.validaRut(this.rut)){
+        if(this.comprobarTelefono(this.fono_personal)==false || this.comprobarTelefono(this.fono_corporativo)==false){
+          alert("Error en formato de telefono.")
+          return 0
+        }
         if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){        
           try {
             //se llama el servicio para crear un nuevo relator
@@ -315,7 +355,7 @@ export default {
         }
       }
       else{
-        alert("Debe ingresar el rut de manera correcta")
+        alert("Debe ingresar un rut valido.")
       }
     },
     permisos(){
