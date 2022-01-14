@@ -550,6 +550,14 @@ def eliminar_curso():
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------INSTANCIA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+@app.route("/intancia/obtener/id",methods=["GET"])
+def obtener_sences():
+	# Se toma todos los curso
+	id_instancias = db.session.query(mo.Instancia.id).all()
+	# Se realiza el dump
+	instancias = instancia_schemas.dump(id_instancias)
+	
+	return jsonify(instancias)
 
 # Funcion que se encarga de agregar una instancia
 @app.route("/instancia/agregar",methods=["POST"])
