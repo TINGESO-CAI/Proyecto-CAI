@@ -382,7 +382,7 @@ export default {
   methods:{
     obtenerDescripcion: async function(){
       try{
-        let response= await axios.get('http://localhost:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono)
+        let response= await axios.get('http://localhost:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono.replace('+','%2B'))
         console.log(response.data)
         this.descripcion=response.data[0].descripcion
       }
@@ -473,10 +473,13 @@ export default {
         console.log(response.data)
         this.contactos=response.data
         this.contacto=this.contactos[0]
+        console.log(this.contacto.fono[0])
         if(this.contacto != null){
-          let response2= await axios.get('http://localhost:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono)
-          console.log(response2.data)
-          this.descripcion=response2.data[0].descripcion
+          let response2= await axios.get('http://localhost:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono.replace('+','%2B'))
+          console.log("datos",response2.data)
+          if(response2.data!=[]){
+            this.descripcion=response2.data[0].descripcion
+          }
         }
         else{
           this.contacto={contacto:''}
@@ -497,7 +500,6 @@ export default {
       }
       else{
         try{
-          alert(this.direccion_particular)
           let response= await axios.post('http://localhost:5000/factura/agregar',
           {
             num_registro: this.transformarVacio(this.numeroRegistro)
@@ -515,8 +517,8 @@ export default {
             ,direccion_particular:this.transformarVacio(this.direccion_particular)
             ,comuna_particular:this.transformarVacio(this.comuna_particular)
           })
+          console.log(response)
           window.location.href='http://localhost:5000/factura/descargar/'+response.data.id_factura.toString()
-          this.$router.push('factura') 
           this.page=1
           this.getSences()
           this.curso=[]
@@ -547,7 +549,7 @@ export default {
       }
     },
     continuarPage4: async function(){
-      console.log(this.razon_social.razon_social)
+      console.log("razon social:",this.razon_social)
       if(this.enviar!=''){
         if(this.comprobarFecha(this.fecha_vencimiento)==false){
           alert("Mal formato en fecha")

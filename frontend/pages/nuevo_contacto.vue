@@ -177,6 +177,10 @@ export default {
       let check= await axios.get('http://localhost:5000/empresa/obtener?razon_social='+this.razon_social)
       console.log(check.data)
       if (check.data.length==1){
+        if(this.comprobarTelefono(this.fono)==false){
+          alert("Error en formato de telefono.")
+          return 0
+        }
         try {
           //se llama el servicio para crear un nuevo contacto
           let response = await axios.post('http://localhost:5000/contacto/agregar',newContacto);
@@ -197,6 +201,27 @@ export default {
       }
       else{
         alert('Debe ingresar una razon social valida')
+      }
+    },
+    comprobarTelefono(fono){
+      if (fono==''){
+        return true
+      }
+      if(fono.length!=9){
+        if(fono[0]=='+' && fono.length==12){
+          return true
+        }
+        else{
+          return false
+        }
+      }
+      else{
+        if(fono[0]!='+'){
+          return true
+        }
+        else{
+          return false
+        }
       }
     },
     permisos(){
