@@ -141,7 +141,7 @@ def editar_cuenta():
 		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
 	return jsonify({"respuesta":"edicion exitosa"})
 @app.route('/cuenta/obtener/todos',methods=["PUT"])
-def editar_cuenta():
+def obtener_cuentas():
 
 	cuentas = mo.Cuenta.query.all()
 	dump=cuenta_schemas.dump(cuentas)
@@ -572,7 +572,7 @@ def eliminar_curso():
 # --------------------------------------INSTANCIA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
 @app.route("/intancia/obtener/id",methods=["GET"])
-def obtener_sences():
+def obtener_instancias():
 	# Se toma todos los curso
 	id_instancias = db.session.query(mo.Instancia.id_instancia).all()
 	# Se realiza el dump
