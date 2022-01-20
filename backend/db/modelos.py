@@ -1,3 +1,4 @@
+from enum import unique
 from flask_sqlalchemy import SQLAlchemy 
 from marshmallow import Schema, fields, ValidationError, pre_load
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
@@ -47,7 +48,7 @@ class ContactoSchema(SQLAlchemyAutoSchema):
 class Cuenta(UserMixin,db.Model):
 	__tablename__ = 'cuenta'
 	id = db.Column(db.Integer, primary_key=True,autoincrement=True, nullable = False)
-	correo = db.Column(db.Text, nullable = True)
+	correo = db.Column(db.Text, nullable = True, unique=True)
 	contrasena = db.Column(db.Text, nullable = True)
 	nombre = db.Column(db.Text, nullable = True)
 	apellido = db.Column(db.Text, nullable = True)
@@ -74,7 +75,7 @@ class Cuenta(UserMixin,db.Model):
 
 class CuentaSchema(SQLAlchemyAutoSchema):
 	class Meta:
-		fields = ('id_cuenta','correo','contrasena','nombre','apellido',"nivel_acceso")	
+		fields = ('id','rut','correo','contrasena','nombre','apellido',"nivel_acceso")	
 
 class Curso(db.Model):
 	__tablename__ = 'curso'

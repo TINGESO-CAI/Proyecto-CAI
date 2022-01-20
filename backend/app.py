@@ -27,7 +27,7 @@ import db.modelos as mo
 
 # LOGIN
 from flask_jwt_extended import JWTManager,jwt_required, create_access_token, get_jwt_identity
-import jwt
+import jwt as jwtLib
 
 # Configuracion de la app
 db= mo.objeto_db()
@@ -140,7 +140,8 @@ def editar_cuenta():
 	except:
 		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
 	return jsonify({"respuesta":"edicion exitosa"})
-@app.route('/cuenta/obtener/todos',methods=["PUT"])
+
+@app.route('/cuenta/obtener/todos',methods=["GET"])
 def obtener_cuentas():
 
 	cuentas = mo.Cuenta.query.all()
@@ -151,10 +152,13 @@ def obtener_cuentas():
 def obtener_permisos():
 
 	token = request.json['token']
-	current_user = get_jwt_identity()
-	payload = jwt.decode(token, verify=False)
 
-	return jsonify(payload)
+	payload = jwtLib.decode(token,'Super_Secret_JWT_KEY',algorithms=["HS256"])
+	print(payload["sub"])
+	cuenta = mo.Cuenta.query.filter(mo.Cuenta.correo==str(payload["sub"])).first()
+
+	dump={"nivel_acceso":cuenta.nivel_acceso}
+	return jsonify(dump)
 
 	'''
 	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
