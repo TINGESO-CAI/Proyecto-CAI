@@ -283,10 +283,9 @@
           <v-toolbar-title >DATOS USUARIO</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
-
-              <span>Nombre: {{usuario.nombre}}</span>
-              <span>Rut: {{usuario.rut}}</span>
-              <span>Correo: {{usuario.correo}}</span>
+              <span>Nombre: {{usuario.nombre}}</span><br>
+              <span>Rut: {{usuario.rut}}</span><br>
+              <span>Correo: {{usuario.correo}}</span><br>
 
         </v-card-text>
 				<v-card-actions>

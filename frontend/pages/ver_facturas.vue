@@ -5,12 +5,22 @@
               :headers="headers"
               :items="facturas"
               dense
+              :search="search"
             >
              <template v-slot:top>
       <v-toolbar
         flat
       >
         <v-toolbar-title> VISOR SOLICITUD FACTURAS</v-toolbar-title>
+        <v-spacer></v-spacer>
+          <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Busqueda"
+                single-line
+                hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
         <v-divider
           class="mx-4"
           inset
@@ -180,6 +190,7 @@ export default {
     dialog: false,
     dialogDelete: false,
     editedIndex: -1,
+    search: '',
     editedItem: {
       id_factura: '',
       sence: '',
