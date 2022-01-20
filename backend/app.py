@@ -125,15 +125,48 @@ def entrar_cuenta():
 			'token': access_token})
 	except Exception as e:
 		return jsonify(str(e))
+@app.route('/cuenta/editar_acceso',methods=["PUT"])
+def editar_cuenta():
+	id_aux=request.json['id_cuenta']
 
+	cuenta = mo.Cuenta.query.get(id_aux)
+	nivel_acceso=request.json['nivel_acceso']
+	if nivel_acceso != cuenta.nivel_acceso:
+		cuenta.nivel_acceso = nivel_acceso
+
+	try:
+		# Los agrego a la bd
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	return jsonify({"respuesta":"edicion exitosa"})
+@app.route('/cuenta/obtener/todos',methods=["PUT"])
+def editar_cuenta():
+
+	cuentas = mo.Cuenta.query.all()
+	dump=cuenta_schemas.dump(cuentas)
+	return jsonify(dump)
+		
 @app.route('/cuenta/permisos',methods=["GET"])
-@jwt_required()
 def obtener_permisos():
-    # Accede a la identidad del usuario actual con get_jwt_identity
-    current_user_id = get_jwt_identity()
-    user = mo.Cuenta.filter.get(current_user_id)
-    
-    return jsonify({"permiso":user.nivel_acceso})
+
+	token = request.json['token']
+	current_user = get_jwt_identity()
+	payload = jwt.decode(token, verify=False)
+
+	return jsonify(payload)
+
+	'''
+	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
+	permiso={
+		"nombre": cuenta.nombre + " " + cuenta.apellido,
+		"rut": cuenta.rut,
+		"correo": cuenta.correo,
+		"nivel_acceso": cuenta.nivel_acceso
+		}
+	
+	return jsonify(permiso)
+	'''
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------

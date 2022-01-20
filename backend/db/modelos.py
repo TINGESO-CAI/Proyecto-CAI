@@ -60,7 +60,7 @@ class Cuenta(UserMixin,db.Model):
 		self.nombre=nombre
 		self.apellido=apellido
 		self.rut=rut
-		self.nivel_acceso=0
+		self.nivel_acceso=3
 	
 	@classmethod
 	def autenticar(cls,correo,contrasena):
