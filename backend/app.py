@@ -127,25 +127,13 @@ def entrar_cuenta():
 		return jsonify(str(e))
 
 @app.route('/cuenta/permisos',methods=["GET"])
+@jwt_required()
 def obtener_permisos():
-
-	token = request.json['token']
-
-	payload = jwt.decode(token, verify=False)
-
-	return jsonify(payload)
-
-	'''
-	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
-	permiso={
-		"nombre": cuenta.nombre + " " + cuenta.apellido,
-		"rut": cuenta.rut,
-		"correo": cuenta.correo,
-		"nivel_acceso": cuenta.nivel_acceso
-		}
-	
-	return jsonify(permiso)
-	'''
+    # Accede a la identidad del usuario actual con get_jwt_identity
+    current_user_id = get_jwt_identity()
+    user = mo.Cuenta.filter.get(current_user_id)
+    
+    return jsonify({"permiso":user.nivel_acceso})
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
