@@ -151,7 +151,7 @@ def obtener_cuentas():
 @app.route('/cuenta/permisos',methods=["GET"])
 def obtener_permisos():
 
-	token = request.json['token']
+	token = request.args.get('token')
 
 	payload = jwtLib.decode(token,'Super_Secret_JWT_KEY',algorithms=["HS256"])
 	print(payload["sub"])
