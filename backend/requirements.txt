@@ -1,0 +1,12 @@
+flask
+flask_sqlalchemy
+flask_marshmallow
+flask_migrate
+flask_cors
+sqlalchemy
+docxtpl
+datetime
+flask_login
+requests
+marshmallow_sqlalchemy
+psycopg2

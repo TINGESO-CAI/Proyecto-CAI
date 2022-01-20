@@ -127,25 +127,13 @@ def entrar_cuenta():
 		return jsonify(str(e))
 
 @app.route('/cuenta/permisos',methods=["GET"])
+@jwt_required()
 def obtener_permisos():
-
-	token = request.json['token']
-
-	payload = jwt.decode(token, verify=False)
-
-	return jsonify(payload)
-
-	'''
-	cuenta=db.session.query(mo.Cuenta).filter(mo.Cuenta.correo==get_jwt_identity())
-	permiso={
-		"nombre": cuenta.nombre + " " + cuenta.apellido,
-		"rut": cuenta.rut,
-		"correo": cuenta.correo,
-		"nivel_acceso": cuenta.nivel_acceso
-		}
-	
-	return jsonify(permiso)
-	'''
+    # Accede a la identidad del usuario actual con get_jwt_identity
+    current_user_id = get_jwt_identity()
+    user = mo.Cuenta.filter.get(current_user_id)
+    
+    return jsonify({"permiso":user.nivel_acceso})
 
 # -----------------------------------------------------------------------------------------------------
 # -----------------------------------PARTICIPANTE------------------------------------------------------
@@ -550,6 +538,14 @@ def eliminar_curso():
 # -----------------------------------------------------------------------------------------------------
 # --------------------------------------INSTANCIA------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+@app.route("/intancia/obtener/id",methods=["GET"])
+def obtener_sences():
+	# Se toma todos los curso
+	id_instancias = db.session.query(mo.Instancia.id).all()
+	# Se realiza el dump
+	instancias = instancia_schemas.dump(id_instancias)
+	
+	return jsonify(instancias)
 
 # Funcion que se encarga de agregar una instancia
 @app.route("/instancia/agregar",methods=["POST"])
