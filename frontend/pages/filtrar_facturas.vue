@@ -28,11 +28,12 @@
                 </v-col>
 
                 <v-col>
-                <v-text-field
+                <v-autocomplete
                     v-model="estado"
+                    :items="estados"
                     :counter="16"
                     label="estado" 
-                ></v-text-field>
+                ></v-autocomplete>
                 </v-col>
 
                 
@@ -65,10 +66,11 @@
               </v-row>
               <v-row>
                 <v-col>
-                <v-text-field
+                <v-autocomplete
                   v-model="enviar_factura"
-                  label="enviar_factura"
-                ></v-text-field>
+                  :items="enviados"
+                  label="envio 0:usach, 1:empresa, 2:otro"
+                ></v-autocomplete>
                 </v-col>
 
                 <v-col>
@@ -104,22 +106,17 @@
  
                 ></v-text-field>
                 </v-col>
-                <v-col>
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
                 <v-text-field
-                    v-model="estado"
-                    :rules="estadoRules"
-                    :counter="20"
-                    label="estado"
+                  v-model="id_instancia"
+                  label="id_factura"
                 ></v-text-field>
-                </v-col>
+              </v-col>
 
-                <v-col>
-                <v-text-field
-                    v-model="fono"
-                    :counter="15"
-                    label="fono"
-                ></v-text-field>
-                </v-col>
             </v-row>
             </v-container>
         </v-form>
@@ -163,7 +160,14 @@ export default {
       especificar: '',
       num_orden: '',
       observacion: '',
-      num_cai:'', 
+      num_cai:'',
+      instancias:'',
+
+      id_instancia: '',
+      mandada: '',
+      pagada: '',
+      estados:["abierto","cerrado"],
+      enviados:['0','1','2'], //0: usach, 1: empresa, 2: otro 
       headers: [
         {
           text: 'id_factura',
@@ -209,7 +213,10 @@ export default {
     empyMessage:function(){
       alert("No existen facturas con esas caracteristicas.")
     },
-
+    obtenerInstancias: async function(value){
+      let response= axios.get('http://localhost:5000//instancia/obtener/id')
+      return response
+    },
     async filtro(){ //Filtrar facturas
       
       try {

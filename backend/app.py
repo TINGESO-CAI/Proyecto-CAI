@@ -574,7 +574,7 @@ def eliminar_curso():
 @app.route("/intancia/obtener/id",methods=["GET"])
 def obtener_sences():
 	# Se toma todos los curso
-	id_instancias = db.session.query(mo.Instancia.id).all()
+	id_instancias = db.session.query(mo.Instancia.id_instancia).all()
 	# Se realiza el dump
 	instancias = instancia_schemas.dump(id_instancias)
 	
