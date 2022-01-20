@@ -57,9 +57,46 @@
               return converted_date
             },            
             cambiarGenero(valor){
-              if (valor == 'femenino' ) return '1'
-              else if (valor == 'masculino' ) return '2'
-              else return ''
+              if (valor == 'f' ) return 1
+              else if (valor == 'm' ) return 2
+              else return null
+            },
+
+            comprobarTelefono(fono){
+              if (fono==null){
+                return true
+              }
+              if(fono.length!=9){
+                if(fono[0]=='+' && fono.length==12){
+                  return true
+                }
+                else{
+                  return false
+                }
+              }
+              else{
+                if(fono[0]!='+'){
+                  return true
+                }
+                else{
+                  return false
+                }
+              }
+            },
+            validaRut : function (rutCompleto) {
+            if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test( rutCompleto ))
+              return false;
+            var tmp 	= rutCompleto.split('-');
+            var digv	= tmp[1]; 
+            var rut 	= tmp[0];
+            if ( digv == 'K' ) digv = 'k' ;
+            return (this.dv(rut) == digv );
+            },
+            dv : function(T){
+              var M=0,S=1;
+              for(;T;T=Math.floor(T/10))
+                S=(S+T%10*(9-M++%6))%11;
+              return S?S-1:'k';
             },
             ingresar: async function(i){
               let errores=[]
@@ -73,21 +110,26 @@
                   ,apellido_paterno:archivo[j][2]
                   ,apellido_materno:archivo[j][3]
                   ,titulo:archivo[j][4]
-                  ,cv:archivo[j][5]
-                  ,fecha_nacimiento: this.todate(archivo[j][6])
-                  ,numero_cuenta:archivo[j][7]
-                  ,banco: archivo[j][8]
-                  ,tipo_cuenta: archivo[j][9]
-                  ,fono_personal: archivo[j][10]
-                  ,fono_corporativo: archivo[j][11]
-                  ,correo_personal: archivo[j][12]
-                  ,correo_corporativo: archivo[j][13]
-                  ,genero: this.cambiarGenero(archivo[j][14])}//)
-                  console.log(NewRelator)
-                  let response=await axios.post('http://localhost:5000/relator/agregar',NewRelator)
+                  ,cv:archivo[j][6]
+                  ,fecha_nacimiento: this.todate(archivo[j][7])
+                  ,numero_cuenta:archivo[j][8].toString()
+                  ,banco: archivo[j][9]
+                  ,tipo_cuenta: archivo[j][10]
+                  ,fono_personal: archivo[j][11]
+                  ,fono_corporativo: archivo[j][12]
+                  ,correo_personal: archivo[j][13]
+                  ,correo_corporativo: archivo[j][14]
+                  ,genero: this.cambiarGenero(archivo[j][5])}//)
+                  if(this.validaRut(archivo[j][0]) && this.comprobarTelefono(archivo[j][11]) && this.comprobarTelefono(archivo[j][12]) ){
+                    await axios.post('http://localhost:5000/relator/agregar',NewRelator)
+                    
+                    }
+                  else{
+                      console.log(archivo[j][11],archivo[j][12])
+                      errores.push(j)
+                    }                 
                   }
                   catch(error){
-                    console.log(error)
                     errores.push(j)
                   }                  
                 }
@@ -121,7 +163,6 @@
             },
             permisos(){
               let data=localStorage.getItem("user")
-              console.log(data)
                 if(data!=null){
                   return true
                     /*data=JSON.parse(data)

@@ -426,7 +426,6 @@ export default {
 				//limpiar
 				this.correo = '';
 				this.contrasena = '';
-				console.log('response: ', response.data);
 				localStorage.setItem("user",JSON.stringify({token:response.data.token,nombre:response.data.nombre,correo:response.data.correo,rut:response.data.rut}))
 				this.usuario.nombre=response.data.nombre
 				this.usuario.rut=response.data.rut
@@ -446,7 +445,6 @@ export default {
 				let response = await axios.get('http://localhost:5000/cuenta/permisos');
 				//limpiar
 				this.usuario=response.data;
-				console.log('response', response.data);
 			}
 			catch (error){
 				console.log('error', error); 
@@ -483,7 +481,6 @@ export default {
 		},
 		permisos(){
 			let data=localStorage.getItem("user")
-			console.log(data)
 			if(data!=null){
 				return true
 				/*data=JSON.parse(data)
@@ -559,7 +556,6 @@ export default {
 			this.usuario.correo=data.correo
 			this.usuario.rut=data.rut
 			this.usuario.nombre=data.nombre
-			console.log("DATOS: ",data)
 		}
 	},
 	created(){

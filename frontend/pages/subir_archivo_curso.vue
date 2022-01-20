@@ -114,7 +114,6 @@
             },
             permisos(){
               let data=localStorage.getItem("user")
-              console.log(data)
                 if(data!=null){
                   return true
                     /*data=JSON.parse(data)

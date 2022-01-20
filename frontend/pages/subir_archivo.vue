@@ -57,14 +57,51 @@
               return converted_date
             },
             cambiarGenero(valor){
-              if (valor == 'f' ) return '1'
-              else if (valor == 'm' ) return '2'
+              if (valor == 'f' ) return 1
+              else if (valor == 'm' ) return 2
               else return null
+            },
+
+            comprobarTelefono(fono){
+              if (fono==null){
+                return true
+              }
+              if(fono.length!=9){
+                if(fono[0]=='+' && fono.length==12){
+                  return true
+                }
+                else{
+                  return false
+                }
+              }
+              else{
+                if(fono[0]!='+'){
+                  return true
+                }
+                else{
+                  return false
+                }
+              }
+            },
+            validaRut : function (rutCompleto) {
+            if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test( rutCompleto ))
+              return false;
+            var tmp 	= rutCompleto.split('-');
+            var digv	= tmp[1]; 
+            var rut 	= tmp[0];
+            if ( digv == 'K' ) digv = 'k' ;
+            return (this.dv(rut) == digv );
+            },
+            dv : function(T){
+              var M=0,S=1;
+              for(;T;T=Math.floor(T/10))
+                S=(S+T%10*(9-M++%6))%11;
+              return S?S-1:'k';
             },
             ingresar: async function(i){
               let errores=[]
               let archivo=await readXlsxFile(this.filelist[i])
-                for (let j=1; j< archivo.length; j++){  
+                for (let j=1; j< archivo.length; j++){                    
                   try{
               //let response=await axios.post('http://localhost:5000/participante/agregar',
                   let NewParticipante={rut:archivo[j][0]
@@ -82,12 +119,19 @@
                   ,correo_personal: archivo[j][14]
                   ,correo_corporativo: archivo[j][13]
                   ,razon_social: archivo[j][10]}//)
-                  let response=await axios.post('http://localhost:5000/participante/agregar',NewParticipante)
+                  let check= await axios.get('http://localhost:5000/empresa/obtener?razon_social='+archivo[j][10])
+                  if(this.validaRut(archivo[j][0]) && this.comprobarTelefono(archivo[j][12]) && this.comprobarTelefono(archivo[j][11]) && check.data.length==1){
+                    await axios.post('http://localhost:5000/participante/agregar',NewParticipante)
+                    
+                    }
+                  else{
+                      errores.push(j)
+                    }
                   }
                   catch(error){
                     console.log(error)
                     errores.push(j)
-                  }                  
+                  }                 
                 }
                 let mensaje="Se ha ingresado archivo "+this.filelist[i].name+" con exito."
                 if (errores.length!=0){
@@ -119,7 +163,6 @@
             },
             permisos(){
               let data=localStorage.getItem("user")
-              console.log(data)
                 if(data!=null){
                   return true
                     /*data=JSON.parse(data)
