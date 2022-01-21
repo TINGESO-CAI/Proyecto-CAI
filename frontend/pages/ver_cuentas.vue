@@ -193,7 +193,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="editarUsuario"
+                @click="editarCuenta"
               >
                 Guardar
               </v-btn>
@@ -206,7 +206,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
-              <v-btn color="blue darken-1" text @click="eliminarParticipante">OK</v-btn>
+              <v-btn color="blue darken-1" text @click="eliminarCuenta">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
@@ -350,11 +350,13 @@ export default {
     forEach: async function(){
 
     },
-    getUsuarios: async function(){
+    getCuentas: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/cuenta/obtener/todos');
+        
         this.usuarios = response.data;
+        console.log(this.usuarios)
       }
       catch (error) {
         console.log('error', error); 
@@ -374,16 +376,41 @@ export default {
         this.cambiarAcceso=true
         this.usuario=item
     },
-    editarParticipante: async function(){
-      let newUsuario ={
-        rut: this.editedItem.rut,
+    validaRut : function (rutCompleto) {
+		if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test( rutCompleto ))
+			return false;
+		var tmp 	= rutCompleto.split('-');
+		var digv	= tmp[1]; 
+		var rut 	= tmp[0];
+		if ( digv == 'K' ) digv = 'k' ;
+		return (this.dv(rut) == digv );
+    },
+    dv : function(T){
+      var M=0,S=1;
+      for(;T;T=Math.floor(T/10))
+        S=(S+T%10*(9-M++%6))%11;
+      return S?S-1:'k';
+    },
+    editarCuenta: async function(){
+      let newCuenta ={
+        id:this.editedItem.id,
+        rut: this.transformarVacio(this.editedItem.rut),
         nombre: this.transformarVacio(this.editedItem.nombre),
         apellido: this.transformarVacio(this.editedItem.apellido),
         correo: this.transformarVacio(this.editedItem.correo)
       }
+      if(this.validaRut(this.editedItem.rut)==false){
+        alert("rut invalido.")
+        return 0
+      }
+      console.log(this.editedItem.id)
       try {
-        //let response = await axios.put('http://localhost:5000/participante/editar?rut='+newUsuario.rut,newUsuario);
+        await axios.put('http://localhost:5000/cuenta/editar',newCuenta);
         this.close();
+        this.editedItem.rut=newCuenta.rut
+        this.editedItem.correo=newCuenta.correo
+        this.editedItem.apellido=newCuenta.apellido
+        this.editedItem.nombre=newCuenta.nombre
         Object.assign(this.usuarios[this.editedIndex], this.editedItem)
       }
       catch (error) {
@@ -392,12 +419,11 @@ export default {
 
     },
     eliminarCuenta: async function(){
-      return 0
       try {
-        let response = await axios.delete('http://localhost:5000/participante/eliminar?rut='+this.editedItem.rut);
+        let response = await axios.delete('http://localhost:5000/cuenta/eliminar?id='+this.editedItem.id);
         console.log(response);
         this.closeDelete();
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+        Object.assign(this.usuarios[this.editedIndex], this.editedItem)
       }
       catch (error) {
         console.log('error', error);
@@ -481,7 +507,7 @@ export default {
   },
   created: async function(){
     if(await this.permisos()){
-      this.getUsuarios()
+      this.getCuentas()
     }
     else{
       window.location.href='/'

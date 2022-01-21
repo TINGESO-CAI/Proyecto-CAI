@@ -161,7 +161,7 @@ def editar_cuenta():
 	correo=request.json['correo']
 	nombre=request.json['nombre']
 	apellidos=request.json['apellido']
-	rut=request.json['correo']
+	rut=request.json['rut']
 	if rut != cuenta.rut:
 		cuenta.rut = rut
 	if nombre != cuenta.nombre:
