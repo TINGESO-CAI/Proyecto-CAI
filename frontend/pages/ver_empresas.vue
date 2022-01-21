@@ -658,7 +658,7 @@ export default {
       if(data!=null){
         try{
           let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
-          return (response.data.nivel_acceso <2)
+          return (response.data.nivel_acceso <3)
         }
         catch(error){
           console.log(error)
