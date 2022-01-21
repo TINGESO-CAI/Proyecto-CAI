@@ -1,0 +1,71 @@
+version: "2.1"
+services:
+
+      
+
+#La base de datos espera a que zookeper y kafka esten arriba
+  db:
+    image: postgres:13.1
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    user: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - APP_DB_USER=root
+      - APP_DB_PASS=root
+      - APP_DB_NAME=cai
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    networks:
+      - api_bridge
+ #Flask depende de la base de datos
+  flask:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - "./backend:/backend"
+    ports:
+      - 5000:5000
+    expose:
+      - 5000
+
+    depends_on:
+       db: 
+          condition: service_healthy
+    links:
+      - db
+    networks:
+      - api_bridge
+      #vue depende de flask
+  vue:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - "./frontend:/frontend"
+      - "/frontend/node_modules"
+    ports:
+      - 8081:8081
+      - 8080:8080
+    expose: 
+      - 8081
+      - 8080
+    depends_on:
+      - flask
+    networks:
+      - api_bridge
+
+networks:
+  api_bridge:
+    driver: bridge
+
