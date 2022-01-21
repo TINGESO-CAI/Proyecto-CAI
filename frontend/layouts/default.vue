@@ -477,7 +477,6 @@ export default {
 					this.Prelator=true
 					this.Pcursos=true
 					this.Pempresa=true
-					this.Pfinanza=true
 				}
 				else if(await this.ejecutivo()){
 					this.cambiarMenuPermisosEjecutivo()
@@ -732,12 +731,21 @@ export default {
 			this.login=1
 			this.cambiarMenuPermisosAdmin()		
 		}
-		else if(permiso=="jefe administrador" || permiso=="cai"){
+		else if(permiso=="jefe administrador" ){
 			this.Pparticipante=true
 			this.Prelator=true
 			this.Pcursos=true
 			this.Pempresa=true
 			this.Pfinanza=true	
+			this.asignarDatos()
+			this.login=1
+			this.cambiarMenuPermisosJefeAdmin()		
+		}
+		else if(permiso=="cai" ){
+			this.Pparticipante=true
+			this.Prelator=true
+			this.Pcursos=true
+			this.Pempresa=true
 			this.asignarDatos()
 			this.login=1
 			this.cambiarMenuPermisosJefeAdmin()		
