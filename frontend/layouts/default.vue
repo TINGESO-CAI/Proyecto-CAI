@@ -35,6 +35,7 @@
 						router
 						exact
 						sub-group
+						v-if="Pparticipante"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -61,6 +62,7 @@
 						router
 						exact
 						sub-group
+						v-if="Prelator"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -88,6 +90,7 @@
 						router
 						exact
 						sub-group
+						v-if="Pcursos"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -115,6 +118,7 @@
 						router
 						exact
 						sub-group
+						v-if="Pempresa"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -141,7 +145,7 @@
 						router
 						exact
 						sub-group
-						v-if="permisos()"
+						v-if="Pfinanza"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -168,7 +172,7 @@
 						router
 						exact
 						sub-group
-						v-if="permisos()"
+						v-if="Padmin"
 					>
 			<template v-slot:activator>
 					<v-list-item-content>
@@ -324,6 +328,12 @@ export default {
 				rut:'',
 				correo:'',
 			},
+			Pparticipante:false,
+			Prelator:false,
+			Pcursos:false,
+			Pempresa:false,
+			Pfinanza:false,
+			Padmin:false,
 			//lista para submenu
 			participantes: [
 			['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
@@ -359,6 +369,7 @@ export default {
 			],
 			administracion:[
 			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],
+			['Ver usuarios','mdi-account-multiple','/ver_cuentas'],
 			/*
 			['Asignar permisos', 'mdi-account-multiple-plus','/permisos'],
 			['Editar datos','mdi-account-multiple','/editar datos']*/
@@ -430,7 +441,38 @@ export default {
 				this.usuario.rut=response.data.rut
 				this.usuario.correo=response.data.correo
 				this.login=1;
-				this.cambiarMenuPermisos()
+				if(await this.admin()){
+					this.cambiarMenuPermisosAdmin()
+					this.Pparticipante=true
+					this.Prelator=true
+					this.Pcursos=true
+					this.Pempresa=true
+					this.Pfinanza=true
+					this.Padmin=true
+				}
+				else if(await this.jefeAdmin()){
+					this.cambiarMenuPermisosJefeAdmin()
+					this.Pparticipante=true
+					this.Prelator=true
+					this.Pcursos=true
+					this.Pempresa=true
+					this.Pfinanza=true
+				}
+				else if(await this.cai()){
+					this.cambiarMenuPermisosJefeAdmin()
+					this.Pparticipante=true
+					this.Prelator=true
+					this.Pcursos=true
+					this.Pempresa=true
+					this.Pfinanza=true
+				}
+				else if(await this.ejecutivo()){
+					this.cambiarMenuPermisosEjecutivo()
+					this.Pparticipante=true
+					this.Prelator=true
+					this.Pcursos=true
+					this.Pempresa=true
+				}
 				//this.traerDatos();
 			}
 			catch (error){
@@ -459,7 +501,12 @@ export default {
 				correo:'',
 			},
 			this.contrasena = '';
-			this.cambiarMenuSinPermisos()
+			this.Pparticipante=false
+			this.Prelator=false
+			this.Pcursos=false
+			this.Pempresa=false
+			this.Pfinanza=false
+			this.Padmin=false
 			window.location.href='/'
 			/*
 			this.message = '';
@@ -478,24 +525,93 @@ export default {
 			}
 			*/
 		},
-		permisos(){
+		admin: async function(){
+			try{
+				let data=localStorage.getItem("user")
+				data=JSON.parse(data)
+				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let acceso=response.data.nivel_acceso
+				console.log("ACCESO!!!!",acceso)
+				return (acceso == 0)
+				}
+			catch(error){
+				console.log("error",error)
+				return false
+			}
+		},
+		jefeAdmin: async function(){
+			try{
+				let data=localStorage.getItem("user")
+				data=JSON.parse(data)
+				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let acceso=response.data.nivel_acceso
+				console.log("ACCESO!!!!",acceso)
+				return (acceso == 1)
+				}
+			catch(error){
+				console.log("error",error)
+				return false
+			}
+		},
+		cai: async function(){
+			try{
+				let data=localStorage.getItem("user")
+				data=JSON.parse(data)
+				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let acceso=response.data.nivel_acceso
+				console.log("ACCESO!!!!",acceso)
+				return (acceso == 2)
+				}
+			catch(error){
+				console.log("error",error)
+				return false
+			}
+		},
+		ejecutivo: async function(){
+			try{
+				let data=localStorage.getItem("user")
+				data=JSON.parse(data)
+				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let acceso=response.data.nivel_acceso
+				console.log("ACCESO!!!!",acceso)
+				return (acceso == 3)
+				}
+			catch(error){
+				console.log("error",error)
+				return false
+			}
+		},
+		permisos: async function(){
 			let data=localStorage.getItem("user")
+			     
 			if(data!=null){
-				return true
-				/*data=JSON.parse(data)
-				if(data.permiso==3){
-				return true
+				data=JSON.parse(data)
+				console.log("admin:",await this.admin())
+				if (await this.admin()){
+					
+					return "administrador"
+				}
+				else if (await this.jefeAdmin()){
+					
+					return "jefe administrador"
+				}
+				else if (await this.cai()){
+					
+					return "cai"
+				}
+				if (await this.ejecutivo()){
+					
+					return "ejecutivo"
 				}
 				else{
-				return false
+					return false
 				}
-				*/
 			}
 			else{
 				return false
 			}
-    	},
-		cambiarMenuPermisos(){
+		},
+		cambiarMenuPermisosAdmin(){
 			this.participantes= [
 			['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
 			['Ver participantes','mdi-account-multiple','/ver_participantes'],
@@ -529,9 +645,44 @@ export default {
 			
 			]
 			this.administracion=[
-			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],]
+			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],
+			['Ver usuarios','mdi-account-multiple','/ver_cuentas'],]
 		},
-		cambiarMenuSinPermisos(){
+		cambiarMenuPermisosJefeAdmin(){
+			this.participantes= [
+			['Nuevo participante', 'mdi-account-multiple-plus','/nuevo_participante'],
+			['Ver participantes','mdi-account-multiple','/ver_participantes'],
+			['Subir archivo', 'mdi-file-plus','/subir_archivo'],
+			['Filtrar participantes','mdi-account-filter-outline','/filtrar_participantes' ]
+			]
+			this.relatores= [
+			['Nuevo relator', 'mdi-account-multiple-plus','/nuevo_relator'],
+			['Ver relatores','mdi-format-list-bulleted-type','/ver_relatores'],
+			['Subir archivo', 'mdi-file-plus','/subir_archivo_relator']
+			]
+			this.cursos=[
+			['Crear curso', 'mdi-account-multiple-plus','/crear_curso'],
+			['Ver cursos','mdi-format-list-bulleted-type','/ver_cursos'],
+			['Subir archivo', 'mdi-file-plus','/subir_archivo_curso'],
+			['Ver Instancias','mdi-format-list-bulleted-type','/ver_instancias'],
+			['Asignar Instancia','mdi-loupe','/Instancia_curso'],
+			['Asignar relatores','mdi-account-multiple','/asignar_relator_instancia'],
+			['Asignar participantes','mdi-account-multiple','/matricular_participantes']
+			]
+			this.empresas=[
+			['Nueva empresa', 'mdi-account-multiple-plus','/nueva_empresa'],
+			['Nuevo Contacto', 'mdi-cellphone-basic', '/nuevo_contacto'],
+			['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
+			]
+			this.finanzas=[
+			['Generar S. Factura','mdi-file-plus','/factura'],
+			['Ver S. facturas','mdi-format-list-bulleted-type','/ver_facturas'],
+			['Filtrar S. facturas','mdi-book-open-page-variant','/filtrar_facturas'],
+			['Ver participantes','mdi-account-multiple','/ver_participantes_factura'],
+			
+			]
+		},
+		cambiarMenuPermisosEjecutivo(){
 			this.participantes= [
 			['Ver participantes','mdi-account-multiple','/ver_participantes'],
 			['Filtrar participantes','mdi-account-filter-outline','/filtrar_participantes' ]
@@ -547,26 +698,52 @@ export default {
 			['Ver empresas','mdi-format-list-bulleted-type','/ver_empresas']
 			]
 			this.administracion=[
-			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],]
+			['Registrarse', 'mdi-account-multiple-plus','/nuevo_usuario'],
+			['Ver usuarios','mdi-account-multiple','/ver_cuentas'],]
 		},
 		asignarDatos(){
 			let data=localStorage.getItem("user")
-			data=JSON.parse(data)
-			this.usuario.correo=data.correo
-			this.usuario.rut=data.rut
-			this.usuario.nombre=data.nombre
+			if(data!=null){
+				data=JSON.parse(data)
+				this.usuario.correo=data.correo
+				this.usuario.rut=data.rut
+				this.usuario.nombre=data.nombre
+			}
 		}
 	},
-	created(){
-		if(this.permisos()){		
+	created: async function(){
+		let permiso=await this.permisos()
+		if(permiso=="administrador"){
+			this.Pparticipante=true
+			this.Prelator=true
+			this.Pcursos=true
+			this.Pempresa=true
+			this.Padmin=true
+			this.Pfinanza=true		
 			this.asignarDatos()
 			this.login=1
-			this.cambiarMenuPermisos()		
+			this.cambiarMenuPermisosAdmin()		
 		}
-		else{
-			this.cambiarMenuSinPermisos()
+		else if(permiso=="jefe administrador" || permiso=="cai"){
+			this.Pparticipante=true
+			this.Prelator=true
+			this.Pcursos=true
+			this.Pempresa=true
+			this.Pfinanza=true	
+			this.asignarDatos()
+			this.login=1
+			this.cambiarMenuPermisosJefeAdmin()		
 		}
-		this.traerDatos();
+		else if(permiso=="ejecutivo"){
+			this.Pparticipante=true
+			this.Prelator=true
+			this.Pcursos=true
+			this.Pempresa=true
+			this.asignarDatos()
+			this.login=1
+			this.cambiarMenuPermisosEjecutivo()		
+		}
+		//this.traerDatos();
 	}
 }
 </script>
