@@ -32,8 +32,8 @@ import jwt as jwtLib
 # Configuracion de la app
 db= mo.objeto_db()
 app= Flask(__name__)
-CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@db:5432/cai" # conexion con la bd
+cors=CORS(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = False # Para mostrar las query SQL
 #LOGIN
@@ -98,7 +98,7 @@ def validar_permiso(token,nivel_requerido):
 # Funcion encargada de registar una cuenta
 @app.route('/registrar', methods=['POST'])
 def registrar_cuenta():
-	if not validar_permiso(request.header.get('token'),0):
+	if not validar_permiso(request.headers.get('token'),0):
 		return None
 	token=request.headers.get('token')
 	#if not obtenerpermiso(token,0)
@@ -151,7 +151,7 @@ def entrar_cuenta():
 		return jsonify(str(e))
 @app.route('/cuenta/editar_acceso',methods=["PUT"])
 def editar_cuenta():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 	
 	id_aux=request.json['id_cuenta']
@@ -170,7 +170,7 @@ def editar_cuenta():
 
 @app.route('/cuenta/obtener/todos',methods=["GET"])
 def obtener_cuentas():
-	if not validar_permiso(request.header.get('token'),0):
+	if not validar_permiso(request.headers.get('token'),0):
 		return None	
 
 	cuentas = mo.Cuenta.query.all()
@@ -179,7 +179,7 @@ def obtener_cuentas():
 		
 @app.route('/cuenta/permisos',methods=["GET"])
 def obtener_permisos():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	token = request.args.get('token')
@@ -210,7 +210,7 @@ def obtener_permisos():
 # Funcion para agregar un participante
 @app.route("/participante/agregar",methods=["POST"])
 def crear_participante():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 		
 	# Request de los json
@@ -250,9 +250,9 @@ def crear_participante():
 # Funcion para filtrar por algun parametro o entregar todos los participantes
 @app.route("/participante/obtener",methods=["GET"])
 def filtro_participante():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None
 	# Request de los json a traves de la ruta
 	# ej: /participante/obtener?tipo_inscripcion=XX
@@ -316,7 +316,7 @@ def filtro_participante():
 # Se obtienen todos los ruts de los participantes
 @app.route("/participante/obtener/rut",methods=["GET"])
 def obtener_ruts():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Se sacan todos los ruts de los participantes con query().all()
@@ -329,7 +329,7 @@ def obtener_ruts():
 # Se obtienen todas las instancias de un participante especifico
 @app.route("/participante/<rut>/instancias",methods=["GET"])
 def obtener_cursos_inscritos_participante(rut):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Tomamos al participante del rut ingresado
@@ -343,7 +343,7 @@ def obtener_cursos_inscritos_participante(rut):
 # Funcion encargada de editar/actualizar los participantes
 @app.route("/participante/editar",methods=["PUT"])
 def editar_participante():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -413,7 +413,7 @@ def editar_participante():
 # Funcion encargada de borrar al participante de la bd
 @app.route("/participante/eliminar",methods=["DELETE"])
 def eliminar_participante():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 
 	# Request del rut ingresado por la ruta
@@ -432,7 +432,7 @@ def eliminar_participante():
 
 @app.route("/participante/obtener/independientes",methods=["GET"])
 def obtener_independientes():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 		participantes = db.session.query(mo.Participante).filter(mo.Participante.empresa==None)
@@ -448,7 +448,7 @@ def obtener_independientes():
 # Funcion encargada de agregar un curso
 @app.route("/curso/agregar",methods=["POST"])
 def crear_curso():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	
 	# Request de los json
@@ -478,7 +478,7 @@ def crear_curso():
 # Funcion encarga de filtar los cursos
 @app.route("/curso/obtener",methods=["GET"])
 def obtener_curso():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Request de los json
@@ -528,7 +528,7 @@ def obtener_curso():
 # Funcion que obtiene todos los sence de todos los cursos
 @app.route("/curso/obtener/sence",methods=["GET"])
 def obtener_sences():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	# Se toma todos los curso
 	sence_curso = db.session.query(mo.Curso.sence).all()
@@ -540,7 +540,7 @@ def obtener_sences():
 # Funcion que retorna todos los sence con instancias
 @app.route("/curso/obtener/sences_con_instancia",methods=["GET"])
 def obtener_sences_existente():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	# se toman todos los cursos
 	sence_curso = mo.Curso.query.all()
@@ -556,7 +556,7 @@ def obtener_sences_existente():
 # Funcion que se encarga de editar o actualizar una instancia
 @app.route("/curso/editar",methods=["PUT"])
 def editar_curso():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -614,7 +614,7 @@ def editar_curso():
 # Funcion que se usa para eliminar
 @app.route("/curso/eliminar",methods=["DELETE"])
 def eliminar_curso():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 	# Request de los json
 	# ej: /curso/eliminar?sence=xxxx
@@ -635,7 +635,7 @@ def eliminar_curso():
 # -----------------------------------------------------------------------------------------------------
 @app.route("/intancia/obtener/id",methods=["GET"])
 def obtener_instancias():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	# Se toma todos los curso
 	id_instancias = db.session.query(mo.Instancia.id_instancia).all()
@@ -647,7 +647,7 @@ def obtener_instancias():
 # Funcion que se encarga de agregar una instancia
 @app.route("/instancia/agregar",methods=["POST"])
 def crear_instancia_curso():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	
 	sence = request.json['sence']
@@ -672,7 +672,7 @@ def crear_instancia_curso():
 # Funcion para filtrar las instancias
 @app.route("/instancia/obtener",methods=["GET"])
 def obtener_instancia_curso():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Request de los json
@@ -713,7 +713,7 @@ def obtener_instancia_curso():
 # Funcion que se encarga de editar o actualizar una instancia
 @app.route("/instancia/editar",methods=["PUT"])
 def editar_instancia():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -759,7 +759,7 @@ def editar_instancia():
 # Funcion que elimina la instancia
 @app.route("/instancia/eliminar",methods=["DELETE"])
 def eliminar_instancias():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 	# Request de los json
 	# ej: /instacia/eliminar?id_instancia=xxxx
@@ -778,7 +778,7 @@ def eliminar_instancias():
 # Funcion que se encarga de obtener todas las razones sociales asociada a un id
 @app.route("/instancia/obtener_razones_sociales/<id_instancia>",methods=["GET"])
 def obtener_razones_sociales_validas(id_instancia):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Capturamos la instancia segun el id ingresado
@@ -794,7 +794,7 @@ def obtener_razones_sociales_validas(id_instancia):
 # Funcion que obtiene todos los id de las instancias que existan
 @app.route("/instancia/obtener/id",methods=["GET"])
 def obtener_ids():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# capturamos todas las instancias 
@@ -807,7 +807,7 @@ def obtener_ids():
 # Funcion que obtiene
 @app.route("/instancia/obtener_todo/<id_instancia>",methods=["GET"])
 def obtener_todo(id_instancia):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	
 	instancia = mo.Instancia.query.get(id_instancia)
@@ -858,7 +858,7 @@ def obtener_todo(id_instancia):
 # Funcion para crear una empresa
 @app.route("/empresa/agregar",methods=["POST"])
 def crear_empresa():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	
 	# Request de los json
@@ -885,7 +885,7 @@ def crear_empresa():
 # Funcion que se encarga de filtar las empresas
 @app.route("/empresa/obtener",methods=["GET"])
 def filtro_empresas():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Request de los json
@@ -926,7 +926,7 @@ def filtro_empresas():
 # Funcion que se encarga de editar o actualizar una empresa
 @app.route("/empresa/editar",methods=["PUT"])
 def editar_empresa():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -972,7 +972,7 @@ def editar_empresa():
 # Funcion que trae todas las razones sociales de las empresas
 @app.route("/empresa/obtener/razon_social",methods=["GET"])
 def obtener_por_razon_social():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Se traen todas las razones sociales
@@ -985,7 +985,7 @@ def obtener_por_razon_social():
 # Funcion que elimina una empresa
 @app.route("/empresa/eliminar",methods=["DELETE"])
 def eliminar_empresa():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 	# Request de los json
 	# ej: /empresa/eliminar?razon_social=xxxx
@@ -1008,7 +1008,7 @@ def eliminar_empresa():
 # Funcion que se encarga de obtener un relator
 @app.route("/relator/obtener",methods=["GET"])
 def filtro_relator():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Request de los json
@@ -1073,7 +1073,7 @@ def filtro_relator():
 # Funcion que agrega un relator
 @app.route("/relator/agregar",methods=["POST"])
 def crear_relator():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	
 	# Request json
@@ -1113,7 +1113,7 @@ def crear_relator():
 # Funcion encargada de editar o actualizar los datos de un relator
 @app.route("/relator/editar",methods=["PUT"])
 def editar_relator():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -1182,7 +1182,7 @@ def editar_relator():
 # Funcion que se encarga de eliminar un relator
 @app.route("/relator/eliminar",methods=["DELETE"])
 def eliminar_relator():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 	# Request de los json
 	# ej: /relator/eliminar?rut=xxxx
@@ -1205,7 +1205,7 @@ def eliminar_relator():
 # Funcion que se encarga de agregar un contacto
 @app.route("/contacto/agregar",methods=["POST"])
 def crear_contacto():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	
 	# Request de los json
@@ -1231,7 +1231,7 @@ def crear_contacto():
 # Funcion que se encarga de filtrar los contactos
 @app.route("/contacto/obtener",methods=["GET"])
 def filtro_contacto():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	
 	# Request de los json
@@ -1266,7 +1266,7 @@ def filtro_contacto():
 # Funcion que elimina los contactos
 @app.route("/contacto/eliminar",methods=["DELETE"])
 def eliminar_contacto():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 	# Request de los json
 	# ej: /contacto/eliminar?id_contacto=xxxx
@@ -1285,7 +1285,7 @@ def eliminar_contacto():
 # Funcion que se encarga de editar un contacto
 @app.route("/contacto/editar",methods=["PUT"])
 def editar_contacto():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -1322,7 +1322,7 @@ def editar_contacto():
 # Funcion que obtiene todas las empresas con sus contacos pertinentes
 @app.route("/contacto/obtener_empresa",methods=["GET"])
 def obtener_contactos_empresa():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# Se obtienen todas las empresas
@@ -1338,7 +1338,7 @@ def obtener_contactos_empresa():
 # Funcion que entrega los contactos asociados a una razon social
 @app.route("/contacto/obtener/<razon_social>",methods=["GET"])
 def obtener_contactos_razon_social(razon_social):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	empresa = mo.Empresa.query.get(razon_social)
 	contactos=[]
@@ -1352,7 +1352,7 @@ def obtener_contactos_razon_social(razon_social):
 # HACER QUERY DECIFRADO TOKEN***
 @app.route("/contacto/obtener_descripcion",methods=["GET"])
 def obtener_descripcion():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	# /contacto/obtener_descripcion?razon_social=XXXX&fono=XXXX
@@ -1375,7 +1375,7 @@ def obtener_descripcion():
 # Funcion de agreagar una factura
 @app.route("/factura/agregar",methods=["POST"])
 def crear_factura():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	
 	# Se obtiene el id
@@ -1568,7 +1568,7 @@ def crear_factura():
 # Funcion para filtrar u obtener las facturas
 @app.route("/factura/obtener",methods=["GET"])
 def filtro_factura():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	
 	# Request de los json
@@ -1631,7 +1631,7 @@ def filtro_factura():
 # Funcion que se encarga de editar un contacto
 @app.route("/factura/editar",methods=["PUT"])
 def editar_factura():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 
 
@@ -1665,7 +1665,7 @@ def editar_factura():
 
 @app.route("/factura/eliminar",methods=["DELETE"])
 def eliminar_factura():
-	if not validar_permiso(request.header.get('token'),1):
+	if not validar_permiso(request.headers.get('token'),1):
 		return None	
 	id_factura=request.args.get('id_factura')
 	factura = mo.Factura.query.get(id_factura) # Capturo la factura
@@ -1680,7 +1680,7 @@ def eliminar_factura():
 		
 @app.route("/factura/obtener/id",methods=["GET"])
 def obtener_ids_facturas():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	ids_facturas = db.session.query(mo.Factura.id_factura).all()
@@ -1690,7 +1690,7 @@ def obtener_ids_facturas():
 
 @app.route("/factura/descargar/<id>",methods=["GET"])
 def descargar(id):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	ruta="db/facturas_generadas/"+str(id)+".docx"
 	return send_file(ruta,as_attachment=True)
@@ -1701,7 +1701,7 @@ def descargar(id):
 
 @app.route("/relator_instancia/agregar",methods=["POST"])
 def crear_RI():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	request_rut=request.json['rut']
 	request_id_instancia=request.json['id_instancia']
@@ -1721,7 +1721,7 @@ def crear_RI():
 
 @app.route("/participante_instancia/agregar",methods=["POST"])
 def crear_PI():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 	request_rut=request.json['rut']
 	request_id_instancia=request.json['id_instancia']
@@ -1743,7 +1743,7 @@ def crear_PI():
 
 @app.route("/participante_instancia/obtener",methods=["GET"])
 def obtener_participante_instancia():
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	id_instancia = request.args.get('id_instancia')
@@ -1761,7 +1761,7 @@ def obtener_participante_instancia():
 
 @app.route("/participante_instancia/obtener_instancias/<rut>",methods=["GET"])
 def obtener_instancias_participante(rut):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 
 	participante = mo.Participante.query.get(rut)
@@ -1785,7 +1785,7 @@ def obtener_instancias_participante(rut):
 
 @app.route("/participante_factura/agregar",methods=["POST"])
 def crear_PF():
-	if not validar_permiso(request.header.get('token'),2):
+	if not validar_permiso(request.headers.get('token'),2):
 		return None
 		
 	request_rut=request.json['rut']
@@ -1808,7 +1808,7 @@ def crear_PF():
 	
 @app.route("/participante_factura/obtener/<id_factura>",methods=["GET"])
 def obtener_participante_factura(id_factura):
-	if not validar_permiso(request.header.get('token'),3):
+	if not validar_permiso(request.headers.get('token'),3):
 		return None	
 	factura = mo.Factura.query.get(id_factura)
 	participantes_filtrados = participante_schemas.dump(factura.facturas_alumnos)
