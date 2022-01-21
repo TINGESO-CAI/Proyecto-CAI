@@ -514,6 +514,22 @@ export default {
       if(data!=null){
         try{
           let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <3)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
+    permisosFacturacion:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <2)
         }
         catch(error){
@@ -606,7 +622,7 @@ export default {
       this.cambiarEstado=false
     },
     confirmacion: async function(item,token){
-      if(await this.permisos()){
+      if(await this.permisosFacturacion()){
         if(item.id_factura!=null){
         this.token=token
         console.log(item)
