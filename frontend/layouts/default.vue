@@ -309,6 +309,18 @@
 
 <script>
 import axios from 'axios'
+
+axios.interceptors.request.use(function (config) {
+	
+  let data=localStorage.getItem("user")
+  data=JSON.parse(data)
+  config.headers = {
+  'token': data.token}
+  return config;
+}, function (error) {
+// Do something with request error
+   return Promise.reject(error);
+});
 export default {
 	name: 'default',
 	data () {
@@ -441,6 +453,7 @@ export default {
 				this.usuario.rut=response.data.rut
 				this.usuario.correo=response.data.correo
 				this.login=1;
+				
 				if(await this.admin()){
 					this.cambiarMenuPermisosAdmin()
 					this.Pparticipante=true
@@ -531,7 +544,6 @@ export default {
 				data=JSON.parse(data)
 				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
-				console.log("ACCESO!!!!",acceso)
 				return (acceso == 0)
 				}
 			catch(error){
@@ -545,7 +557,6 @@ export default {
 				data=JSON.parse(data)
 				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
-				console.log("ACCESO!!!!",acceso)
 				return (acceso == 1)
 				}
 			catch(error){
@@ -559,7 +570,6 @@ export default {
 				data=JSON.parse(data)
 				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
-				console.log("ACCESO!!!!",acceso)
 				return (acceso == 2)
 				}
 			catch(error){
@@ -573,7 +583,6 @@ export default {
 				data=JSON.parse(data)
 				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
-				console.log("ACCESO!!!!",acceso)
 				return (acceso == 3)
 				}
 			catch(error){
@@ -586,7 +595,6 @@ export default {
 			     
 			if(data!=null){
 				data=JSON.parse(data)
-				console.log("admin:",await this.admin())
 				if (await this.admin()){
 					
 					return "administrador"
