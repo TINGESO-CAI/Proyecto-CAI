@@ -10,6 +10,12 @@
           </v-col>
   </v-container>
 </template>
+<script>
+if(localStorage.getItem("user")== null){
+  localStorage.setItem("user",JSON.stringify({token:null}))
+}
+</script>
+
 <style>
     .v-cloak {
   display: none;

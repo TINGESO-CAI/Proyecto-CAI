@@ -155,14 +155,16 @@
                       label="nombre"
                     ></v-text-field>
                   </v-col>
+                </v-row>
+                <v-row>
                 <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.apellido_paterno"
-                      label="apellido paterno"
+                      v-model="editedItem.apellido"
+                      label="apellido"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -171,156 +173,10 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.apellido_materno"
-                      label="apellido materno"
+                      v-model="editedItem.correo"
+                      label="correo"
                     ></v-text-field>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.correo_corporativo"
-                      label="correo_corporativo"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.correo_personal"
-                      label="correo_personal"
-                    ></v-text-field>
-                  </v-col>    
-                </v-row>
-                <v-row>
-      
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.fono_personal"
-                      label="fono_personal"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.fono_corporativo"
-                      label="fono_corporativo"
-                    ></v-text-field>
-                  </v-col>
-                   <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                  
-                    <v-select
-                      v-model="editedItem.genero"
-                      :items="generos"
-                      dense
-                      item-text="genero"
-                      label="genero"
-                      persistent-hint
-                      return-object
-                      single-line   
-                      
-                    >
-                    </v-select>
-
-                  </v-col>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  ><v-autocomplete
-                      v-model="editedItem.razon_social"
-                      title="razon social"
-                      :items="razones"
-                      dense
-                      item-text="razon_social"
-                      label="razon_social"
-                      persistent-hint
-                      return-object
-                      single-line
-                ></v-autocomplete>
-                  </v-col>
-                <v-col cols="12"
-                    sm="6"
-                    md="4" >
-                <v-autocomplete
-                  v-model="editedItem.tipo_inscripcion"
-                  :items="inscripciones"
-                  item-text="tipo_inscripcion"
-                  label="tipo_inscripcion"
-                  persistent-hint
-                  return-object
-                  single-line   
-                ></v-autocomplete>
-                </v-col>
-
-                <v-col cols="12"
-                    sm="6"
-                    md="4" >
-
-                <v-text-field
-                    v-model="editedItem.ocupacion"
-                    label="ocupacion"
-                    
-                ></v-text-field>
-                </v-col>
-                </v-row>
-  
-   
-                </v-row>
-
-                <v-row>
-                <v-col cols="12"
-                    sm="6"
-                    md="4">
-                <v-autocomplete
-                  v-model="editedItem.nacionalidad"
-                  :items="paises"
-                  item-text="nacionalidad"
-                  label="nacionalidad"
-                  persistent-hint
-                  return-object
-                  single-line   
-                ></v-autocomplete>
-                </v-col>
-                <v-col cols="12"
-                    sm="6"
-                    md="4">
-                <v-select
-                  v-model="nivel_educacional"
-                  :items="nivelesEdu"
-                  item-text="nivel_educacional"
-                  label="nivel_educacional"
-                  persistent-hint
-                  return-object
-                  single-line
-                ></v-select>
-                </v-col>
-                <v-col cols="12"
-                    sm="6"
-                    md="4" >
-
-                <v-text-field
-                    v-model="editedItem.fecha_nacimiento"
-                    label="fecha_nacimiento <YYYY-MM-DD>"
-                    
-                ></v-text-field>
-                </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -337,7 +193,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="editarParticipante"
+                @click="editarUsuario"
               >
                 Guardar
               </v-btn>
@@ -396,8 +252,20 @@
 
 //librería axios
 import axios from 'axios';
-export default {
+axios.interceptors.request.use(function (config) {
+  let data=localStorage.getItem("user")
+  data=JSON.parse(data)
+  config.headers = {
+  'token': data.token}
+  return config;
+}, function (error) {
+// Do something with request error
+   return Promise.reject(error);
+});
 
+
+export default {
+  
   data:()=>( {
     busqueda: null,
     cambiarAcceso:false,
@@ -487,9 +355,6 @@ export default {
         //se llama el servicio para obtener las emergencias 
         let response = await axios.get('http://localhost:5000/cuenta/obtener/todos');
         this.usuarios = response.data;
-
-        
-        console.log(response);
       }
       catch (error) {
         console.log('error', error); 
@@ -505,42 +370,21 @@ export default {
       }
     },
     confirmacion(item,token){
-      if(this.permisos()){
         this.token=token
-        console.log(item)
         this.cambiarAcceso=true
         this.usuario=item
-      }
-      else{
-        alert("No cuenta con permisos para edicion.")
-      }
     },
     editarParticipante: async function(){
-      let newParticipante ={
+      let newUsuario ={
         rut: this.editedItem.rut,
         nombre: this.transformarVacio(this.editedItem.nombre),
-        apellido_paterno: this.transformarVacio(this.editedItem.apellido_paterno),
-        apellido_materno: this.transformarVacio(this.editedItem.apellido_materno),
-        genero: this.transformarVacio(this.cambiarGenero(this.editedItem.genero)),
-        nivel_educacional: this.transformarVacio(this.editedItem.nivel_educacional),
-        fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
-        nacionalidad: this.transformarVacio(this.editedItem.nacionalidad),
-        tipo_inscripcion: this.transformarVacio(this.editedItem.tipo_inscripcion),
-        ocupacion: this.transformarVacio(this.editedItem.ocupacion),
-        correo_corporativo: this.transformarVacio(this.editedItem.correo_corporativo),
-        correo_personal: this.transformarVacio(this.editedItem.correo_personal),
-        fono_personal: this.transformarVacio(this.editedItem.fono_personal),
-        fono_corporativo: this.transformarVacio(this.editedItem.fono_corporativo),
-        razon_social: this.transformarVacio(this.editedItem.razon_social)
+        apellido: this.transformarVacio(this.editedItem.apellido),
+        correo: this.transformarVacio(this.editedItem.correo)
       }
       try {
-        let response = await axios.put('http://localhost:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
-        console.log(response);
+        //let response = await axios.put('http://localhost:5000/participante/editar?rut='+newUsuario.rut,newUsuario);
         this.close();
-
-        console.log(this.cambiarGenero(this.editedItem.genero),this.editedItem.genero)
-        this.editedItem.genero=this.cambiarGenero(this.editedItem.genero)
-        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+        Object.assign(this.usuarios[this.editedIndex], this.editedItem)
       }
       catch (error) {
         console.log('error', error);
@@ -560,16 +404,9 @@ export default {
       }
     },
     editItem (item) {
-      if(this.permisos()){
-        this.editedIndex = this.participantes.indexOf(item)
+        this.editedIndex = this.usuarios.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.editedItem.genero=this.mostrarGenero(this.editedItem.genero)
-        console.log(this.editedItem.genero)
         this.dialog = true
-      }
-      else{
-        alert("No cuenta con permisos para editar.")
-      }
     },
     permisos:async function(){
       let data=localStorage.getItem("user")
@@ -588,14 +425,9 @@ export default {
       }
     },
     deleteItem (item) {
-      if(this.permisos()){
-        this.editedIndex = this.participantes.indexOf(item)
+        this.editedIndex = this.usuarios.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
-      }
-      else{
-        alert("No cuenta con permisos para borrar.")
-      }
     },
     deleteItemConfirm () {
       this.participantes.splice(this.editedIndex, 1)
@@ -638,7 +470,7 @@ export default {
     confirmarCambiarAcceso: async function(){
       try{
         let response = await axios.put('http://localhost:5000/cuenta/editar_acceso', {id_cuenta:this.usuario.id , nivel_acceso: this.token});
-        console.log(response);
+        this.usuario.nivel_acceso=this.token
       }
       catch(error){
         alert("Ocurrio un error.")
