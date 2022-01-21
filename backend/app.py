@@ -37,7 +37,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhos
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = False # Para mostrar las query SQL
 #LOGIN
-app.config['JWT_SECRET_KEY'] = 'Super_Secret_JWT_KEY'
+app.config['JWT_SECRET_KEY'] = 'LvZXgGRpQBR4@Uc3ZxZ2Polnhmc6dwBXdSW3MX6S8cwzW88gG&!CvNG2hw5gG1tEbYXW#e5w^jiajDKnp3PK#6F*52ljqFE8Q@$ti2Y!YVES$QvmchE&D9#dKoB46M3XzT$*9U8hD!R@gcC5g2KKlcpFqxEI6S1L91u&j#JULJ!BPg$zvs5#jmw*^xHD8Xq#zFQQ49'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 db.init_app(app)
 
@@ -149,8 +149,55 @@ def entrar_cuenta():
 			'token': access_token})
 	except Exception as e:
 		return jsonify(str(e))
-@app.route('/cuenta/editar_acceso',methods=["PUT"])
+
+@app.route('/cuenta/editar',methods=["PUT"])
 def editar_cuenta():
+	if not validar_permiso(request.headers.get('token'),0):
+		return None	
+	
+	id_aux=request.json['id']
+
+	cuenta = mo.Cuenta.query.get(id_aux)
+	correo=request.json['correo']
+	nombre=request.json['nombre']
+	apellidos=request.json['apellido']
+	rut=request.json['correo']
+	if rut != cuenta.rut:
+		cuenta.rut = rut
+	if nombre != cuenta.nombre:
+		cuenta.nombre = nombre
+	if apellidos != cuenta.apellido:
+		cuenta.apellido = apellidos
+	if correo != cuenta.correo:
+		cuenta.correo = correo
+
+	try:
+		# Los agrego a la bd
+		db.session.commit() 
+	except:
+		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
+	return jsonify({"respuesta":"edicion exitosa"})
+
+@app.route("/cuenta/eliminar",methods=["DELETE"])
+def eliminar_cuenta():
+	if not validar_permiso(request.headers.get('token'),0):
+		return None	
+
+	# Request del rut ingresado por la ruta
+	# ej: /participante/editar?id=xxxxxxxx-x
+	id=request.args.get('id')
+	cuenta = mo.Cuenta.query.get(id) # Capturo al participante
+	
+	try:
+		# Borro al participante de la base de dato
+		db.session.delete(cuenta)
+		db.session.commit()
+		msg="la cuenta de "+cuenta.correo+" fue eliminada correctamente"
+		return jsonify({"respuesta":msg}) 
+	except:
+		return jsonify({"respuesta":"la cuenta  a eliminar no existe"})
+@app.route('/cuenta/editar_acceso',methods=["PUT"])
+def editar_cuenta_acceso():
 	if not validar_permiso(request.headers.get('token'),2):
 		return None	
 	
