@@ -347,9 +347,30 @@ export default {
       else if (valor == '2' ) return 'masculino'
       else return null
     },
+    permisos:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <4)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
   },
-  created(){
-    this.getRazones();
+  created:async function(){
+    if(await this.permisos()){
+      this.getRazones();
+    }
+    else{
+      window.location.href='/'
+    }
   },
 
 }

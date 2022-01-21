@@ -358,27 +358,25 @@ export default {
         alert("Debe ingresar un rut valido.")
       }
     },
-    permisos(){
+    permisos:async function(){
       let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <3)
         }
-        else{
-          return false
+        catch(error){
+          console.log(error)
         }
-    }
+      }
+      else{
+        return false
+      }
+    },
   },
-  created(){
-    if(this.permisos()==false){
+  created: async function(){
+    if(await this.permisos()==false){
       window.location.href='/'
     }
   }

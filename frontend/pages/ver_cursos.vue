@@ -370,26 +370,40 @@ export default {
         console.log('error', error);
       }
     },
-    permisos(){
+    permisos:async function(){
       let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <2)
         }
-        else{
-          return false
+        catch(error){
+          console.log(error)
         }
+      }
+      else{
+        return false
+      }
     },
-    editItem (item) {
-        if(this.permisos()){
+    permisosPagina:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <4)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
+    editItem: async function (item) {
+        if(await this.permisos()){
           this.editedIndex = this.cursos.indexOf(item)
           this.editedItem = Object.assign({}, item)
           console.log(this.editedItem.resolucion_sence)
@@ -399,8 +413,8 @@ export default {
           alert("No cuenta con permisos para editar.")
         }
       },
-    deleteItem (item) {
-      if(this.permisos()){
+    deleteItem: async function(item) {
+      if(await this.permisos()){
         this.editedIndex = this.cursos.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
@@ -444,8 +458,13 @@ export default {
       this.close()
     },
   },
-  created(){
-    this.getCursos()
+  created:async function(){
+    if(await this.permisosPagina()){
+      this.getCursos()
+    }
+    else{
+      window.location.href='/'
+    }
     //this.mostrarresolucion_sence(valor)
   }
 }

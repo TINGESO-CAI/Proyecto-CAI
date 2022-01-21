@@ -244,16 +244,16 @@ export default {
         console.log('error', error); 
       }
     },
-    descargar (item) {
-      if(this.permisos()){  
+    descargar: async function (item) {
+      if(await this.permisosPagina()){  
         window.location.href='http://localhost:5000/factura/descargar/'+item.id_factura.toString()
       }
       else{
         alert("No cuenta con permisos para descargar.")
       }
     },
-    deleteItem (item) {
-      if(this.permisos()){
+    deleteItem:async function (item) {
+      if(await this.permisos()){
         this.editedIndex = this.facturas.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
@@ -262,24 +262,6 @@ export default {
         alert("No cuenta con permisos para borrar.")
       }
 
-    },
-    permisos(){
-      let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
-        }
-        else{
-          return false
-        }
     },
     deleteItemConfirm: async function() {
       try{
@@ -315,27 +297,41 @@ export default {
       this.close()
     },
 
-    permisos(){
+    permisos:async function(){
       let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <2)
         }
-        else{
-          return false
+        catch(error){
+          console.log(error)
         }
+      }
+      else{
+        return false
+      }
+    },
+    permisosPagina:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <3)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
     },
   },
-  created(){
-    if(this.permisos()){
+  created: async function(){
+    if(await this.permisosPagina()){
       this.getFacturas()
     }
     else{

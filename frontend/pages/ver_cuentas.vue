@@ -1,20 +1,94 @@
 <template>
     <v-container class="test" >
         <v-card>
+
             <v-data-table
               :headers="headers"
-              :items="relatores"
+              :items="usuarios"
               :search="search"
               dense
+
             >
-              <template v-slot:[`item.genero`]="{ item }">
-                <span>{{ mostrarGenero(item.genero) }}</span>
+              <template v-slot:[`item.administrador`]="{item }">
+                    <v-icon
+                      v-if="item.nivel_acceso == 0"
+                      class="mr-2"
+                      color="green darken-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.nivel_acceso != 0"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(item,0)"
+                    >
+                      mdi-close-circle
+                    </v-icon>
+              </template>
+              <template v-slot:[`item.jefeAdmin`]="{item }">
+                    <v-icon
+                      v-if="item.nivel_acceso == 1"
+                      class="mr-2"
+                      color="green darken-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.nivel_acceso != 1"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(item,1)"
+                    >
+                      mdi-close-circle
+                    </v-icon>
+              </template>
+              <template v-slot:[`item.trabajador`]="{item }">
+                    <v-icon
+                      v-if="item.nivel_acceso == 2"
+                      class="mr-2"
+                      color="green darken-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.nivel_acceso != 2"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(item,2)"
+                    >
+                      mdi-close-circle
+                    </v-icon>
+              </template>
+               <template v-slot:[`item.ejecutivo`]="{item }">
+                    <v-icon
+                      v-if="item.nivel_acceso == 3"
+                      class="mr-2"
+                      color="green darken-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <v-icon
+                      v-if="item.nivel_acceso != 3"
+                      center
+                      class="mr-2"
+                      color="red darken-2"
+                      @click="confirmacion(item,3)"
+                    >
+                      mdi-close-circle
+                    </v-icon>
               </template>
               <template v-slot:top>
               <v-toolbar
                 flat
+                class="test"
+
               >
-        <v-toolbar-title> VER RELATORES</v-toolbar-title>
+        <v-toolbar-title> VER USUARIOS</v-toolbar-title>
+
           <v-spacer></v-spacer>
           <v-text-field
                 v-model="search"
@@ -30,7 +104,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               
-              <v-btn to="/nuevo_relator"
+              <v-btn to="/nuevo_participante"
                 color="primary"
                 dark
                 class="mb-2"
@@ -41,7 +115,7 @@
                 
               </v-btn>
               <v-spacer></v-spacer>
-              <v-btn to="/subir_archivo_relator"
+              <v-btn to="/subir_archivo"
                 color="primary"
                 dark
                 class="mb-2"
@@ -164,31 +238,61 @@
                     </v-select>
 
                   </v-col>
-                </v-row>
-
                 <v-row>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  ><v-autocomplete
+                      v-model="editedItem.razon_social"
+                      title="razon social"
+                      :items="razones"
+                      dense
+                      item-text="razon_social"
+                      label="razon_social"
+                      persistent-hint
+                      return-object
+                      single-line
+                ></v-autocomplete>
+                  </v-col>
+                <v-col cols="12"
+                    sm="6"
+                    md="4" >
+                <v-autocomplete
+                  v-model="editedItem.tipo_inscripcion"
+                  :items="inscripciones"
+                  item-text="tipo_inscripcion"
+                  label="tipo_inscripcion"
+                  persistent-hint
+                  return-object
+                  single-line   
+                ></v-autocomplete>
+                </v-col>
 
                 <v-col cols="12"
                     sm="6"
-                    md="4">
-                <v-select
-                  v-model="editedItem.banco"
-                  :items="bancos"
-                  item-text="banco"
-                  label="banco"
-                  persistent-hint
-                  return-object
-                  single-line
-                ></v-select>
+                    md="4" >
+
+                <v-text-field
+                    v-model="editedItem.ocupacion"
+                    label="ocupacion"
+                    
+                ></v-text-field>
                 </v-col>
+                </v-row>
+  
+   
+                </v-row>
+
+                <v-row>
                 <v-col cols="12"
                     sm="6"
                     md="4">
                 <v-autocomplete
-                  v-model="editedItem.tipo_cuenta"
-                  :items="tipos"
-                  item-text="tipo_cuenta"
-                  label="tipo_cuenta"
+                  v-model="editedItem.nacionalidad"
+                  :items="paises"
+                  item-text="nacionalidad"
+                  label="nacionalidad"
                   persistent-hint
                   return-object
                   single-line   
@@ -197,38 +301,27 @@
                 <v-col cols="12"
                     sm="6"
                     md="4">
-                <v-text-field
-                  v-model="editedItem.numero_cuenta"
-                  item-text="numero_cuenta"
-                  label="numero_cuenta"
+                <v-select
+                  v-model="nivel_educacional"
+                  :items="nivelesEdu"
+                  item-text="nivel_educacional"
+                  label="nivel_educacional"
+                  persistent-hint
+                  return-object
+                  single-line
+                ></v-select>
+                </v-col>
+                <v-col cols="12"
+                    sm="6"
+                    md="4" >
 
+                <v-text-field
+                    v-model="editedItem.fecha_nacimiento"
+                    label="fecha_nacimiento <YYYY-MM-DD>"
+                    
                 ></v-text-field>
                 </v-col>
-
                 </v-row>
-
-                 <v-row>
-                <v-col cols="12"
-                    sm="6"
-                    md="4">
-                <v-text-field
-                  v-model="editedItem.cv"
-                  item-text="CV"
-                  label="CV"
-
-                ></v-text-field>
-                </v-col>
-                <v-col cols="12"
-                    sm="6"
-                    md="4">
-                <v-text-field
-                  v-model="editedItem.titulo"
-                  item-text="titulo"
-                  label="titulo"
-
-                ></v-text-field>
-                </v-col>
-                 </v-row>
               </v-container>
             </v-card-text>
 
@@ -244,7 +337,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="editarRelator"
+                @click="editarParticipante"
               >
                 Guardar
               </v-btn>
@@ -257,7 +350,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
-              <v-btn color="blue darken-1" text @click="eliminarRelator">OK</v-btn>
+              <v-btn color="blue darken-1" text @click="eliminarParticipante">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
@@ -273,6 +366,7 @@
         mdi-pencil
       </v-icon>
       <v-icon
+        v-if="item.nivel_acceso!=0"
         small
         @click="deleteItem(item)"
       >
@@ -281,6 +375,20 @@
     </template>
             </v-data-table>
           </v-card>
+        <v-dialog v-model="cambiarAcceso" max-width="500px">
+          <v-card>
+            <v-card-title v-if="token==0" class="text-h5">¿Quiere cambiar el nivel de acceso a administrador?</v-card-title>
+            <v-card-title v-if="token==1" class="text-h5">¿Quiere cambiar el nivel de acceso a Jefe administrativo?</v-card-title>
+            <v-card-title v-if="token==2" class="text-h5">¿Quiere cambiar el nivel de acceso a miembro CAI?</v-card-title>
+            <v-card-title v-if="token==3" class="text-h5">¿Quiere cambiar el nivel de acceso a ejecutivo?</v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="cerrar">Cancelar</v-btn>
+              <v-btn color="blue darken-1" text @click="confirmarCambiarAcceso">OK</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -292,40 +400,30 @@ export default {
 
   data:()=>( {
     busqueda: null,
+    cambiarAcceso:false,
     search: '',
-    generos:['femenino','masculino'],
-    paises: [ "Chile","Desconocido","Afganistán","Albania","Alemania","Andorra","Angola","Antigua y Barbuda","Arabia Saudita","Argelia","Argentina","Armenia","Australia","Austria","Azerbaiyán","Bahamas","Bangladés","Barbados","Baréin","Bélgica","Belice","Benín","Bielorrusia","Birmania","Bolivia","Bosnia y Herzegovina","Botsuana","Brasil","Brunéi","Bulgaria","Burkina Faso","Burundi","Bután","Cabo Verde","Camboya","Camerún","Canadá","Catar","Chad","China","Chipre","Ciudad del Vaticano","Colombia","Comoras","Corea del Norte","Corea del Sur","Costa de Marfil","Costa Rica","Croacia","Cuba","Dinamarca","Dominica","Ecuador","Egipto","El Salvador","Emiratos Árabes Unidos","Eritrea","Eslovaquia","Eslovenia","España","Estados Unidos","Estonia","Etiopía","Filipinas","Finlandia","Fiyi","Francia","Gabón","Gambia","Georgia","Ghana","Granada","Grecia","Guatemala","Guyana","Guinea","Guinea ecuatorial","Guinea-Bisáu","Haití","Honduras","Hungría","India","Indonesia","Irak","Irán","Irlanda","Islandia","Islas Marshall","Islas Salomón","Israel","Italia","Jamaica","Japón","Jordania","Kazajistán","Kenia","Kirguistán","Kiribati","Kuwait","Laos","Lesoto","Letonia","Líbano","Liberia","Libia","Liechtenstein","Lituania","Luxemburgo","Madagascar","Malasia","Malaui","Maldivas","Malí","Malta","Marruecos","Mauricio","Mauritania","México","Micronesia","Moldavia","Mónaco","Mongolia","Montenegro","Mozambique","Namibia","Nauru","Nepal","Nicaragua","Níger","Nigeria","Noruega","Nueva Zelanda","Omán","Países Bajos","Pakistán","Palaos","Palestina","Panamá","Papúa Nueva Guinea","Paraguay","Perú","Polonia","Portugal","Reino Unido","República Centroafricana","República Checa","República de Macedonia","República del Congo","República Democrática del Congo","República Dominicana","República Sudafricana","Ruanda","Rumanía","Rusia","Samoa","San Cristóbal y Nieves","San Marino","San Vicente y las Granadinas","Santa Lucía","Santo Tomé y Príncipe","Senegal","Serbia","Seychelles","Sierra Leona","Singapur","Siria","Somalia","Sri Lanka","Suazilandia","Sudán","Sudán del Sur","Suecia","Suiza","Surinam","Tailandia","Tanzania","Tayikistán","Timor Oriental","Togo","Tonga","Trinidad y Tobago","Túnez","Turkmenistán","Turquía","Tuvalu","Ucrania","Uganda","Uruguay","Uzbekistán","Vanuatu","Venezuela","Vietnam","Yemen","Yibuti","Zambia","Zimbabue"],
-    bancos: ["BANCOESTADO","BANCO DE CHILE/EDWARDS","BANCO INTERNACIONAL","SCOTIABANK CHILE/Desarrollo",
-      "BCI","BANCO BICE","HSBC BANK","BANCO SANTANDER/Banefe",
-      "ITAÚ CORPBANCA","BANCO SECURITY","BANCO FALABELLA","BANCO RIPLEY","BANCO CONSORCIO",
-      "SCOTIABANK AZUL","BANCO BTG"
-    ],
-    tipos: ["corriente","vista","chequera electrónica","ahorro"],
     headers: [
       { text: 'Editar/Borrar', value: 'actions', sortable: false },
+      { text: 'Administrador', value: 'administrador', sortable: false, align: 'center' },
+      { text: 'Jefe administrativo', value: 'jefeAdmin', sortable: false, align: 'center' },
+      { text: 'Miembro CAI', value: 'trabajador', sortable: false, align: 'center' },
+      { text: 'Ejecutivo', value: 'ejecutivo', sortable: false, align: 'center' },
       {
         text: 'Rut',
         align: 'start',
         filterable: true,
         value: 'rut',
       },
-      { text: 'Nombre', value: 'nombre' },
-      { text: 'Apellido_paterno', value: 'apellido_paterno'},
-      { text: 'Apellido_materno', value: 'apellido_materno' },
-      { text: 'Titulo', value: 'titulo'},
-      { text: 'Numero cuenta', value: 'numero_cuenta'},
-      { text: 'Banco', value: 'banco'},
-      { text: 'Tipo cuenta', value: 'tipo_cuenta'},
-      { text: 'numero_cuenta', value: 'numero_cuenta'},
-      { text: 'correo corporativo', value: 'correo_corporativo'},
-      { text: 'fono corporativo', value: 'fono_corporativo'},
-      { text: 'correo_personal', value: 'correo_personal'},
-      { text: 'fono_personal', value: 'fono_personal'},
-      { text: 'fecha_nacimiento', value: 'fecha_nacimiento'},
-      { text: 'genero', value: 'genero'},
-      { text: 'CV', value: 'cv'},
+      { text: 'nombre', value: 'nombre' },
+      { text: 'apellido', value: 'apellido'},
+      { text: 'correo', value: 'correo' },  
+  
     ],
-    relatores:[],
+
+    usuarios:[
+    ],
+    usuario:{},
+
     //datos para editar
     dialog: false,
     dialogDelete: false,
@@ -335,40 +433,41 @@ export default {
       nombre: '',
       apellido_paterno: '',
       apellido_materno: '',
-      titulo: '',
-      cv: '',
+      genero: '',
+      nivel_educacional: '',
       fecha_nacimiento: '',
-      numero_cuenta: '',
-      banco: '',
-      tipo_cuenta: '',
-      genero:'',
+      nacionalidad: '',
+      tipo_inscripcion: '',
+      ocupacion: '',
       correo_corporativo: '',
       correo_personal: '',
       fono_personal: '',
       fono_corporativo: '',
+      razon_social: ''
     },
+    token:'',
     defaultItem: {
       rut: '',
       nombre: '',
       apellido_paterno: '',
       apellido_materno: '',
-      titulo: '',
-      cv: '',
+      genero: '',
+      nivel_educacional: '',
       fecha_nacimiento: '',
-      numero_cuenta: '',
-      banco: '',
-      tipo_cuenta: '',
-      genero:'',
+      nacionalidad: '',
+      tipo_inscripcion: '',
+      ocupacion: '',
       correo_corporativo: '',
       correo_personal: '',
       fono_personal: '',
       fono_corporativo: '',
+      razon_social: ''
     }, 
   }),
   //funciones para editar
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'Nueva relator' : 'Editar relator'
+      return this.editedIndex === -1 ? 'Nuevo participante' : 'Editar participante'
     },
   },
   watch: {
@@ -380,11 +479,14 @@ export default {
     },
   },
   methods:{
-    getRelatores: async function(){
+    forEach: async function(){
+
+    },
+    getUsuarios: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/relator/obtener?');
-        this.relatores = response.data;
+        let response = await axios.get('http://localhost:5000/cuenta/obtener/todos');
+        this.usuarios = response.data;
 
         
         console.log(response);
@@ -393,78 +495,7 @@ export default {
         console.log('error', error); 
       }
     },
-    async getRazones(){
-      try {
-        //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
-        this.razones = response.data;
-        console.log(response);
-      }
-      catch (error) {
-        console.log('error', error); 
-      }
-    },
-    editarRelator: async function(){
-      let newRelator ={
-        rut: this.editedItem.rut,
-        nombre: this.transformarVacio(this.editedItem.nombre),
-        apellido_paterno: this.transformarVacio(this.editedItem.apellido_paterno),
-        apellido_materno: this.transformarVacio(this.editedItem.apellido_materno),
-        titulo: this.transformarVacio(this.editedItem.titulo),
-        cv: this.transformarVacio(this.editedItem.cv),
-        genero: this.transformarVacio(this.cambiarGenero(this.editedItem.genero)),
-        fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
-        numero_cuenta: this.transformarVacio(this.editedItem.numero_cuenta),
-        banco: this.transformarVacio(this.editedItem.banco),
-        tipo_cuenta: this.transformarVacio(this.editedItem.tipo_cuenta),
-        correo_corporativo: this.transformarVacio(this.editedItem.correo_corporativo),
-        correo_personal: this.transformarVacio(this.editedItem.correo_personal),
-        fono_personal: this.transformarVacio(this.editedItem.fono_personal),
-        fono_corporativo: this.transformarVacio(this.editedItem.fono_corporativo),
-      }
-      try {
-        let response = await axios.put('http://localhost:5000/relator/editar?rut='+newRelator.rut,newRelator);
-        console.log(response);
-        this.close();
 
-        console.log(this.cambiarGenero(this.editedItem.genero),this.editedItem.genero)
-        this.editedItem.genero=this.cambiarGenero(this.editedItem.genero)
-        Object.assign(this.relatores[this.editedIndex], this.editedItem)
-      }
-      catch (error) {
-        console.log('error', error);
-      }
-    },
-    eliminarRelator: async function(){
-      try {
-        let response = await axios.delete('http://localhost:5000/relator/eliminar?rut='+this.editedItem.rut);
-        console.log(response);
-        this.closeDelete();
-        Object.assign(this.relatores[this.editedIndex], this.editedItem)
-      }
-      catch (error) {
-        console.log('error', error);
-      }
-    },
-    cambiarGenero(valor){
-      console.log(valor)
-      if (valor ==  'femenino') return '1'
-      else if (valor == 'masculino' ) return '2'
-      else return null
-    },
-    mostrarGenero(valor){
-      if (valor == '1' ) return 'femenino'
-      else if (valor == '2' ) return 'masculino'
-      else return 'desconocido'
-    },
-    comprobarFecha:function(fecha){
-      if (fecha.split('-').length == 3){
-        return true
-      }
-      else{
-        return false
-      }
-    },
     transformarVacio: function(valor){
       if(valor==''){
         return null
@@ -473,52 +504,92 @@ export default {
         return valor
       }
     },
-    permisos:async function(){
-      let data=localStorage.getItem("user")
-      data=JSON.parse(data)      
-      if(data!=null){
-        try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
-          return (response.data.nivel_acceso <2)
-        }
-        catch(error){
-          console.log(error)
-        }
+    confirmacion(item,token){
+      if(this.permisos()){
+        this.token=token
+        console.log(item)
+        this.cambiarAcceso=true
+        this.usuario=item
       }
       else{
-        return false
+        alert("No cuenta con permisos para edicion.")
       }
     },
-    permisosPagina:async function(){
-      let data=localStorage.getItem("user")
-      data=JSON.parse(data)      
-      if(data!=null){
-        try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
-          return (response.data.nivel_acceso <4)
-        }
-        catch(error){
-          console.log(error)
-        }
+    editarParticipante: async function(){
+      let newParticipante ={
+        rut: this.editedItem.rut,
+        nombre: this.transformarVacio(this.editedItem.nombre),
+        apellido_paterno: this.transformarVacio(this.editedItem.apellido_paterno),
+        apellido_materno: this.transformarVacio(this.editedItem.apellido_materno),
+        genero: this.transformarVacio(this.cambiarGenero(this.editedItem.genero)),
+        nivel_educacional: this.transformarVacio(this.editedItem.nivel_educacional),
+        fecha_nacimiento: this.transformarVacio(this.editedItem.fecha_nacimiento),
+        nacionalidad: this.transformarVacio(this.editedItem.nacionalidad),
+        tipo_inscripcion: this.transformarVacio(this.editedItem.tipo_inscripcion),
+        ocupacion: this.transformarVacio(this.editedItem.ocupacion),
+        correo_corporativo: this.transformarVacio(this.editedItem.correo_corporativo),
+        correo_personal: this.transformarVacio(this.editedItem.correo_personal),
+        fono_personal: this.transformarVacio(this.editedItem.fono_personal),
+        fono_corporativo: this.transformarVacio(this.editedItem.fono_corporativo),
+        razon_social: this.transformarVacio(this.editedItem.razon_social)
       }
-      else{
-        return false
+      try {
+        let response = await axios.put('http://localhost:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
+        console.log(response);
+        this.close();
+
+        console.log(this.cambiarGenero(this.editedItem.genero),this.editedItem.genero)
+        this.editedItem.genero=this.cambiarGenero(this.editedItem.genero)
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+      }
+      catch (error) {
+        console.log('error', error);
+      }
+
+    },
+    eliminarCuenta: async function(){
+      return 0
+      try {
+        let response = await axios.delete('http://localhost:5000/participante/eliminar?rut='+this.editedItem.rut);
+        console.log(response);
+        this.closeDelete();
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+      }
+      catch (error) {
+        console.log('error', error);
       }
     },
-    editItem: async function (item) {
-      if(await this.permisos()){
-        this.editedIndex = this.relatores.indexOf(item)
+    editItem (item) {
+      if(this.permisos()){
+        this.editedIndex = this.participantes.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.editedItem.genero=this.mostrarGenero(this.editedItem.genero)
+        console.log(this.editedItem.genero)
         this.dialog = true
       }
       else{
         alert("No cuenta con permisos para editar.")
       }
     },
-    deleteItem: async function (item) {
-      if(await this.permisos()){
-        this.editedIndex = this.relatores.indexOf(item)
+    permisos:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso == 0)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
+    deleteItem (item) {
+      if(this.permisos()){
+        this.editedIndex = this.participantes.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       }
@@ -527,7 +598,7 @@ export default {
       }
     },
     deleteItemConfirm () {
-      this.relators.splice(this.editedIndex, 1)
+      this.participantes.splice(this.editedIndex, 1)
       this.closeDelete()
     },
     close () {
@@ -544,25 +615,46 @@ export default {
         this.editedIndex = -1
       })
     },
+    saveBUP () {
+      if (this.editedIndex > -1) {
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
+      } else {
+        this.participantes.push(this.editedItem)
+      }
+      this.close()
+    },
     save () {
       if (this.editedIndex > -1) {
-        Object.assign(this.relatores[this.editedIndex], this.editedItem)
+        Object.assign(this.participantes[this.editedIndex], this.editedItem)
       } else {
-        this.relatores.push(this.editedItem)
+        editarParticipante()
       }
       this.close()
     },
 
+    cerrar(){
+      this.cambiarAcceso=false
+    },
+    confirmarCambiarAcceso: async function(){
+      try{
+        let response = await axios.put('http://localhost:5000/cuenta/editar_acceso', {id_cuenta:this.usuario.id , nivel_acceso: this.token});
+        console.log(response);
+      }
+      catch(error){
+        alert("Ocurrio un error.")
+        console.log(error)
+      }
+      this.cerrar()
+    },
   },
   created: async function(){
-    if(await this.permisosPagina()){
-      this.getRelatores()
-      this.getRazones()
-      //this.mostrarGenero(valor)
+    if(await this.permisos()){
+      this.getUsuarios()
     }
     else{
       window.location.href='/'
     }
+    //this.mostrarGenero(valor)
   }
 }
 </script>

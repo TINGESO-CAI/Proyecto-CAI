@@ -404,26 +404,40 @@ export default {
       else if (valor == '2' ) return 'masculino'
       else return null
     },
-    permisos(){
+    permisos:async function(){
       let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <2)
         }
-        else{
-          return false
+        catch(error){
+          console.log(error)
         }
+      }
+      else{
+        return false
+      }
     },
-    editItem (item) {
-      if(this.permisos()){
+    permisosPagina:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <3)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
+    editItem: async function (item) {
+      if(await this.permisos()){
         this.editedIndex = this.participantes.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
@@ -432,8 +446,8 @@ export default {
         alert("No cuenta con permisos para editar.")
       }
     },
-    deleteItem (item) {
-      if(this.permisos()){
+    deleteItem:async function (item) {
+      if(await this.permisos()){
         this.editedIndex = this.participantes.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
@@ -519,8 +533,8 @@ export default {
       }
     },
   },
-  created(){
-    if(this.permisos()){
+  created: async function(){
+    if(await this.permisosPagina()){
       this.getFacturas()
       this.getRazones()
     }

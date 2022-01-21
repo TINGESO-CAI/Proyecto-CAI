@@ -498,26 +498,40 @@ export default {
       else if (valor == false ) return 'NO'
       else return null
     },
-    permisos(){
+    permisos:async function(){
       let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <2)
         }
-        else{
-          return false
+        catch(error){
+          console.log(error)
         }
+      }
+      else{
+        return false
+      }
     },
-    editItem (item) {
-        if(this.permisos()){
+    permisosPagina:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <4)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
+    editItem: async function(item) {
+        if(await this.permisos()){
           this.editedIndex = this.instancias.indexOf(item)
           this.editedItem = Object.assign({}, item)
           this.dialog = true
@@ -526,8 +540,8 @@ export default {
           alert("No cuenta con permisos para editar.")
         }
       },
-    deleteItem (item) {
-      if(this.permisos()){
+    deleteItem: async function (item) {
+      if(await this.permisos()){
         this.editedIndex = this.instancias.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
@@ -581,8 +595,8 @@ export default {
     cerrar(){
       this.cambiarEstado=false
     },
-    confirmacion(item,token){
-      if(this.permisos()){
+    confirmacion: async function(item,token){
+      if(await this.permisos()){
         if(item.id_factura!=null){
         this.token=token
         console.log(item)
@@ -666,8 +680,13 @@ export default {
       this.close()
     },
   },
-  created(){
-    this.getInstancias()
+  created: async function(){
+    if(await this.permisosPagina()){
+      this.getInstancias()
+    }
+    else{
+      window.location.href='/'
+    }
   }
 }
 </script>

@@ -161,11 +161,27 @@ export default {
         return false
       }
     },
+    permisos:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso ==0)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
+    },
     
     
   },
-  created(){
-    if(this.permisos==false){
+  created: async function(){
+    if(await this.permisos==false){
       window.location.href='/'
     }
   }

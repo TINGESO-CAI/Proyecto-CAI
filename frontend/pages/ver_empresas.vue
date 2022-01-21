@@ -242,9 +242,8 @@
               </template>
           </v-data-table>
           </v-card>       
-          
+          <div v-if="crearContacto">
           <br>
-          <div v-if="permisos()">
           <v-row>
               <h3>Ingresar nuevo contacto</h3>
               </v-row>
@@ -295,7 +294,7 @@
             </v-row>
             </div>
             <v-btn  color="blue lighten-1" class="mr-3" @click="volver">Ver empresas</v-btn>
-            <v-btn  v-if="permisos()" color="blue lighten-1" class="mr-3" @click="createContacto">Agregar contacto</v-btn>
+            <v-btn  v-if="crearContacto" color="blue lighten-1" class="mr-3" @click="createContacto">Agregar contacto</v-btn>
             
             <v-dialog v-model="confirmarEliminarContacto" max-width="500px">
               <v-card>
@@ -357,7 +356,7 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-        </div>
+            </div>
     </v-container>
 </template>
 <script>
@@ -426,6 +425,7 @@ export default {
       { text: 'Fono', value: 'fono'},
       { text: 'Descripción', value: 'descripcion'},
     ],
+    crearContacto:false,
     //datos para editar
     dialog: false,
     dialogDelete: false,
@@ -475,8 +475,8 @@ export default {
         console.log('error', error); 
       }
     },
-    verBorrarContacto(item){
-      if(this.permisos()){
+    verBorrarContacto: async function(item){
+      if(await this.permisos()){
         this.contactoEditar=item
         this.confirmarEliminarContacto=true
       }
@@ -536,8 +536,8 @@ export default {
     ocultar: function(){
       this.editar=false
     },
-    permitirEditar: function(item){
-      if(this.permisos()){
+    permitirEditar: async function(item){
+      if(await this.permisos()){
         this.editar=true
         this.contactoEditar=item
       }
@@ -545,13 +545,31 @@ export default {
         alert("No cuenta con permisos para editar.")
       }
     },
-    paginaContactos:function(item){
+    paginaContactos: async function(item){
       this.editedIndex = this.empresas.indexOf(item)
       this.editedItem = Object.assign({}, item)
       if(this.getContactos(this.editedItem)){
-        console.log("contactos:",this.contactos)
+        if (await this.permisosCreacion()){
+          this.crearContacto=true
+        }
         this.razon_social=this.editedItem.razon_social
         this.page=2
+      }
+    },
+    permisosCreacion:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <3)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
       }
     },
     getContactos: async function(item){
@@ -567,8 +585,8 @@ export default {
         return false
       }
     },
-    editItem (item) {
-        if(this.permisos()){
+    editItem: async function(item) {
+        if(await this.permisos()){
           this.editedIndex = this.empresas.indexOf(item)
           this.editedItem = Object.assign({}, item)
           this.dialog = true
@@ -577,8 +595,8 @@ export default {
           alert("No cuenta con permisos para editar.")
         }
       },
-    deleteItem (item) {
-      if(this.permisos()){
+    deleteItem:async function (item) {
+      if(await this.permisos()){
         this.editedIndex = this.empresas.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
@@ -624,50 +642,42 @@ export default {
       }
       this.editar=false
     },
-    permisos(){
+    permisos:async function(){
       let data=localStorage.getItem("user")
-      console.log(data)
-        if(data!=null){
-          return true
-            /*data=JSON.parse(data)
-            if(data.permiso==3){
-              return true
-            }
-            else{
-              return false
-            }
-            */
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <2)
         }
-        else{
-          return false
+        catch(error){
+          console.log(error)
         }
+      }
+      else{
+        return false
+      }
+    },
+    permisosPagina:async function(){
+      let data=localStorage.getItem("user")
+      data=JSON.parse(data)      
+      if(data!=null){
+        try{
+          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          return (response.data.nivel_acceso <4)
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      else{
+        return false
+      }
     },
     volver(){
       this.page=1
       this.editar=false
     },
-    comprobarTelefono(fono){
-      if (fono==''){
-        return true
-      }
-      if(fono.length!=9){
-        if(fono[0]=='+' && fono.length==12){
-          return true
-        }
-        else{
-          return false
-        }
-      }
-      else{
-        if(fono[0]!='+'){
-          return true
-        }
-        else{
-          return false
-        }
-      }
-    },
-
 
     async createContacto(){ //Crear un nuevo contacto apra empresa
       this.message = '';
@@ -682,10 +692,6 @@ export default {
       let check= await axios.get('http://localhost:5000/empresa/obtener?razon_social='+this.razon_social)
       console.log(check.data)
       if (check.data.length==1){
-        if(this.comprobarTelefono(this.fono)==false){
-          alert("Error en formato de telefono.")
-          return 0
-        }
         try {
           //se llama el servicio para crear un nuevo contacto
           let response = await axios.post('http://localhost:5000/contacto/agregar',newContacto);
@@ -718,8 +724,13 @@ export default {
       }
     },
   },
-  created(){
-    this.getEmpresas()
+  created: async function(){
+    if (await this.permisosPagina()){
+      this.getEmpresas()
+    }
+    else{
+      window.location.href='/'
+    }
     //this.getContactos()
   }
 }
