@@ -113,7 +113,7 @@
               >
                 <v-text-field
                   v-model="id_instancia"
-                  label="id_factura"
+                  label="id_instancia"
                 ></v-text-field>
               </v-col>
 

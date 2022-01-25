@@ -175,6 +175,7 @@ export default {
     observacion: 'test',
     num_cai:'test', 
     headers: [
+      { text: 'Descargar/Borrar', value: 'actions', sortable: false },
       {
         text: 'id_factura',
         align: 'start',
@@ -192,7 +193,7 @@ export default {
       { text: 'obs', value: 'observacion'},
       { text: 'num_cai', value: 'num_cai' },
       
-      { text: 'Descargar/Borrar', value: 'actions', sortable: false },
+      
 
   
     ],

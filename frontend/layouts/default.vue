@@ -282,20 +282,25 @@
 		</v-card>
 
 		<!--usuario logeado-->
-    <v-card v-if="login==1">
+    <v-card v-if="login==1" fluid>
         <v-toolbar dark color="primary">
           <v-toolbar-title >DATOS USUARIO</v-toolbar-title>
         </v-toolbar>
-        <v-card-text>
-              <span>Nombre: {{usuario.nombre}}</span><br>
-              <span>Rut: {{usuario.rut}}</span><br>
-              <span>Correo: {{usuario.correo}}</span><br>
-
-        </v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="primary" @click="salir">SALIR</v-btn>
-				</v-card-actions>
+		<v-list>
+		<v-list-item>
+		<v-list-item-content>
+            <v-list-item-title class="text-h6">
+              {{usuario.nombre}}
+            </v-list-item-title>
+            <v-list-item-subtitle>{{usuario.correo}}</v-list-item-subtitle>
+			<v-list-item-subtitle>{{usuario.rut}}</v-list-item-subtitle>
+          </v-list-item-content>
+		</v-list-item>
+		</v-list>
+		<v-card-actions>
+			<v-spacer></v-spacer>
+			<v-btn color="primary" @click="salir">SALIR</v-btn>
+		</v-card-actions>
     </v-card>
 		</v-navigation-drawer>
 		<v-footer
