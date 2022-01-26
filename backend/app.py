@@ -47,6 +47,16 @@ migrate= Migrate(app,db) # Para el uso de los migrate
 # LOGIN
 jwt = JWTManager(app)
 
+#inicializacion cuenta
+
+len_cuentas = mo.Cuenta.query.count()
+if len_cuentas==0:
+	nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
+	db.session.add(nueva_cuenta)
+	db.session.commit()
+
+
+
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
 participante_schemas = mo.ParticipanteSchema(many=True)
@@ -1865,17 +1875,7 @@ def obtener_participante_factura(id_factura):
 
 	return jsonify(participantes_filtrados)
 
-def inicializar():
-	len_cuentas = mo.Cuenta.query.count()
-	if len_cuentas==0:
-		nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
-		db.session.add(nueva_cuenta)
-		try:
-			db.session.commit()
-			return jsonify({"exito":"Se ha inicializado un usuario con exito"})
-		except:
-			return jsonify({"error":"Ha ocurrido un error al registrar"})
-	return jsonify({"error":"Ya esta inicializado el primer usuario"})
+
 
 if __name__ == '__main__':
 	inicializar()
