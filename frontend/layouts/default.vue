@@ -202,7 +202,7 @@
 			fixed
 			height="40"
 			app
-			scroll-off-screen="true"
+			scroll-off-screen
 		>
 			<v-app-bar-nav-icon @click.stop="drawer = !drawer" />
 			<v-btn
