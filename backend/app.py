@@ -46,13 +46,7 @@ migrate= Migrate(app,db) # Para el uso de los migrate
 
 # LOGIN
 jwt = JWTManager(app)
-def iniciar():
-	nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
-	try:
-		db.session.add(nueva_cuenta)
-		db.session.commit()
-	except:
-		print("error")
+
 #inicializacion cuenta
 
 # Definicon de los schemas
@@ -89,7 +83,15 @@ def before_request():
 		token=request.headers.get('token')
 		if token is None or len(token)==0:
 			return None
-
+@app.route('/iniciar', methods=['GET'])
+def iniciar():
+	nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
+	try:
+		db.session.add(nueva_cuenta)
+		db.session.commit()
+		return jsonify("exito")
+	except:
+		return jsonify("error")
 def validar_permiso(token,nivel_requerido):
 	payload = jwtLib.decode(token,'LvZXgGRpQBR4@Uc3ZxZ2Polnhmc6dwBXdSW3MX6S8cwzW88gG&!CvNG2hw5gG1tEbYXW#e5w^jiajDKnp3PK#6F*52ljqFE8Q@$ti2Y!YVES$QvmchE&D9#dKoB46M3XzT$*9U8hD!R@gcC5g2KKlcpFqxEI6S1L91u&j#JULJ!BPg$zvs5#jmw*^xHD8Xq#zFQQ49',algorithms=["HS256"])
 	cuenta = mo.Cuenta.query.filter(mo.Cuenta.correo==str(payload["sub"])).first()
