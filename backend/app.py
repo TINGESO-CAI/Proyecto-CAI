@@ -46,14 +46,15 @@ migrate= Migrate(app,db) # Para el uso de los migrate
 
 # LOGIN
 jwt = JWTManager(app)
-
+def iniciar():
+	nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
+	try:
+		db.session.add(nueva_cuenta)
+		db.session.commit()
 #inicializacion cuenta
 
 len_cuentas = mo.Cuenta.query.count()
 if len_cuentas==0:
-	nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
-	db.session.add(nueva_cuenta)
-	db.session.commit()
 
 
 
@@ -1876,7 +1877,7 @@ def obtener_participante_factura(id_factura):
 	return jsonify(participantes_filtrados)
 
 
-
+iniciar()
 if __name__ == '__main__':
-	inicializar()
+
 	app.run(debug=True)
