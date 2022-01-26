@@ -214,20 +214,8 @@ def editar_cuenta_acceso():
 	except:
 		return jsonify({"respuesta":"Revise bien los campos de actualizacion"})
 	return jsonify({"respuesta":"edicion exitosa"})
-@app.route('/inicializar_cuenta',methods=["GET"])
-def inicializar():
 
 
-	len_cuentas = mo.Cuenta.query.count()
-	if len_cuentas==0:
-		nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
-		db.session.add(nueva_cuenta)
-		try:
-			db.session.commit()
-			return jsonify({"exito":"Se ha inicializado un usuario con exito"})
-		except:
-			return jsonify({"error":"Ha ocurrido un error al registrar"})
-	return jsonify({"error":"Ya esta inicializado el primer usuario"})
 
 		
 @app.route('/cuenta/obtener/todos',methods=["GET"])
@@ -1877,5 +1865,18 @@ def obtener_participante_factura(id_factura):
 
 	return jsonify(participantes_filtrados)
 
+def inicializar():
+	len_cuentas = mo.Cuenta.query.count()
+	if len_cuentas==0:
+		nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
+		db.session.add(nueva_cuenta)
+		try:
+			db.session.commit()
+			return jsonify({"exito":"Se ha inicializado un usuario con exito"})
+		except:
+			return jsonify({"error":"Ha ocurrido un error al registrar"})
+	return jsonify({"error":"Ya esta inicializado el primer usuario"})
+
 if __name__ == '__main__':
+	inicializar()
 	app.run(debug=True)
