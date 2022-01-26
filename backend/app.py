@@ -51,12 +51,9 @@ def iniciar():
 	try:
 		db.session.add(nueva_cuenta)
 		db.session.commit()
+	except:
+		print("error")
 #inicializacion cuenta
-
-len_cuentas = mo.Cuenta.query.count()
-if len_cuentas==0:
-
-
 
 # Definicon de los schemas
 participante_schema = mo.ParticipanteSchema()
