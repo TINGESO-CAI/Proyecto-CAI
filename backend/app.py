@@ -33,7 +33,7 @@ import jwt as jwtLib
 db= mo.objeto_db()
 app= Flask(__name__)
 cors=CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/cai" # conexion con la bd
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@db:5432/cai" # conexion con la bd
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 app.config['SQLALCHEMY_ECHO'] = False # Para mostrar las query SQL
 #LOGIN
