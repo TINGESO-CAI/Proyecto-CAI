@@ -152,7 +152,7 @@ export default {
         
         try {
           //se llama el servicio para crear una nueva empresa
-          let response = await axios.post('http://localhost:5000/empresa/agregar' ,newEmpresa);
+          let response = await axios.post('http://52.188.153.77:5000/empresa/agregar' ,newEmpresa);
           console.log('response', response.data);
           let id = response.data.id;
           this.message = `${this.razon_social} fue creado con éxito con id: ${id}`;
@@ -183,7 +183,7 @@ export default {
         descripcion: this.transformarVacio(this.descripcion),
         razon_social: this.razon_social
       }
-      let check= await axios.get('http://localhost:5000/empresa/obtener?razon_social='+this.razon_social)
+      let check= await axios.get('http://52.188.153.77:5000/empresa/obtener?razon_social='+this.razon_social)
       console.log(check.data)
       if (check.data.length==1){
         if(this.comprobarTelefono(this.fono)==false){
@@ -192,7 +192,7 @@ export default {
         }
         try {
           //se llama el servicio para crear un nuevo contacto
-          let response = await axios.post('http://localhost:5000/contacto/agregar',newContacto);
+          let response = await axios.post('http://52.188.153.77:5000/contacto/agregar',newContacto);
           console.log('response', response.data);
           let id = response.data.id;
           this.message = `${this.id_contacto} fue creado con éxito con id: ${id}`;
@@ -238,7 +238,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){

@@ -221,7 +221,7 @@ export default {
         if(this.comprobarFecha(this.f_vigencia) || this.f_vigencia==''){
           try {
             //se llama el servicio para crear un nuevo curso
-            let response = await axios.post('http://localhost:5000/curso/agregar',newCurso);
+            let response = await axios.post('http://52.188.153.77:5000/curso/agregar',newCurso);
             console.log('response', response.data);
             let id = response.data.id;
             this.message = `${this.sence} fue creado con éxito con id: ${id}`;
@@ -263,7 +263,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){

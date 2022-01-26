@@ -10,7 +10,7 @@ export default {
   },
 
   axios: {
-    baseURL: 'http://localhost:8080/',
+    baseURL: 'http://52.188.153.77:8080/',
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head

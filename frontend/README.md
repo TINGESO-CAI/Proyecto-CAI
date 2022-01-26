@@ -6,7 +6,7 @@
 # install dependencies
 $ npm install
 
-# serve with hot reload at localhost:3000
+# serve with hot reload at 52.188.153.77:3000
 $ npm run dev
 
 # build for production and launch server

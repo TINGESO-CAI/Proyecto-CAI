@@ -477,7 +477,7 @@ export default {
     getEmpresas: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/empresa/obtener?');
+        let response = await axios.get('http://52.188.153.77:5000/empresa/obtener?');
         this.empresas = response.data;
         console.log(response);
       }
@@ -499,7 +499,7 @@ export default {
     },
     borrarContacto:async function(){
       try{
-        let response = await axios.delete('http://localhost:5000/contacto/eliminar?id_contacto='+this.contactoEditar.id_contacto)
+        let response = await axios.delete('http://52.188.153.77:5000/contacto/eliminar?id_contacto='+this.contactoEditar.id_contacto)
         console.log(response.data)
         this.getContactos(this.editedItem)
         this.cancelar()
@@ -521,7 +521,7 @@ export default {
         comuna: this.transformarVacio(this.editedItem.comuna)
       }
       try{ 
-        let response = await axios.put('http://localhost:5000/empresa/editar?razon_social='+newEmpresa.razon_social,newEmpresa);
+        let response = await axios.put('http://52.188.153.77:5000/empresa/editar?razon_social='+newEmpresa.razon_social,newEmpresa);
         console.log(response);
         this.close();
         Object.assign(this.empresas[this.editedIndex], this.editedItem)
@@ -534,7 +534,7 @@ export default {
     },
     eliminarEmpresa: async function(){
       try {
-        let response = await axios.delete('http://localhost:5000/empresa/eliminar?razon_social='+this.editedItem.razon_social);
+        let response = await axios.delete('http://52.188.153.77:5000/empresa/eliminar?razon_social='+this.editedItem.razon_social);
         console.log(response);
         this.closeDelete();
         Object.assign(this.empresas[this.editedIndex], this.editedItem)
@@ -571,7 +571,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){
@@ -585,7 +585,7 @@ export default {
     getContactos: async function(item){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/contacto/obtener?razon_social='+item.razon_social);
+        let response = await axios.get('http://52.188.153.77:5000/contacto/obtener?razon_social='+item.razon_social);
         this.contactos = response.data;
         console.log(response);
         return true
@@ -642,7 +642,7 @@ export default {
         razon_social: this.transformarVacio(this.razon_social)
       }
       try{ 
-        let response = await axios.put('http://localhost:5000/contacto/editar?id_contacto='+this.contactoEditar.id_contacto,newContacto);
+        let response = await axios.put('http://52.188.153.77:5000/contacto/editar?id_contacto='+this.contactoEditar.id_contacto,newContacto);
         console.log(response);
 
       }
@@ -657,7 +657,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){
@@ -673,7 +673,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <4)
         }
         catch(error){
@@ -699,12 +699,12 @@ export default {
         descripcion: this.transformarVacio(this.descripcion),
         razon_social: this.razon_social
       }
-      let check= await axios.get('http://localhost:5000/empresa/obtener?razon_social='+this.razon_social)
+      let check= await axios.get('http://52.188.153.77:5000/empresa/obtener?razon_social='+this.razon_social)
       console.log(check.data)
       if (check.data.length==1){
         try {
           //se llama el servicio para crear un nuevo contacto
-          let response = await axios.post('http://localhost:5000/contacto/agregar',newContacto);
+          let response = await axios.post('http://52.188.153.77:5000/contacto/agregar',newContacto);
           console.log('response', response.data);
           let id = response.data.id;
           this.message = `${this.id_contacto} fue creado con éxito con id: ${id}`;

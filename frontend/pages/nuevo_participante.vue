@@ -265,7 +265,7 @@ export default {
     async getRazones(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://localhost:5000/empresa/obtener/razon_social');
+        let response = await axios.get('http://52.188.153.77:5000/empresa/obtener/razon_social');
         this.razones = response.data;
         console.log(response);
       }
@@ -367,7 +367,7 @@ export default {
         if(this.comprobarFecha(this.fecha_nacimiento) || this.fecha_nacimiento==''){         
           try {
             //se llama el servicio para crear un nuevo participante
-            let response = await axios.post('http://localhost:5000/participante/agregar',newParticipante);
+            let response = await axios.post('http://52.188.153.77:5000/participante/agregar',newParticipante);
             console.log('response', response.data);
             let id = response.data.id;
             this.message = `${this.rut} fue creado con éxito con id: ${id}`;
@@ -418,7 +418,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){

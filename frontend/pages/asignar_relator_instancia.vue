@@ -134,7 +134,7 @@ export default {
       for (var i=0; i< this.relatoresCurso.length; i++){
         try{
           console.log(this.relatoresCurso[i].rut,this.curso[0].id_instancia)
-          let response = await axios.post('http://localhost:5000/relator_instancia/agregar',{rut:this.relatoresCurso[i].rut, id_instancia:this.curso[0].id_instancia});
+          let response = await axios.post('http://52.188.153.77:5000/relator_instancia/agregar',{rut:this.relatoresCurso[i].rut, id_instancia:this.curso[0].id_instancia});
           console.log('response', response.data);          
         }
         catch (error){
@@ -157,7 +157,7 @@ export default {
       console.log(index)
     },
     obtenerRelator: async function(value){
-      let response= axios.get('http://localhost:5000/relator/obtener?rut='+value)
+      let response= axios.get('http://52.188.153.77:5000/relator/obtener?rut='+value)
       return response
     },
     agregarRelator: async function(value){
@@ -189,7 +189,7 @@ export default {
     */
     getRelatores: async function(){
       try {
-        let response = await axios.get('http://localhost:5000/relator/obtener?');
+        let response = await axios.get('http://52.188.153.77:5000/relator/obtener?');
         this.relatores = response.data;
       }
       catch (error) {
@@ -198,7 +198,7 @@ export default {
     },
     getInstancias: async function(){
       try {
-        let response = await axios.get('http://localhost:5000/instancia/obtener?');
+        let response = await axios.get('http://52.188.153.77:5000/instancia/obtener?');
         this.cursos = response.data;
       }
       catch (error) {
@@ -211,7 +211,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){

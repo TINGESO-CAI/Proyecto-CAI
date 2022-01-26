@@ -449,7 +449,7 @@ export default {
 				contrasena: this.contrasena
 			}
 			try {
-				let response = await axios.post('http://localhost:5000/entrar',credenciales);
+				let response = await axios.post('http://52.188.153.77:5000/entrar',credenciales);
 				//limpiar
 				this.correo = '';
 				this.contrasena = '';
@@ -500,7 +500,7 @@ export default {
 		async traerDatos(){
 			this.message = '';
 			try {
-				let response = await axios.get('http://localhost:5000/cuenta/permisos');
+				let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos');
 				//limpiar
 				this.usuario=response.data;
 			}
@@ -528,7 +528,7 @@ export default {
 			/*
 			this.message = '';
 			try {
-				let response = await axios.post('http://localhost:5000/salir');
+				let response = await axios.post('http://52.188.153.77:5000/salir');
 				//limpiar
 				this.usuario = {};
 				this.contrasena = '';
@@ -546,7 +546,7 @@ export default {
 			try{
 				let data=localStorage.getItem("user")
 				data=JSON.parse(data)
-				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
 				return (acceso == 0)
 				}
@@ -559,7 +559,7 @@ export default {
 			try{
 				let data=localStorage.getItem("user")
 				data=JSON.parse(data)
-				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
 				return (acceso == 1)
 				}
@@ -572,7 +572,7 @@ export default {
 			try{
 				let data=localStorage.getItem("user")
 				data=JSON.parse(data)
-				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
 				return (acceso == 2)
 				}
@@ -585,7 +585,7 @@ export default {
 			try{
 				let data=localStorage.getItem("user")
 				data=JSON.parse(data)
-				let response = await axios.get('http://localhost:5000/cuenta/permisos?token='+data.token);
+				let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
 				let acceso=response.data.nivel_acceso
 				return (acceso == 3)
 				}
