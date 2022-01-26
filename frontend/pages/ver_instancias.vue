@@ -490,7 +490,7 @@ export default {
     getInstancias: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/instancia/obtener?');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener?');
         this.instancias = response.data;
 
         
@@ -513,7 +513,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){
@@ -529,7 +529,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <2)
         }
         catch(error){
@@ -545,7 +545,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <4)
         }
         catch(error){
@@ -579,7 +579,7 @@ export default {
     deleteItemConfirm: async function() {
       this.instancias.splice(this.editedIndex, 1)
       try{
-      let response= await axios.delete('http://52.188.153.77:5000/instancia/eliminar?id_instancia='+this.editedItem.id_instancia.toString())
+      let response= await axios.delete('http://'+process.env.IP_FRONT+':5000/instancia/eliminar?id_instancia='+this.editedItem.id_instancia.toString())
       console.log(response.data)
       }
       catch(error){
@@ -608,7 +608,7 @@ export default {
         console.log(item)
         this.instancia=item
         this.page=2
-        let response=await axios.get('http://52.188.153.77:5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
+        let response=await axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
         console.log(response.data)
         this.participantes=response.data.participante
         this.relatores=response.data.relatores
@@ -651,9 +651,9 @@ export default {
         this.participante.mandada=true
       }
       try{
-        let response=await axios.put('http://52.188.153.77:5000/factura/editar?id_factura='+this.participante.id_factura.toString(),{mandada:this.participante.mandada,pagada:this.participante.pagada})
+        let response=await axios.put('http://'+process.env.IP_FRONT+':5000/factura/editar?id_factura='+this.participante.id_factura.toString(),{mandada:this.participante.mandada,pagada:this.participante.pagada})
         console.log(response.data)
-        let response2=await axios.get('http://52.188.153.77:5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
+        let response2=await axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
         console.log(response.data)
         this.participantes=response2.data.participante
 
@@ -671,9 +671,9 @@ export default {
         this.participante.pagada=true
       }
       try{
-        let response=await axios.put('http://52.188.153.77:5000/factura/editar?id_factura='+this.participante.id_factura.toString(),{mandada:this.participante.mandada,pagada:this.participante.pagada})
+        let response=await axios.put('http://'+process.env.IP_FRONT+':5000/factura/editar?id_factura='+this.participante.id_factura.toString(),{mandada:this.participante.mandada,pagada:this.participante.pagada})
         console.log(response.data)
-        let response2=await axios.get('http://52.188.153.77:5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
+        let response2=await axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener_todo/'+this.instancia.id_instancia.toString())
         console.log(response.data)
         this.participantes=response2.data.participante
 
@@ -688,7 +688,7 @@ export default {
         Object.assign(this.instancias[this.editedIndex], this.editedItem)
         console.log(this.editedItem.malla)
         try{
-          let response= await axios.put('http://52.188.153.77:5000/instancia/editar?id_instancia='+this.editedItem.id_instancia.toString(),{
+          let response= await axios.put('http://'+process.env.IP_FRONT+':5000/instancia/editar?id_instancia='+this.editedItem.id_instancia.toString(),{
             sence:this.editedItem.sence,
             malla:this.editedItem.malla,
             direccion: this.editedItem.direccion,

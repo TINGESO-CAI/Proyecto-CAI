@@ -140,7 +140,7 @@ export default {
         return 0
       }
       try{
-      let response = await axios.post('http://52.188.153.77:5000/registrar',{correo:this.mail,contrasena:this.password,nombre:this.nombre,apellido:this.apellido,rut:this.rut});
+      let response = await axios.post('http://'+process.env.IP_FRONT+':5000/registrar',{correo:this.mail,contrasena:this.password,nombre:this.nombre,apellido:this.apellido,rut:this.rut});
       console.log('response', response.data);
       alert("Usuario creado con exito.")
       this.mail=''
@@ -175,7 +175,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso ==0)
         }
         catch(error){

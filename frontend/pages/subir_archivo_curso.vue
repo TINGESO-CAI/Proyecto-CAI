@@ -74,7 +74,7 @@
               let archivo=await readXlsxFile(this.filelist[i])
                 for (let j=1; j< archivo.length; j++){  
                   try{
-              //let response=await axios.post('http://52.188.153.77:5000/participante/agregar',
+              //let response=await axios.post('http://'+process.env.IP_FRONT+':5000/participante/agregar',
                   let NewCurso={
                    sence:archivo[j][0].toString()
                   ,nombre:archivo[j][1]
@@ -86,7 +86,7 @@
                   ,resolucion_sence:archivo[j][7].toString()
                   ,resolucion_usach: archivo[j][8].toString()
                   ,f_vigencia: this.todate(archivo[j][9])}
-                  let response=await axios.post('http://52.188.153.77:5000/curso/agregar',NewCurso)
+                  let response=await axios.post('http://'+process.env.IP_FRONT+':5000/curso/agregar',NewCurso)
                   }
                   catch(error){
                     console.log(error)
@@ -127,7 +127,7 @@
             data=JSON.parse(data)      
             if(data!=null){
               try{
-                let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+                let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
                 return (response.data.nivel_acceso <3)
               }
               catch(error){

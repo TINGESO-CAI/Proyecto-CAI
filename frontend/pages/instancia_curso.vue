@@ -161,7 +161,7 @@ export default {
   }),
   methods:{
     obtenerCurso: async function(value){
-      let response= axios.get('http://52.188.153.77:5000/curso/obtener?sence='+value)
+      let response= axios.get('http://'+process.env.IP_FRONT+':5000/curso/obtener?sence='+value)
       return response
     },
 
@@ -193,7 +193,7 @@ export default {
           else{
             this.malla=null
           }
-          let response = await axios.post('http://52.188.153.77:5000/instancia/agregar',{sence: this.sence , direccion: this.transformarVacio(this.direccion) , malla: this.malla , fecha_inicio:this.transformarVacio(this.fecha_inicio) , fecha_termino:this.transformarVacio(this.fecha_termino),estado: this.estado})
+          let response = await axios.post('http://'+process.env.IP_FRONT+':5000/instancia/agregar',{sence: this.sence , direccion: this.transformarVacio(this.direccion) , malla: this.malla , fecha_inicio:this.transformarVacio(this.fecha_inicio) , fecha_termino:this.transformarVacio(this.fecha_termino),estado: this.estado})
           console.log(this.malla)
           console.log(response.data)
           alert("Instancia creada con exito")
@@ -217,7 +217,7 @@ export default {
     async getSences(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/curso/obtener/sence');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/curso/obtener/sence');
         this.sences = response.data;
         console.log(response);
       }
@@ -246,7 +246,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso < 3)
         }
         catch(error){

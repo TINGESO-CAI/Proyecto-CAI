@@ -425,7 +425,7 @@ export default {
     getParticipantes: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/participante/obtener?');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/participante/obtener?');
         this.participantes = response.data;
 
         
@@ -469,7 +469,7 @@ export default {
         razon_social: this.transformarVacio(this.editedItem.razon_social)
       }
       try {
-        let response = await axios.put('http://52.188.153.77:5000/participante/editar?rut='+newParticipante.rut,newParticipante);
+        let response = await axios.put('http://'+process.env.IP_FRONT+':5000/participante/editar?rut='+newParticipante.rut,newParticipante);
         console.log(response);
         this.close();
 
@@ -484,7 +484,7 @@ export default {
     },
     eliminarParticipante: async function(){
       try {
-        let response = await axios.delete('http://52.188.153.77:5000/participante/eliminar?rut='+this.editedItem.rut);
+        let response = await axios.delete('http://'+process.env.IP_FRONT+':5000/participante/eliminar?rut='+this.editedItem.rut);
         console.log(response);
         this.closeDelete();
         Object.assign(this.participantes[this.editedIndex], this.editedItem)
@@ -495,7 +495,7 @@ export default {
     },
     async getRazones(){
       try {
-        let response = await axios.get('http://52.188.153.77:5000/empresa/obtener/razon_social');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/empresa/obtener/razon_social');
         this.razones = response.data;
         console.log(response);
       }
@@ -525,7 +525,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){
@@ -541,7 +541,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <4)
         }
         catch(error){

@@ -113,7 +113,7 @@
               let archivo=await readXlsxFile(this.filelist[i])
                 for (let j=1; j< archivo.length; j++){  
                   try{
-              //let response=await axios.post('http://52.188.153.77:5000/participante/agregar',
+              //let response=await axios.post('http://'+process.env.IP_FRONT+':5000/participante/agregar',
                   let NewRelator={
                    rut:archivo[j][0]
                   ,nombre:archivo[j][1]
@@ -131,7 +131,7 @@
                   ,correo_corporativo: archivo[j][14]
                   ,genero: this.cambiarGenero(archivo[j][5])}//)
                   if(this.validaRut(archivo[j][0]) && this.comprobarTelefono(archivo[j][11]) && this.comprobarTelefono(archivo[j][12]) ){
-                    await axios.post('http://52.188.153.77:5000/relator/agregar',NewRelator)
+                    await axios.post('http://'+process.env.IP_FRONT+':5000/relator/agregar',NewRelator)
                     
                     }
                   else{
@@ -176,7 +176,7 @@
             data=JSON.parse(data)      
             if(data!=null){
               try{
-                let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+                let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
                 return (response.data.nivel_acceso <3)
               }
               catch(error){

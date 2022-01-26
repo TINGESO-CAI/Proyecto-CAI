@@ -10,7 +10,7 @@ export default {
   },
 
   axios: {
-    baseURL: 'http://52.188.153.77:8080/',
+    baseURL: 'http://'+process.env.IP_FRONT+':8080/',
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head

@@ -353,7 +353,7 @@ export default {
     getCuentas: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/cuenta/obtener/todos');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/obtener/todos');
         
         this.usuarios = response.data;
         console.log(this.usuarios)
@@ -405,7 +405,7 @@ export default {
       }
       console.log(this.editedItem.id)
       try {
-        await axios.put('http://52.188.153.77:5000/cuenta/editar',newCuenta);
+        await axios.put('http://'+process.env.IP_FRONT+':5000/cuenta/editar',newCuenta);
         this.close();
         this.editedItem.rut=newCuenta.rut
         this.editedItem.correo=newCuenta.correo
@@ -420,7 +420,7 @@ export default {
     },
     eliminarCuenta: async function(){
       try {
-        let response = await axios.delete('http://52.188.153.77:5000/cuenta/eliminar?id='+this.editedItem.id);
+        let response = await axios.delete('http://'+process.env.IP_FRONT+':5000/cuenta/eliminar?id='+this.editedItem.id);
         console.log(response);
         this.closeDelete();
         Object.assign(this.usuarios[this.editedIndex], this.editedItem)
@@ -439,7 +439,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso == 0)
         }
         catch(error){
@@ -495,7 +495,7 @@ export default {
     },
     confirmarCambiarAcceso: async function(){
       try{
-        let response = await axios.put('http://52.188.153.77:5000/cuenta/editar_acceso', {id_cuenta:this.usuario.id , nivel_acceso: this.token});
+        let response = await axios.put('http://'+process.env.IP_FRONT+':5000/cuenta/editar_acceso', {id_cuenta:this.usuario.id , nivel_acceso: this.token});
         this.usuario.nivel_acceso=this.token
       }
       catch(error){

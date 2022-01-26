@@ -155,7 +155,7 @@ export default {
       //let viejos=''
       for (var i=0; i< this.matriculados.length; i++){
         try{
-          let response = await axios.post('http://52.188.153.77:5000/participante_instancia/agregar',{rut:this.matriculados[i].rut, id_instancia:this.curso[0].id_instancia});
+          let response = await axios.post('http://'+process.env.IP_FRONT+':5000/participante_instancia/agregar',{rut:this.matriculados[i].rut, id_instancia:this.curso[0].id_instancia});
           console.log('response', response.data);
         }
         catch (error){
@@ -188,7 +188,7 @@ export default {
     */
     getParticipantes: async function(){
       try {
-        let response = await axios.get('http://52.188.153.77:5000/participante/obtener?');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/participante/obtener?');
         this.participantes = response.data;
       }
       catch (error) {
@@ -197,7 +197,7 @@ export default {
     },
     getCursos: async function(){
       try {
-        let response = await axios.get('http://52.188.153.77:5000/instancia/obtener?');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener?');
         this.cursos = response.data;
       }
       catch (error) {
@@ -211,7 +211,7 @@ export default {
       else return '?'
     },
     obtenerParticipante: async function(value){
-      let response= axios.get('http://52.188.153.77:5000/participante/obtener?rut='+value)
+      let response= axios.get('http://'+process.env.IP_FRONT+':5000/participante/obtener?rut='+value)
       return response
     },
     agregarParticipante: async function(value){
@@ -236,7 +236,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <3)
         }
         catch(error){

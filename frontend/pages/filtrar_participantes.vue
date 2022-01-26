@@ -257,7 +257,7 @@ export default {
     async getRazones(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/empresa/obtener/razon_social');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/empresa/obtener/razon_social');
         this.razones = response.data;
       }
       catch (error) {
@@ -275,7 +275,7 @@ export default {
     async filtro(){ //Filtrar participantes
       
       try {
-       let ruta = 'http://52.188.153.77:5000/participante/obtener?'
+       let ruta = 'http://'+process.env.IP_FRONT+':5000/participante/obtener?'
        if (this.rut != '' ){
          ruta= ruta + 'rut='+this.rut +'&'
        }
@@ -361,7 +361,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <4)
         }
         catch(error){

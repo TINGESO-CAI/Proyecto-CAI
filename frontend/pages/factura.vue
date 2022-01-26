@@ -391,7 +391,7 @@ export default {
   methods:{
     obtenerDescripcion: async function(){
       try{
-        let response= await axios.get('http://52.188.153.77:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono.replace('+','%2B'))
+        let response= await axios.get('http://'+process.env.IP_FRONT+':5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono.replace('+','%2B'))
         console.log(response.data)
         this.descripcion=response.data[0].descripcion
       }
@@ -478,13 +478,13 @@ export default {
     obtenerContacto:async function(){
       try{
         this.hide=false
-        let response= await axios.get('http://52.188.153.77:5000/contacto/obtener/'+this.razon_social.razon_social)
+        let response= await axios.get('http://'+process.env.IP_FRONT+':5000/contacto/obtener/'+this.razon_social.razon_social)
         console.log(response.data)
         this.contactos=response.data
         this.contacto=this.contactos[0]
         console.log(this.contacto.fono[0])
         if(this.contacto != null){
-          let response2= await axios.get('http://52.188.153.77:5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono.replace('+','%2B'))
+          let response2= await axios.get('http://'+process.env.IP_FRONT+':5000/contacto/obtener_descripcion?razon_social='+this.razon_social.razon_social+'&fono='+this.contacto.fono.replace('+','%2B'))
           console.log("datos",response2.data)
           if(response2.data!=[]){
             this.descripcion=response2.data[0].descripcion
@@ -509,7 +509,7 @@ export default {
       }
       else{
         try{
-          let response= await axios.post('http://52.188.153.77:5000/factura/agregar',
+          let response= await axios.post('http://'+process.env.IP_FRONT+':5000/factura/agregar',
           {
             num_registro: this.transformarVacio(this.numeroRegistro)
             ,num_hes: this.transformarVacio(this.num_hes)
@@ -527,7 +527,7 @@ export default {
             ,comuna_particular:this.transformarVacio(this.comuna_particular)
           })
           console.log(response)
-          window.location.href='http://52.188.153.77:5000/factura/descargar/'+response.data.id_factura.toString()
+          window.location.href='http://'+process.env.IP_FRONT+':5000/factura/descargar/'+response.data.id_factura.toString()
           this.page=1
           this.getSences()
           this.curso=[]
@@ -567,7 +567,7 @@ export default {
         if(this.particular==false){
           this.direccion_particular=''
           this.comuna_particular=''
-          let response= await axios.get('http://52.188.153.77:5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
+          let response= await axios.get('http://'+process.env.IP_FRONT+':5000/participante_instancia/obtener?razon_social='+this.razon_social.razon_social+'&id_instancia='+this.instancia[0].id_instancia)
           this.participantes=response.data
           console.log(this.razon_social.razon_social)
           if(this.participantes.length==0){
@@ -581,7 +581,7 @@ export default {
         else{
           this.razon_social.razon_social=''
           this.contacto.fono=''
-          let response= await axios.get('http://52.188.153.77:5000/participante/obtener/independientes')
+          let response= await axios.get('http://'+process.env.IP_FRONT+':5000/participante/obtener/independientes')
           this.participantes=response.data          
           if(this.participantes.length==0){
             alert("No existen participantes independientes.")
@@ -600,7 +600,7 @@ export default {
     async getRazones(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/empresa/obtener/razon_social');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/empresa/obtener/razon_social');
         this.razones = response.data;
         console.log(response);
       }
@@ -611,7 +611,7 @@ export default {
     async getRazonesValidas(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/instancia/obtener_razones_sociales/'+this.instancia[0].id_instancia);
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener_razones_sociales/'+this.instancia[0].id_instancia);
         this.razonesV = response.data;
         console.log(response);
       }
@@ -622,7 +622,7 @@ export default {
     async getSences(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/curso/obtener/sences_con_instancia');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/curso/obtener/sences_con_instancia');
         this.sences = response.data;
         console.log(response);
         
@@ -632,7 +632,7 @@ export default {
       }
     },
     getEmpresa: async function(value){
-      let response= axios.get('http://52.188.153.77:5000/curso/obtener?sence='+value)
+      let response= axios.get('http://'+process.env.IP_FRONT+':5000/curso/obtener?sence='+value)
       this.empresa=response.data;
       console.log(response);
     },
@@ -640,16 +640,16 @@ export default {
       console.log(value)
     },
     obtenerCurso: async function(value){
-      let response= axios.get('http://52.188.153.77:5000/curso/obtener?sence='+value)
+      let response= axios.get('http://'+process.env.IP_FRONT+':5000/curso/obtener?sence='+value)
       return response
     },
 
     obtenerInstancias: async function(value){
-      let response= axios.get('http://52.188.153.77:5000/instancia/obtener?sence='+value)
+      let response= axios.get('http://'+process.env.IP_FRONT+':5000/instancia/obtener?sence='+value)
       return response
     },
     obtenerDatos: async function(value){
-      let response= axios.get('http://52.188.153.77:5000/empresa/obtener?razon_social='+value)
+      let response= axios.get('http://'+process.env.IP_FRONT+':5000/empresa/obtener?razon_social='+value)
       return response
     },
     buscar: async function(value){
@@ -676,7 +676,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <2)
         }
         catch(error){

@@ -247,7 +247,7 @@ export default {
     getFacturas: async function(){
       try {
         //se llama el servicio para obtener las emergencias 
-        let response = await axios.get('http://52.188.153.77:5000/factura/obtener?');
+        let response = await axios.get('http://'+process.env.IP_FRONT+':5000/factura/obtener?');
         this.facturas = response.data;
         console.log(response);
       }
@@ -257,7 +257,7 @@ export default {
     },
     descargar: async function (item) {
       if(await this.permisosPagina()){  
-        window.location.href='http://52.188.153.77:5000/factura/descargar/'+item.id_factura.toString()
+        window.location.href='http://'+process.env.IP_FRONT+':5000/factura/descargar/'+item.id_factura.toString()
       }
       else{
         alert("No cuenta con permisos para descargar.")
@@ -276,7 +276,7 @@ export default {
     },
     deleteItemConfirm: async function() {
       try{
-        let response= await axios.delete('http://52.188.153.77:5000/factura/eliminar?id_factura='+this.editedItem.id_factura.toString())
+        let response= await axios.delete('http://'+process.env.IP_FRONT+':5000/factura/eliminar?id_factura='+this.editedItem.id_factura.toString())
         console.log(response)
         this.facturas.splice(this.editedIndex, 1)
         this.closeDelete()
@@ -313,7 +313,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <2)
         }
         catch(error){
@@ -329,7 +329,7 @@ export default {
       data=JSON.parse(data)      
       if(data!=null){
         try{
-          let response = await axios.get('http://52.188.153.77:5000/cuenta/permisos?token='+data.token);
+          let response = await axios.get('http://'+process.env.IP_FRONT+':5000/cuenta/permisos?token='+data.token);
           return (response.data.nivel_acceso <2)
         }
         catch(error){
