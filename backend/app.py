@@ -1876,7 +1876,6 @@ def obtener_participante_factura(id_factura):
 	return jsonify(participantes_filtrados)
 
 
-iniciar()
 if __name__ == '__main__':
 
 	app.run(debug=True)
