@@ -87,6 +87,7 @@ def before_request():
 def iniciar():
 	nueva_cuenta = mo.Cuenta("admin","admin","Jef@","Suprem@","99999999-9")
 	try:
+		nueva_cuenta.nivel_acceso=0
 		db.session.add(nueva_cuenta)
 		db.session.commit()
 		return jsonify("exito")
